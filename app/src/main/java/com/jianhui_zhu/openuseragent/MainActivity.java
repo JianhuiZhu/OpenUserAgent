@@ -2,6 +2,9 @@ package com.jianhui_zhu.openuseragent;
 
 import android.os.Bundle;
 
+import com.jianhui_zhu.openuseragent.fragment.HomeFragment;
+import com.jianhui_zhu.openuseragent.util.FragmenUtil;
+
 /**
  * Created by jianhuizhu on 2016-01-27
  */
@@ -11,16 +14,17 @@ public class MainActivity extends AbstractActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		FragmenUtil.switchToFragment(this, new HomeFragment());
 
 	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-	}
-
-	@Override
-	protected void onPostResume() {
-		super.onPostResume();
-	}
+//
+//	@Override
+//	protected void onResume() {
+//		super.onResume();
+//	}
+//
+//	@Override
+//	protected void onPostResume() {
+//		super.onPostResume();
+//	}
 }

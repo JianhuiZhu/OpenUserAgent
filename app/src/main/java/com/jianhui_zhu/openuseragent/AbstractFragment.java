@@ -21,17 +21,17 @@ public class AbstractFragment extends Fragment {
 		mEventBus = EventBus.getDefault();
 	}
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		Log.d(this.getClass().getName(), "registered bus");
-		mEventBus.register(this);
-	}
-
-	@Override
-	public void onPause() {
-		super.onPause();
-		Log.d(this.getClass().getName(), "unregistered bus");
-		mEventBus.unregister(this);
-	}
+//	@Override
+//	public void onResume() {
+//		super.onResume();
+//		Log.d(this.getClass().getName(), "registered bus");
+//		mEventBus.register(this);
+//	}
+//
+//	@Override
+//	public void onPause() {
+//		super.onPause();
+//		Log.d(this.getClass().getName(), "unregistered bus");
+//		mEventBus.unregister(this);
+//	}
 }

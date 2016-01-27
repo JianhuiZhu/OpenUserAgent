@@ -27,16 +27,16 @@ public class AbstractActivity extends Activity {
 		super.onResume();
 	}
 
-	@Override
-	protected void onPostResume() {
-		super.onPostResume();
-		mEventBus.register(this);
-
-	}
-
-	@Override
-	protected void onPause() {
-		super.onPause();
-		mEventBus.unregister(this);
-	}
+//	@Override
+//	protected void onPostResume() {
+//		super.onPostResume();
+//		mEventBus.register(this);
+//
+//	}
+//
+//	@Override
+//	protected void onPause() {
+//		super.onPause();
+//		mEventBus.unregister(this);
+//	}
 }
