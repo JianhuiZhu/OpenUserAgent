@@ -1,9 +1,10 @@
-package com.jianhui_zhu.openuseragent;
+package com.jianhui_zhu.openuseragent.util;
 
 import android.app.Activity;
 import android.os.Bundle;
 
-import de.greenrobot.event.EventBus;
+import com.squareup.otto.Bus;
+
 
 /**
  * Created by jianhuizhu on 2016-01-27
@@ -12,12 +13,11 @@ public class AbstractActivity extends Activity {
 //	private ObjectGraph mObjectGraph;
 
 //	@Inject
-	protected EventBus mEventBus;
+	protected Bus mEventBus = new Bus();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mEventBus = EventBus.getDefault();
 //		mObjectGraph = ObjectGraph.create(((AbstractApplication)getApplication()).getApplicationGraph());
 //		mObjectGraph.inject(this);
 	}
@@ -27,16 +27,16 @@ public class AbstractActivity extends Activity {
 		super.onResume();
 	}
 
-//	@Override
-//	protected void onPostResume() {
-//		super.onPostResume();
-//		mEventBus.register(this);
-//
-//	}
-//
-//	@Override
-//	protected void onPause() {
-//		super.onPause();
-//		mEventBus.unregister(this);
-//	}
+	@Override
+	protected void onPostResume() {
+		super.onPostResume();
+		mEventBus.register(this);
+
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		mEventBus.unregister(this);
+	}
 }

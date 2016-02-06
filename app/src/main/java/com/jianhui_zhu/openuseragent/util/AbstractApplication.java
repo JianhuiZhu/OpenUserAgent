@@ -1,4 +1,4 @@
-package com.jianhui_zhu.openuseragent;
+package com.jianhui_zhu.openuseragent.util;
 
 import android.app.Application;
 

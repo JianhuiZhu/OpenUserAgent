@@ -1,10 +1,9 @@
-package com.jianhui_zhu.openuseragent;
+package com.jianhui_zhu.openuseragent.util;
 
 import android.app.DialogFragment;
 import android.os.Bundle;
 import android.util.Log;
 
-import de.greenrobot.event.EventBus;
 
 
 /**
@@ -13,12 +12,11 @@ import de.greenrobot.event.EventBus;
 public class AbstractDialogFragment extends DialogFragment {
 
 //	@Inject
-protected EventBus mEventBus;
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mEventBus = EventBus.getDefault();
 	}
 
 //	@Override

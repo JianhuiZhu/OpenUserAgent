@@ -1,7 +1,9 @@
-package com.jianhui_zhu.openuseragent;
+package com.jianhui_zhu.openuseragent.activity;
 
 import android.os.Bundle;
 
+import com.jianhui_zhu.openuseragent.R;
+import com.jianhui_zhu.openuseragent.util.AbstractActivity;
 import com.jianhui_zhu.openuseragent.fragment.HomeFragment;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 
@@ -17,14 +19,14 @@ public class MainActivity extends AbstractActivity {
 		FragmenUtil.switchToFragment(this, new HomeFragment());
 
 	}
-//
-//	@Override
-//	protected void onResume() {
-//		super.onResume();
-//	}
-//
-//	@Override
-//	protected void onPostResume() {
-//		super.onPostResume();
-//	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+	}
+
+	@Override
+	protected void onPostResume() {
+		super.onPostResume();
+	}
 }

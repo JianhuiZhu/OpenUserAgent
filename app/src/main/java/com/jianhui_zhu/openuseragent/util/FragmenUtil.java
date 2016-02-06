@@ -6,7 +6,6 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 
-import com.jianhui_zhu.openuseragent.AbstractDialogFragment;
 import com.jianhui_zhu.openuseragent.R;
 
 /**
