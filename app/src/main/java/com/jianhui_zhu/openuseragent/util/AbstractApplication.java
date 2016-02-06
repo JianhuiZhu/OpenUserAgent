@@ -2,6 +2,8 @@ package com.jianhui_zhu.openuseragent.util;
 
 import android.app.Application;
 
+import com.firebase.client.Firebase;
+
 
 /**
  * Created by jianhuizhu on 2016-01-27
@@ -14,6 +16,7 @@ private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		Firebase.setAndroidContext(this);
 //		manager.registerGcm(this).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).subscribe(new Action1<Boolean>() {
 //			@Override
 //			public void call(Boolean succeed) {
