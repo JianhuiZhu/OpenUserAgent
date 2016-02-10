@@ -1,9 +1,9 @@
-package com.jianhui_zhu.openuseragent.fragment;
+package com.jianhui_zhu.openuseragent.view;
 
 import com.jianhui_zhu.openuseragent.util.AbstractFragment;
 
 /**
  * Created by Jianhui Zhu on 2016-02-05.
  */
-public class SettingFragment extends AbstractFragment {
+public class ProfileView extends AbstractFragment {
 }

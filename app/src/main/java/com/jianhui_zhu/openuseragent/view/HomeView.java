@@ -1,4 +1,4 @@
-package com.jianhui_zhu.openuseragent.fragment;
+package com.jianhui_zhu.openuseragent.view;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -17,7 +17,7 @@ import butterknife.ButterKnife;
 /**
  * Created by Jianhui Zhu on 2016-01-27.
  */
-public class HomeFragment extends AbstractFragment {
+public class HomeView extends AbstractFragment {
     @Bind(R.id.web_container) WebView webHolder;
 
     @Override

@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.util.AbstractActivity;
-import com.jianhui_zhu.openuseragent.fragment.HomeFragment;
+import com.jianhui_zhu.openuseragent.view.HomeView;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 
 /**
@@ -16,7 +16,7 @@ public class MainActivity extends AbstractActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		FragmenUtil.switchToFragment(this, new HomeFragment());
+		FragmenUtil.switchToFragment(this, new HomeView());
 
 	}
 

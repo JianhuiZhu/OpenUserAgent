@@ -1,4 +1,4 @@
-package com.jianhui_zhu.openuseragent.fragment;
+package com.jianhui_zhu.openuseragent.view;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -20,7 +20,7 @@ import butterknife.OnClick;
  *
  * THIS FRAGMENT IS FOR TESTING ONLY
  */
-public class TestFragment extends AbstractFragment {
+public class TestView extends AbstractFragment {
     @Bind(R.id.go_to_home_fragment)
     Button homeBtn;
     @Bind(R.id.go_to_bookmark_fragment)
@@ -37,22 +37,22 @@ public class TestFragment extends AbstractFragment {
     public void changeFragment(Button btn){
         switch(btn.getId()){
             case R.id.go_to_home_fragment:
-                FragmenUtil.switchToFragment(getActivity(),new HomeFragment());
+                FragmenUtil.switchToFragment(getActivity(),new HomeView());
                 break;
             case R.id.go_to_bookmark_fragment:
-                FragmenUtil.switchToFragment(getActivity(),new BookmarkFragment());
+                FragmenUtil.switchToFragment(getActivity(),new BookmarkView());
                 break;
             case R.id.go_to_download_fragment:
-                FragmenUtil.switchToFragment(getActivity(),new DownloadFragment());
+                FragmenUtil.switchToFragment(getActivity(),new DownloadView());
                 break;
             case R.id.go_to_login_fragment:
-                FragmenUtil.switchToFragment(getActivity(),new LoginFragment());
+                FragmenUtil.switchToFragment(getActivity(),new LoginView());
                 break;
             case R.id.go_to_profile_fragment:
-                FragmenUtil.switchToFragment(getActivity(),new ProfileFragment());
+                FragmenUtil.switchToFragment(getActivity(),new ProfileView());
                 break;
             case R.id.go_to_setting_fragment:
-                FragmenUtil.switchToFragment(getActivity(),new SettingFragment());
+                FragmenUtil.switchToFragment(getActivity(),new SettingView());
                 break;
         }
     }
