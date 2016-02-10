@@ -31,7 +31,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface{
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view= inflater.inflate(R.layout.fragment_home,container,false);
+        View view= inflater.inflate(R.layout.view_home,container,false);
         ButterKnife.bind(this, view);
         return view;
     }
