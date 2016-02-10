@@ -9,7 +9,9 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.jianhui_zhu.openuseragent.R;
+import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
 import com.jianhui_zhu.openuseragent.util.AbstractFragment;
+import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -17,12 +19,13 @@ import butterknife.ButterKnife;
 /**
  * Created by Jianhui Zhu on 2016-01-27.
  */
-public class HomeView extends AbstractFragment {
+public class HomeView extends AbstractFragment implements HomeViewInterface{
     @Bind(R.id.web_container) WebView webHolder;
-
+    private HomePresenter presenter;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        presenter=new HomePresenter(this);
     }
 
     @Nullable
@@ -36,13 +39,28 @@ public class HomeView extends AbstractFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        initBrowserSettings();
+        loadTargetUrl("");
+    }
+
+    @Override
+    public void initBrowserSettings() {
         WebSettings settings = this.webHolder.getSettings();
         WebViewClient client = new CustomWebView();
         settings.setDefaultTextEncodingName("UTF-8");
         settings.setJavaScriptEnabled(true);
         this.webHolder.setWebViewClient(client);
-        this.webHolder.loadUrl("http://www.google.com");
     }
+
+    @Override
+    public void loadTargetUrl(String url) {
+        if(url!=null&&!url.equals("")){
+            this.webHolder.loadUrl(url);
+        }else{
+            this.webHolder.loadUrl("http://www.google.com");
+        }
+    }
+
     private class CustomWebView extends WebViewClient{
 
         @Override
