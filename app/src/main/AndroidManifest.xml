@@ -18,6 +18,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.SplashScreenActivity"></activity>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="d0ff74dbd8150cdda8a7bef23291e659035e5322" />
     </application>
 
 </manifest>
