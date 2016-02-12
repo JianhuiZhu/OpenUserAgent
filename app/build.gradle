@@ -17,7 +17,7 @@ repositories {
 apply plugin: 'com.google.gms.google-services'
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    buildToolsVersion "23.0.2"
 
     defaultConfig {
         applicationId "com.jianhui_zhu.openuseragent"
@@ -25,6 +25,7 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -47,9 +48,18 @@ dependencies {
     compile 'com.android.support:support-v4:23.1.1'
     compile 'com.firebase:firebase-client-android:2.2.3'
     compile 'com.google.android.gms:play-services-auth:8.3.0'
-    compile 'io.reactivex:rxandroid:1.1.0'
-    compile 'io.reactivex:rxjava:1.1.0'
+    compile 'com.google.android.gms:play-services:8.3.0'
+    compile 'com.android.support:multidex:1.0.0'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
+    compile('com.crashlytics.sdk.android:crashlytics-ndk:1.1.2@aar') {
+        transitive = true;
+    }
+}
+
+crashlytics {
+    enableNdk true
+    androidNdkOut 'src/main/obj'
+    androidNdkLibsOut 'src/main/libs'
 }
