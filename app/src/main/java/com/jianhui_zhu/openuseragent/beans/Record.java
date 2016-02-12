@@ -1,4 +1,4 @@
-package com.jianhui_zhu.openuseragent.model;
+package com.jianhui_zhu.openuseragent.beans;
 
 import java.sql.Timestamp;
 
