@@ -1,8 +1,6 @@
 package com.jianhui_zhu.openuseragent.presenter;
 
 import android.content.Context;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
@@ -41,7 +39,7 @@ public class LoginPresenter {
 
                     @Override
                     public void onAuthenticationError(FirebaseError firebaseError) {
-                        // there was an error
+                        loginViewInterface.showTag("Problem" + firebaseError.toString());
                     }
                 });
             }
