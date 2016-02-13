@@ -19,8 +19,7 @@ public class MainActivity extends AbstractActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Fabric.with(this, new Crashlytics(), new CrashlyticsNdk());
-		Firebase.setAndroidContext(this);
+
 		setContentView(R.layout.activity_main);
 		FragmenUtil.switchToFragment(this, new TestView());
 

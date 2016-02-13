@@ -7,6 +7,7 @@ import rx.Observer;
  * Created by jianhuizhu on 2016-02-12.
  */
 public interface LoginModelInterface {
-    public Observable<String> login();
-    public void logout();
+     Observable<String> login();
+
+     void logout();
 }

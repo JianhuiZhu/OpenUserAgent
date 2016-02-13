@@ -42,7 +42,7 @@ public class LoginModel implements LoginModelInterface,GoogleApiClient.Connectio
 
     @Override
     public Observable<String> login() {
-        Observable<String> tokenEmiter=Observable.create(new Observable.OnSubscribe<String>() {
+        return Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
                 String token;
@@ -76,7 +76,6 @@ public class LoginModel implements LoginModelInterface,GoogleApiClient.Connectio
                 }
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
-        return tokenEmiter;
     }
 
     public Observable<String> attemptLogin() {

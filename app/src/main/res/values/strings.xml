@@ -2,7 +2,6 @@
     <string name="app_name">OpenUserAgent</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="login">Login via Google</string>
-    <string name="server_client_id">970339802413-5025nskq7nrkd81uju0semvgheoliqff.apps.googleusercontent.com</string>
+
 </resources>

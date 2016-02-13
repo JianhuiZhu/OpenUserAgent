@@ -2,7 +2,11 @@ package com.jianhui_zhu.openuseragent.util;
 
 import android.app.Application;
 
+import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.ndk.CrashlyticsNdk;
 import com.firebase.client.Firebase;
+
+import io.fabric.sdk.android.Fabric;
 
 
 /**
@@ -16,6 +20,7 @@ private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		Fabric.with(this, new Crashlytics(), new CrashlyticsNdk());
 		Firebase.setAndroidContext(this);
 //		manager.registerGcm(this).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).subscribe(new Action1<Boolean>() {
 //			@Override

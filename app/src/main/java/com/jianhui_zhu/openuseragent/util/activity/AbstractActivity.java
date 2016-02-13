@@ -9,7 +9,7 @@ import com.squareup.otto.Bus;
 /**
  * Created by jianhuizhu on 2016-01-27
  */
-public class AbstractActivity extends Activity {
+public abstract class AbstractActivity extends Activity {
 //	private ObjectGraph mObjectGraph;
 
 //	@Inject
@@ -18,8 +18,6 @@ public class AbstractActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-//		mObjectGraph = ObjectGraph.create(((AbstractApplication)getApplication()).getApplicationGraph());
-//		mObjectGraph.inject(this);
 	}
 
 	@Override

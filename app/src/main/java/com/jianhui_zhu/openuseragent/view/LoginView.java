@@ -40,7 +40,6 @@ import rx.schedulers.Schedulers;
  */
 public class LoginView extends AbstractFragment implements LoginViewInterface{
     private LoginPresenter loginPresenter;
-    public static final int RC_GOOGLE_LOGIN = 1;
     private static final String TAG = LoginView.class.getSimpleName();
     private boolean mGoogleLoginClicked;
     @Bind(R.id.google_login_button)

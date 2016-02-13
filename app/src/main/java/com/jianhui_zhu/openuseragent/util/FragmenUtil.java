@@ -12,6 +12,8 @@ import com.jianhui_zhu.openuseragent.R;
  * Created by Jianhuizhu on 2015-08-21.
  */
 public class FragmenUtil {
+	private FragmenUtil() {
+	}
 	private static String FRAGMENT_TAG = "fragment_tag";
 	private static String DIALOG_FRAGMENT_TAG = "dialog_fragment";
 	public static void switchToFragment(Context context, Fragment fragment){
