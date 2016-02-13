@@ -1,11 +1,13 @@
 package com.jianhui_zhu.openuseragent.presenter;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.jianhui_zhu.openuseragent.model.LoginModel;
 import com.jianhui_zhu.openuseragent.view.interfaces.LoginViewInterface;
 
 import rx.Observer;
+import rx.functions.Action1;
 
 /**
  * Created by Jianhui Zhu on 2016-02-06.
@@ -21,20 +23,10 @@ public class LoginPresenter {
 
     public void login() {
 
-        loginModel.login().subscribe(new Observer<String>() {
+        loginModel.attemptLogin().subscribe(new Action1<String>() {
             @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onNext(String s) {
-                loginViewInterface.showTag(s);
+            public void call(String token) {
+                Log.d(LoginPresenter.class.getName(), token);
             }
         });
     }

@@ -49,7 +49,6 @@ public class LoginView extends AbstractFragment implements LoginViewInterface{
     @OnClick(R.id.google_login_button)
     public void loginGoogle() {
         mGoogleLoginClicked = true;
-
         loginPresenter.login();
     }
 

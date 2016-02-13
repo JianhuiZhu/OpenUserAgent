@@ -1,4 +1,4 @@
-package com.jianhui_zhu.openuseragent.activity;
+package com.jianhui_zhu.openuseragent.util.activity;
 
 import android.os.Bundle;
 
