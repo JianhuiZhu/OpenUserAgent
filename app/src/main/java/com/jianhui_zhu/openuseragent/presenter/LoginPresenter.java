@@ -2,7 +2,11 @@ package com.jianhui_zhu.openuseragent.presenter;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.firebase.client.AuthData;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
 import com.jianhui_zhu.openuseragent.model.LoginModel;
 import com.jianhui_zhu.openuseragent.view.interfaces.LoginViewInterface;
 
@@ -26,7 +30,20 @@ public class LoginPresenter {
         loginModel.attemptLogin().subscribe(new Action1<String>() {
             @Override
             public void call(String token) {
-                Log.d(LoginPresenter.class.getName(), token);
+                //loginViewInterface.showTag(token);
+                Firebase ref = new Firebase("https://openuseragent.firebaseio.com");
+                ref.authWithOAuthToken("google", token, new Firebase.AuthResultHandler() {
+                    @Override
+                    public void onAuthenticated(AuthData authData) {
+                        // the Google user is now authenticated with your Firebase app
+                        loginViewInterface.showTag("Done");
+                    }
+
+                    @Override
+                    public void onAuthenticationError(FirebaseError firebaseError) {
+                        // there was an error
+                    }
+                });
             }
         });
     }

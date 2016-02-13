@@ -3,7 +3,6 @@ package com.jianhui_zhu.openuseragent.util.activity;
 import android.os.Bundle;
 
 import com.jianhui_zhu.openuseragent.R;
-import com.jianhui_zhu.openuseragent.util.AbstractActivity;
 
 public class SplashScreenActivity extends AbstractActivity {
 

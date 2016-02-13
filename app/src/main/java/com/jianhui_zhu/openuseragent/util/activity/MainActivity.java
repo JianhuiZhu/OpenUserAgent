@@ -6,7 +6,6 @@ import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.ndk.CrashlyticsNdk;
 import com.firebase.client.Firebase;
 import com.jianhui_zhu.openuseragent.R;
-import com.jianhui_zhu.openuseragent.util.AbstractActivity;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.view.TestView;
 
