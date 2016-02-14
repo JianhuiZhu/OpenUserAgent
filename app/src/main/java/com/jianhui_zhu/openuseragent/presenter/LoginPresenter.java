@@ -35,6 +35,7 @@ public class LoginPresenter {
                     public void onAuthenticated(AuthData authData) {
                         // the Google user is now authenticated with your Firebase app
                         loginViewInterface.showTag("Done");
+
                     }
 
                     @Override

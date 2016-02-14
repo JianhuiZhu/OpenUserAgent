@@ -21,19 +21,20 @@ import butterknife.OnClick;
  * THIS FRAGMENT IS FOR TESTING ONLY
  */
 public class TestView extends AbstractFragment {
-    @Bind(R.id.go_to_home_fragment)
-    Button homeBtn;
-    @Bind(R.id.go_to_bookmark_fragment)
-    Button bookmarkBtn;
-    @Bind(R.id.go_to_download_fragment)
-    Button downloadBtn;
-    @Bind(R.id.go_to_login_fragment)
-    Button loginBtn;
-    @Bind(R.id.go_to_profile_fragment)
-    Button profileBtn;
-    @Bind(R.id.go_to_setting_fragment)
-    Button settingBtn;
-    @OnClick({R.id.go_to_home_fragment,R.id.go_to_setting_fragment,R.id.go_to_profile_fragment,R.id.go_to_login_fragment,R.id.go_to_download_fragment,R.id.go_to_bookmark_fragment})
+    //    @Bind(R.id.go_to_home_fragment)
+//    Button homeBtn;
+//    @Bind(R.id.go_to_bookmark_fragment)
+//    Button bookmarkBtn;
+//    @Bind(R.id.go_to_download_fragment)
+//    Button downloadBtn;
+//    @Bind(R.id.go_to_login_fragment)
+//    Button loginBtn;
+//    @Bind(R.id.go_to_profile_fragment)
+//    Button profileBtn;
+//    @Bind(R.id.go_to_setting_fragment)
+//    Button settingBtn;
+    @OnClick({R.id.go_to_home_fragment, R.id.go_to_setting_fragment, R.id.go_to_profile_fragment,
+            R.id.go_to_login_fragment, R.id.go_to_download_fragment, R.id.go_to_bookmark_fragment})
     public void changeFragment(Button btn){
         switch(btn.getId()){
             case R.id.go_to_home_fragment:
