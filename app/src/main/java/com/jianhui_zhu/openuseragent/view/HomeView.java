@@ -1,4 +1,5 @@
 package com.jianhui_zhu.openuseragent.view;
+
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -7,11 +8,15 @@ import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.jianhui_zhu.openuseragent.R;
+import com.jianhui_zhu.openuseragent.model.beans.User;
 import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
 import com.jianhui_zhu.openuseragent.util.AbstractFragment;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
+import com.squareup.picasso.Picasso;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -21,6 +26,12 @@ import butterknife.ButterKnife;
  */
 public class HomeView extends AbstractFragment implements HomeViewInterface{
     @Bind(R.id.web_container) WebView webHolder;
+    @Bind(R.id.home_avatar)
+    de.hdodenhof.circleimageview.CircleImageView avatar;
+    @Bind(R.id.home_name)
+    TextView username;
+    @Bind(R.id.profile_area)
+    RelativeLayout profileArea;
     private HomePresenter presenter;
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,6 +50,15 @@ public class HomeView extends AbstractFragment implements HomeViewInterface{
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Bundle bundle = getArguments();
+        if (bundle.getBoolean("hasUser")) {
+            User user = bundle.getParcelable("user");
+            Picasso.with(getActivity()).load(user.getAvatarUrl()).fit().into(avatar);
+            username.setText(user.getUsername());
+            profileArea.setVisibility(View.VISIBLE);
+        } else {
+
+        }
         initBrowserSettings();
         loadTargetUrl("");
     }
@@ -69,6 +89,23 @@ public class HomeView extends AbstractFragment implements HomeViewInterface{
             return true;
         }
 
+    }
+
+    public static AbstractFragment newInstanceWithUser(User user) {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("hasUser", true);
+        bundle.putParcelable("user", user);
+        HomeView homeView = new HomeView();
+        homeView.setArguments(bundle);
+        return homeView;
+
+    }
+
+    public static AbstractFragment newInstance() {
+        HomeView homeView = new HomeView();
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("hasUser", false);
+        return homeView;
     }
 
 }

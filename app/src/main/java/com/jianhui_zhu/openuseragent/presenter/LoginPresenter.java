@@ -3,9 +3,13 @@ package com.jianhui_zhu.openuseragent.presenter;
 import android.content.Context;
 
 import com.firebase.client.AuthData;
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.jianhui_zhu.openuseragent.model.LoginModel;
+import com.jianhui_zhu.openuseragent.model.beans.User;
+import com.jianhui_zhu.openuseragent.util.Constant;
 import com.jianhui_zhu.openuseragent.view.interfaces.LoginViewInterface;
 
 import rx.functions.Action1;
@@ -26,13 +30,24 @@ public class LoginPresenter {
 
         loginModel.attemptLogin().subscribe(new Action1<String>() {
             @Override
-            public void call(String token) {
+            public void call(final String token) {
                 //loginViewInterface.showTag(token);
-                final Firebase ref = new Firebase("https://openuseragent.firebaseio.com");
+                final Firebase ref = new Firebase(Constant.urlRoot);
                 ref.authWithOAuthToken("google", token, new Firebase.AuthResultHandler() {
                     @Override
-                    public void onAuthenticated(AuthData authData) {
+                    public void onAuthenticated(final AuthData authData) {
+                        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot currentPath) {
+                                User user = loginModel.getUserObject(currentPath, authData, ref);
+                                loginViewInterface.switchFragmentWithUser(user);
+                            }
 
+                            @Override
+                            public void onCancelled(FirebaseError firebaseError) {
+
+                            }
+                        });
                     }
 
                     @Override

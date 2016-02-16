@@ -20,8 +20,10 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.jianhui_zhu.openuseragent.R;
+import com.jianhui_zhu.openuseragent.model.beans.User;
 import com.jianhui_zhu.openuseragent.presenter.LoginPresenter;
 import com.jianhui_zhu.openuseragent.util.AbstractFragment;
+import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.view.interfaces.LoginViewInterface;
 import com.google.android.gms.plus.Plus;
 import java.io.IOException;
@@ -68,5 +70,10 @@ public class LoginView extends AbstractFragment implements LoginViewInterface{
     @Override
     public void showTag(String s) {
         Toast.makeText(getActivity(),s,Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void switchFragmentWithUser(User user) {
+        FragmenUtil.switchToFragment(getActivity(), HomeView.newInstanceWithUser(user));
     }
 }

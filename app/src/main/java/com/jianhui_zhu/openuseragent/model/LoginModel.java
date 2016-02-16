@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.firebase.client.AuthData;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
@@ -12,7 +15,9 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
+import com.jianhui_zhu.openuseragent.model.beans.User;
 import com.jianhui_zhu.openuseragent.model.interfaces.LoginModelInterface;
+import com.jianhui_zhu.openuseragent.util.Constant;
 
 import java.io.IOException;
 
@@ -77,6 +82,21 @@ public class LoginModel implements LoginModelInterface,GoogleApiClient.Connectio
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
+
+    @Override
+    public User getUserObject(DataSnapshot currentPath, AuthData authData, Firebase ref) {
+        User user;
+        if (currentPath.hasChild(authData.getUid())) {
+            user = currentPath.child(authData.getUid()).getValue(User.class);
+        } else {
+            user = new User();
+            user.setUsername(authData.getProviderData().get(Constant.nameInGoogle).toString());
+            user.setAvatarUrl(authData.getProviderData().get(Constant.avatarInGoogle).toString());
+            ref.child(authData.getUid()).setValue(user);
+        }
+        return user;
+    }
+
 
     public Observable<String> attemptLogin() {
         return Observable.create(new Observable.OnSubscribe<String>() {

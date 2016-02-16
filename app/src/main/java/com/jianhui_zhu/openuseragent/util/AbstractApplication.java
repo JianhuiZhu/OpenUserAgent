@@ -24,6 +24,7 @@ private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 		Fabric.with(this, new Crashlytics(), new CrashlyticsNdk());
 		Firebase.setAndroidContext(this);
 		Firebase.getDefaultConfig().setLogLevel(Logger.Level.DEBUG);
+
 //		manager.registerGcm(this).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).subscribe(new Action1<Boolean>() {
 //			@Override
 //			public void call(Boolean succeed) {
