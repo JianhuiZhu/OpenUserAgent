@@ -45,43 +45,7 @@ public class LoginModel implements LoginModelInterface,GoogleApiClient.Connectio
                 .build();
     }
 
-    @Override
-    public Observable<String> login() {
-        return Observable.create(new Observable.OnSubscribe<String>() {
-            @Override
-            public void call(Subscriber<? super String> subscriber) {
-                String token;
-//                if (!googleApiClient.isConnecting()) {
-//                    if (mGoogleConnectionResult != null) {
-//
-//                    } else if (googleApiClient.isConnected()) {
-//                        login();
-//                    } else {
-//                    /* connect API now */
-//                        Log.d(TAG, "Trying to connect to Google API");
-//                        googleApiClient.connect();
-//                    }
-//                }
-                        googleApiClient.connect();
 
-                try {
-                    String scope = String.format("oauth2:%s", Scopes.PLUS_LOGIN);
-                    token = GoogleAuthUtil.getToken(context, Plus.AccountApi.getAccountName(googleApiClient), scope);
-                    subscriber.onNext(token);
-                    subscriber.onCompleted();
-                } catch (IOException transientEx) {
-                    /* Network or server error */
-                    Log.e(TAG, "Error authenticating with Google: " + transientEx);
-                } catch (UserRecoverableAuthException e) {
-                    Log.w(TAG, "Recoverable Google OAuth error: " + e.toString());
-                } catch (GoogleAuthException authEx) {
-                    /* The call is not ever expected to succeed assuming you have already verified that
-                     * Google Play services is installed. */
-                    Log.e(TAG, "Error authenticating with Google: " + authEx.getMessage(), authEx);
-                }
-            }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
-    }
 
     @Override
     public User getUserObject(DataSnapshot currentPath, AuthData authData, Firebase ref) {
@@ -97,13 +61,15 @@ public class LoginModel implements LoginModelInterface,GoogleApiClient.Connectio
         return user;
     }
 
-
     public Observable<String> attemptLogin() {
+
         return Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
                 if (!googleApiClient.isConnected()) {
                     googleApiClient.connect();
+                } else if (googleApiClient.isConnecting()) {
+
                 } else {
                     try {
                         String scope = String.format("oauth2:%s", Scopes.PLUS_LOGIN);
@@ -132,7 +98,7 @@ public class LoginModel implements LoginModelInterface,GoogleApiClient.Connectio
 
     @Override
     public void onConnected(Bundle bundle) {
-        login();
+
     }
 
     @Override

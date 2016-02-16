@@ -12,7 +12,6 @@ import rx.Observer;
  * Created by jianhuizhu on 2016-02-12.
  */
 public interface LoginModelInterface {
-     Observable<String> login();
 
      User getUserObject(DataSnapshot currentPath, AuthData authData, Firebase ref);
      void logout();

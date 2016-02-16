@@ -14,6 +14,8 @@ public class Record implements Parcelable {
     String url;
     TimeStamp timestamp;
 
+    public Record() {
+    }
     public Record(String url) {
         this.url = url;
     }

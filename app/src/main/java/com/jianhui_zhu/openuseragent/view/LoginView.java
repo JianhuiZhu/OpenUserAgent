@@ -43,14 +43,19 @@ import rx.schedulers.Schedulers;
 public class LoginView extends AbstractFragment implements LoginViewInterface{
     private LoginPresenter loginPresenter;
     private static final String TAG = LoginView.class.getSimpleName();
-    private boolean mGoogleLoginClicked;
+    private boolean mGoogleLoginClicked = false;
     @Bind(R.id.google_login_button)
     RelativeLayout loginBtn;
+    @Bind(R.id.progressbar)
+    fr.castorflex.android.circularprogressbar.CircularProgressBar progressBar;
 
     @OnClick(R.id.google_login_button)
     public void loginGoogle() {
-        mGoogleLoginClicked = true;
-        loginPresenter.login();
+        if (!mGoogleLoginClicked) {
+            mGoogleLoginClicked = true;
+            showProgressBar();
+            loginPresenter.login();
+        }
     }
 
     @Override
@@ -70,6 +75,16 @@ public class LoginView extends AbstractFragment implements LoginViewInterface{
     @Override
     public void showTag(String s) {
         Toast.makeText(getActivity(),s,Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showProgressBar() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void dismissProgressBar() {
+        progressBar.setVisibility(View.GONE);
     }
 
     @Override

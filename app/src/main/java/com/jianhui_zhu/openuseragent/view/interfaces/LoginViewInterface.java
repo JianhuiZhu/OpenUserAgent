@@ -10,5 +10,8 @@ import com.jianhui_zhu.openuseragent.model.beans.User;
 public interface LoginViewInterface {
     void showTag(String s);
 
+    void showProgressBar();
+
+    void dismissProgressBar();
     void switchFragmentWithUser(User user);
 }

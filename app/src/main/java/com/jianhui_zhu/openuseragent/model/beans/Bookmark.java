@@ -14,6 +14,9 @@ public class Bookmark implements Parcelable {
     String url;
     String name;
 
+    public Bookmark() {
+
+    }
     public Bookmark(String url, String name) {
         this.url = url;
         this.name = name;

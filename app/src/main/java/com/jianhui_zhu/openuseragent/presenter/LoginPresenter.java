@@ -40,6 +40,7 @@ public class LoginPresenter {
                             @Override
                             public void onDataChange(DataSnapshot currentPath) {
                                 User user = loginModel.getUserObject(currentPath, authData, ref);
+                                loginViewInterface.dismissProgressBar();
                                 loginViewInterface.switchFragmentWithUser(user);
                             }
 
