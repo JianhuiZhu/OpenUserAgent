@@ -18,6 +18,25 @@ public class User implements Parcelable {
     List<Bookmark> bookmarkList;
     List<Record> recordList;
 
+    public User() {
+
+    }
+
+    public List<Bookmark> getBookmarkList() {
+        return bookmarkList;
+    }
+
+    public void setBookmarkList(List<Bookmark> bookmarkList) {
+        this.bookmarkList = bookmarkList;
+    }
+
+    public List<Record> getRecordList() {
+        return recordList;
+    }
+
+    public void setRecordList(List<Record> recordList) {
+        this.recordList = recordList;
+    }
 
     protected User(Parcel in) {
         uID = in.readString();
@@ -86,4 +105,5 @@ public class User implements Parcelable {
         dest.writeTypedList(bookmarkList);
         dest.writeTypedList(recordList);
     }
+
 }
