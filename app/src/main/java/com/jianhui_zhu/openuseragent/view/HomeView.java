@@ -105,6 +105,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface{
         HomeView homeView = new HomeView();
         Bundle bundle = new Bundle();
         bundle.putBoolean("hasUser", false);
+        homeView.setArguments(bundle);
         return homeView;
     }
 

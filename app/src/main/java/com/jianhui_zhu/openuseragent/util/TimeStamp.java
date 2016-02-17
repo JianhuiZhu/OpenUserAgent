@@ -13,6 +13,10 @@ public class TimeStamp extends Timestamp implements Parcelable {
         super(theTime);
     }
 
+    public static Creator<TimeStamp> getCREATOR() {
+        return CREATOR;
+    }
+
     protected TimeStamp(Parcel in) {
         super(in.readLong());
     }

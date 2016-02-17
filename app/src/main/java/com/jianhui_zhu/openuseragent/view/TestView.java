@@ -38,7 +38,7 @@ public class TestView extends AbstractFragment {
     public void changeFragment(Button btn){
         switch(btn.getId()){
             case R.id.go_to_home_fragment:
-                FragmenUtil.switchToFragment(getActivity(),new HomeView());
+                FragmenUtil.switchToFragment(getActivity(), HomeView.newInstance());
                 break;
             case R.id.go_to_bookmark_fragment:
                 FragmenUtil.switchToFragment(getActivity(),new BookmarkView());

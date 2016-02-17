@@ -43,6 +43,7 @@ public class LoginModel implements LoginModelInterface,GoogleApiClient.Connectio
                 .addApi(Plus.API)
                 .addScope(Plus.SCOPE_PLUS_LOGIN)
                 .build();
+        this.googleApiClient.connect();
     }
 
 
@@ -68,8 +69,6 @@ public class LoginModel implements LoginModelInterface,GoogleApiClient.Connectio
             public void call(Subscriber<? super String> subscriber) {
                 if (!googleApiClient.isConnected()) {
                     googleApiClient.connect();
-                } else if (googleApiClient.isConnecting()) {
-
                 } else {
                     try {
                         String scope = String.format("oauth2:%s", Scopes.PLUS_LOGIN);
@@ -98,12 +97,12 @@ public class LoginModel implements LoginModelInterface,GoogleApiClient.Connectio
 
     @Override
     public void onConnected(Bundle bundle) {
-
+        attemptLogin();
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-
+        logout();
     }
 
     @Override
