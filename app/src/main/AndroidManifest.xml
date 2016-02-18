@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:name=".util.AbstractApplication"
         android:fullBackupContent="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
         <activity android:name=".util.activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

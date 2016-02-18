@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/setting_option"
+        android:title="Setting"
+        android:icon="@drawable/setting_icon" />
+    <item
+        android:id="@+id/bookmark_option"
+        android:title="Bookmark"
+        android:icon="@drawable/bookmark_icon" />
+    <item
+        android:id="@+id/history_option"
+        android:title="History"
+        android:icon="@drawable/history_icon" />
+</menu>

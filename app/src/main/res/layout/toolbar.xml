@@ -9,11 +9,11 @@
     <EditText
         android:id="@+id/home_url_bar"
         android:layout_gravity="center"
-        app:layout_widthPercent="50%"
+        app:layout_widthPercent="60%"
         app:layout_heightPercent="100%"
         android:hint="Type url or keyword"
         android:background="@android:color/transparent"
-
+        android:layout_margin="8dp"
         android:layout_width="0dp"
         android:layout_height="0dp" />
 
@@ -21,9 +21,12 @@
         android:id="@+id/add_bookmark_icon"
         android:layout_toRightOf="@+id/home_url_bar"
         android:layout_gravity="center"
-        app:layout_widthPercent="10%"
+        app:layout_widthPercent="8%"
         app:layout_heightPercent="100%"
         android:background="@android:color/transparent"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:src="@drawable/add_bookmark_icon" />
@@ -31,42 +34,24 @@
     <ImageView
         android:id="@+id/home_refresh_icon"
         android:layout_gravity="center"
-        app:layout_widthPercent="10%"
+        app:layout_widthPercent="8%"
         android:layout_toRightOf="@+id/add_bookmark_icon"
         app:layout_heightPercent="100%"
         android:background="@android:color/transparent"
+        android:layout_margin="8dp"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:src="@drawable/refresh_icon" />
 
-    <ImageView
-        android:id="@+id/home_bookmark_icon"
-        android:layout_gravity="center"
-        app:layout_widthPercent="10%"
-        android:layout_toRightOf="@+id/home_refresh_icon"
-        app:layout_heightPercent="100%"
-        android:background="@android:color/transparent"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:src="@drawable/bookmark_icon" />
 
-    <ImageView
-        android:id="@+id/home_history_icon"
-        android:layout_gravity="center"
-        android:layout_toRightOf="@+id/home_bookmark_icon"
-        app:layout_widthPercent="10%"
-        app:layout_heightPercent="100%"
-        android:background="@android:color/transparent"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:src="@drawable/history_icon" />
 
     <ImageView
         android:id="@+id/home_menu_icon"
         android:layout_gravity="center"
-        app:layout_widthPercent="10%"
+        app:layout_widthPercent="8%"
         app:layout_heightPercent="100%"
-        android:layout_toRightOf="@+id/home_history_icon"
+        android:layout_toRightOf="@+id/home_refresh_icon"
+        android:layout_margin="8dp"
         android:background="@android:color/transparent"
         android:layout_width="0dp"
         android:layout_height="0dp"

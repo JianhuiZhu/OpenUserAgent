@@ -1,17 +1,19 @@
 package com.jianhui_zhu.openuseragent.view;
 
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,32 +22,26 @@ import com.jianhui_zhu.openuseragent.model.beans.User;
 import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
 import com.jianhui_zhu.openuseragent.util.AbstractFragment;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
-import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.Observable;
-import rx.Observer;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by Jianhui Zhu on 2016-01-27.
  */
-public class HomeView extends AbstractFragment implements HomeViewInterface{
+public class HomeView extends AbstractFragment implements HomeViewInterface, View.OnClickListener {
+    User user;
+    private boolean drawerIsOpen = false;
     @Bind(R.id.web_container) WebView webHolder;
-    @Bind(R.id.home_avatar)
-    de.hdodenhof.circleimageview.CircleImageView avatar;
-    @Bind(R.id.home_name)
-    TextView username;
-    @Bind(R.id.profile_area)
-    RelativeLayout profileArea;
+    @Bind(R.id.setting_drawer)
+    DrawerLayout settingDrawer;
+    @Bind(R.id.profile_title)
+    NavigationView profileTitle;
 
-    @OnClick({R.id.home_refresh_icon, R.id.add_bookmark_icon, R.id.home_history_icon, R.id.home_bookmark_icon, R.id.home_menu_icon, R.id.home_url_bar})
+    @OnClick({R.id.home_refresh_icon, R.id.add_bookmark_icon, R.id.home_menu_icon, R.id.home_url_bar})
     public void click(View view) {
         switch (view.getId()) {
             case R.id.home_refresh_icon:
@@ -57,14 +53,15 @@ public class HomeView extends AbstractFragment implements HomeViewInterface{
                 Toast.makeText(getActivity(), "current url is " + url + " \n current title is " + urlTitle, Toast.LENGTH_LONG).show();
                 //TO-DO add bookmark function
                 break;
-            case R.id.home_history_icon:
-                Toast.makeText(getActivity(), "Home history icon clicked", Toast.LENGTH_LONG).show();
-                break;
-            case R.id.home_bookmark_icon:
-                Toast.makeText(getActivity(), "Home bookmark icon clicked", Toast.LENGTH_LONG).show();
-                break;
             case R.id.home_menu_icon:
-                Toast.makeText(getActivity(), "menu clicked", Toast.LENGTH_LONG).show();
+                if (user != null) {
+                    CircleImageView avatar = (CircleImageView) getActivity().findViewById(R.id.home_avatar);
+                    TextView username = (TextView) getActivity().findViewById(R.id.home_name);
+                    Picasso.with(getActivity()).load(user.getAvatarUrl()).fit().into(avatar);
+                    username.setText(user.getUsername());
+                }
+                settingDrawer.openDrawer(Gravity.RIGHT);
+                drawerIsOpen = true;
                 break;
             case R.id.home_url_bar:
                 break;
@@ -89,10 +86,11 @@ public class HomeView extends AbstractFragment implements HomeViewInterface{
         super.onViewCreated(view, savedInstanceState);
         Bundle bundle = getArguments();
         if (bundle.getBoolean("hasUser")) {
-            User user = bundle.getParcelable("user");
-            Picasso.with(getActivity()).load(user.getAvatarUrl()).fit().into(avatar);
-            username.setText(user.getUsername());
+            this.user = bundle.getParcelable("user");
+            //Picasso.with(getActivity()).load(user.getAvatarUrl()).fit().into(avatar);
+            // username.setText(user.getUsername());
         }
+        settingDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         initBrowserSettings();
         loadTargetUrl("");
     }
@@ -112,6 +110,15 @@ public class HomeView extends AbstractFragment implements HomeViewInterface{
             this.webHolder.loadUrl(url);
         }else{
             this.webHolder.loadUrl("http://www.google.com");
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        if (drawerIsOpen) {
+            settingDrawer.closeDrawer(Gravity.LEFT);
+            drawerIsOpen = false;
         }
     }
 

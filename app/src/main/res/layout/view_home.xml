@@ -1,32 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/setting_drawer"
+    style="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="end"
+    android:fitsSystemWindows="true">
+
+    <android.support.design.widget.NavigationView
+        android:id="@+id/profile_title"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="5dp"
+        app:headerLayout="@layout/profile_header"
+        app:menu="@menu/menu_settings" />
+
+    <LinearLayout
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <RelativeLayout
-        android:id="@+id/profile_area"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/home_avatar"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@drawable/placeholder"
-            app:civ_border_width="2dp"
-            app:civ_border_color="#FF000000" />
-
-        <TextView
-            android:id="@+id/home_name"
-            android:layout_toRightOf="@+id/home_avatar"
-            android:padding="8dp"
-            android:textSize="20sp"
-            android:layout_centerVertical="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </RelativeLayout>
-
     <include layout="@layout/toolbar" />
     <WebView
         android:id="@+id/web_container"
@@ -36,3 +31,5 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 </LinearLayout>
+
+</android.support.v4.widget.DrawerLayout>
