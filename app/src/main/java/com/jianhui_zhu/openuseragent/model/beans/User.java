@@ -11,6 +11,7 @@ import java.util.List;
  * Created by jianhuizhu on 2016-02-14.
  */
 public class User implements Parcelable {
+    String uID;
     String username;
     String avatarUrl;
     List<Bookmark> bookmarkList;
@@ -21,6 +22,7 @@ public class User implements Parcelable {
     }
 
     protected User(Parcel in) {
+        uID = in.readString();
         username = in.readString();
         avatarUrl = in.readString();
         bookmarkList = in.createTypedArrayList(Bookmark.CREATOR);
@@ -38,6 +40,14 @@ public class User implements Parcelable {
             return new User[size];
         }
     };
+
+    public String getuID() {
+        return uID;
+    }
+
+    public void setuID(String uID) {
+        this.uID = uID;
+    }
 
     public List<Bookmark> getBookmarkList() {
         return bookmarkList;
@@ -80,6 +90,7 @@ public class User implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(uID);
         dest.writeString(username);
         dest.writeString(avatarUrl);
         dest.writeTypedList(bookmarkList);

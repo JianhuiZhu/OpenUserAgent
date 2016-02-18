@@ -11,19 +11,9 @@ import java.sql.Timestamp;
  * Created by Jianhui Zhu on 2016-02-06.
  */
 public class Record implements Parcelable {
+    String rID;
     String url;
     TimeStamp timestamp;
-
-    public Record() {
-    }
-    public Record(String url) {
-        this.url = url;
-    }
-
-    protected Record(Parcel in) {
-        url = in.readString();
-        timestamp = in.readParcelable(TimeStamp.class.getClassLoader());
-    }
 
     public static final Creator<Record> CREATOR = new Creator<Record>() {
         @Override
@@ -36,6 +26,30 @@ public class Record implements Parcelable {
             return new Record[size];
         }
     };
+
+    public String getrID() {
+        return rID;
+    }
+
+    public void setrID(String rID) {
+        this.rID = rID;
+    }
+
+    public void setTimestamp(TimeStamp timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public Record() {
+    }
+    public Record(String url) {
+        this.url = url;
+    }
+
+    protected Record(Parcel in) {
+        url = in.readString();
+        timestamp = in.readParcelable(TimeStamp.class.getClassLoader());
+    }
+
 
     public String getUrl() {
         return url;
@@ -50,20 +64,13 @@ public class Record implements Parcelable {
     }
 
     @Override
-    public String toString() {
-        return "Record{" +
-                "url='" + url + '\'' +
-                ", timestamp=" + timestamp +
-                '}';
-    }
-
-    @Override
     public int describeContents() {
         return 0;
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(rID);
         dest.writeString(url);
         dest.writeParcelable(timestamp, flags);
     }

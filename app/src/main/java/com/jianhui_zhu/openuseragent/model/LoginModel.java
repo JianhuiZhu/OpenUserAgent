@@ -55,6 +55,7 @@ public class LoginModel implements LoginModelInterface,GoogleApiClient.Connectio
             user = currentPath.child(authData.getUid()).getValue(User.class);
         } else {
             user = new User();
+            user.setuID(authData.getUid());
             user.setUsername(authData.getProviderData().get(Constant.nameInGoogle).toString());
             user.setAvatarUrl(authData.getProviderData().get(Constant.avatarInGoogle).toString());
             ref.child(authData.getUid()).setValue(user);

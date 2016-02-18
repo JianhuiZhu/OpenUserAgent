@@ -1,5 +1,6 @@
 package com.jianhui_zhu.openuseragent.presenter;
 
+import com.jianhui_zhu.openuseragent.model.HomeModel;
 import com.jianhui_zhu.openuseragent.model.LoginModel;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 
@@ -8,7 +9,9 @@ import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
  */
 public class HomePresenter {
     private HomeViewInterface homeView;
+    private HomeModel homeModel;
     public HomePresenter(HomeViewInterface homeView){
         this.homeView=homeView;
     }
+
 }

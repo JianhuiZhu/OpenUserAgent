@@ -10,9 +10,29 @@ import java.sql.Timestamp;
  * Created by Jianhui Zhu on 2016-02-06.
  */
 public class Bookmark implements Parcelable {
-
+    String bID;
     String url;
     String name;
+
+    public static final Creator<Bookmark> CREATOR = new Creator<Bookmark>() {
+        @Override
+        public Bookmark createFromParcel(Parcel in) {
+            return new Bookmark(in);
+        }
+
+        @Override
+        public Bookmark[] newArray(int size) {
+            return new Bookmark[size];
+        }
+    };
+
+    public String getbID() {
+        return bID;
+    }
+
+    public void setbID(String bID) {
+        this.bID = bID;
+    }
 
     public Bookmark() {
 
@@ -27,17 +47,7 @@ public class Bookmark implements Parcelable {
         name = in.readString();
     }
 
-    public static final Creator<Bookmark> CREATOR = new Creator<Bookmark>() {
-        @Override
-        public Bookmark createFromParcel(Parcel in) {
-            return new Bookmark(in);
-        }
 
-        @Override
-        public Bookmark[] newArray(int size) {
-            return new Bookmark[size];
-        }
-    };
 
     public String getUrl() {
         return url;
@@ -55,6 +65,7 @@ public class Bookmark implements Parcelable {
         this.name = name;
     }
 
+
     @Override
     public int describeContents() {
         return 0;
@@ -62,6 +73,7 @@ public class Bookmark implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(bID);
         dest.writeString(url);
         dest.writeString(name);
     }
