@@ -2,6 +2,7 @@ package com.jianhui_zhu.openuseragent.model;
 
 import android.content.Context;
 
+import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
 import com.jianhui_zhu.openuseragent.model.beans.Record;
 import com.jianhui_zhu.openuseragent.model.beans.User;
 import com.jianhui_zhu.openuseragent.util.LocalDatabaseSingleton;
@@ -11,7 +12,7 @@ import com.jianhui_zhu.openuseragent.util.RemoteDatabaseSingleton;
  * Created by jianhuizhu on 2016-02-16.
  */
 public class HomeModel {
-    private static boolean userLoggedIn = false;
+    private boolean userLoggedIn = false;
     private User user;
     private Context context;
 
@@ -19,6 +20,9 @@ public class HomeModel {
         this.context = context;
     }
 
+    public void setUserLoggedIn(boolean isLoggedIn) {
+        this.userLoggedIn = isLoggedIn;
+    }
     public void saveHistory(String url, String uID) {
         Record record = new Record();
         record.setUrl(url);
@@ -30,5 +34,14 @@ public class HomeModel {
         }
     }
 
-
+    public void saveBookmark(String url, String name, String uID) {
+        Bookmark bookmark = new Bookmark();
+        bookmark.setUrl(url);
+        bookmark.setName(name);
+        if (userLoggedIn) {
+            RemoteDatabaseSingleton.getInstance(user.getuID()).saveBookmark(bookmark);
+        } else {
+            LocalDatabaseSingleton.getInstance(context).saveBookmark(bookmark);
+        }
+    }
 }
