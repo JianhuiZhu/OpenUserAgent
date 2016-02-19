@@ -9,6 +9,12 @@ import com.jianhui_zhu.openuseragent.model.beans.Record;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observer;
+
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by jianhuizhu on 2016-02-19.
@@ -31,16 +37,28 @@ public class RemoteDatabaseSingleton {
         return remoteDB;
     }
 
-    public void saveBookmark(Bookmark bookmark) {
-        Firebase recordRef = new Firebase(Constant.urlRoot).child(uID).child("bookmarks").push();
-        bookmark.setbID(recordRef.getKey());
-        recordRef.setValue(bookmark);
+    public Observable<String> saveBookmark(final Bookmark bookmark) {
+        return Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                Firebase recordRef = new Firebase(Constant.urlRoot).child(uID).child("bookmarks").push();
+                bookmark.setbID(recordRef.getKey());
+                recordRef.setValue(bookmark);
+                subscriber.onCompleted();
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+
     }
 
-    public void saveHistory(Record record) {
-        Firebase recordRef = new Firebase(Constant.urlRoot).child(uID).child("histories").push();
-        record.setrID(recordRef.getKey());
-        recordRef.setValue(record);
+    public Observable<String> saveHistory(final Record record) {
+        return Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                Firebase recordRef = new Firebase(Constant.urlRoot).child(uID).child("histories").push();
+                record.setrID(recordRef.getKey());
+                recordRef.setValue(record);
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
 
     public List<Record> getAllHistories() {

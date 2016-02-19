@@ -8,6 +8,8 @@ import com.jianhui_zhu.openuseragent.model.beans.User;
 import com.jianhui_zhu.openuseragent.util.LocalDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.util.RemoteDatabaseSingleton;
 
+import rx.Observable;
+
 /**
  * Created by jianhuizhu on 2016-02-16.
  */
@@ -27,21 +29,21 @@ public class HomeModel {
         Record record = new Record();
         record.setUrl(url);
         record.setTimestamp(System.currentTimeMillis());
-        if (userLoggedIn) {
+        if (uID != null) {
             RemoteDatabaseSingleton.getInstance(user.getuID()).saveHistory(record);
         } else {
             LocalDatabaseSingleton.getInstance(context).saveHistory(record);
         }
     }
 
-    public void saveBookmark(String url, String name, String uID) {
+    public Observable<String> saveBookmark(String url, String name, String uID) {
         Bookmark bookmark = new Bookmark();
         bookmark.setUrl(url);
         bookmark.setName(name);
-        if (userLoggedIn) {
-            RemoteDatabaseSingleton.getInstance(user.getuID()).saveBookmark(bookmark);
-        } else {
-            LocalDatabaseSingleton.getInstance(context).saveBookmark(bookmark);
+        if (uID != null) {
+            return RemoteDatabaseSingleton.getInstance(user.getuID()).saveBookmark(bookmark);
         }
+        return LocalDatabaseSingleton.getInstance(context).saveBookmark(bookmark);
+
     }
 }

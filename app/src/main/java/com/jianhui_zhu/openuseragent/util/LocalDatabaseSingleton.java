@@ -13,6 +13,11 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+
 /**
  * Created by jianhuizhu on 2016-02-18.
  */
@@ -37,13 +42,19 @@ public class LocalDatabaseSingleton {
                         + record.getTimestamp() + ")");
     }
 
-    public void saveBookmark(Bookmark bookmark) {
-        LocalDatabaseHelper.getInstance(context)
-                .getWritableDatabase()
-                .execSQL("INSERT INTO Bookmarks (url,name) " +
-                        "VALUES("
-                        + bookmark.getUrl() + ","
-                        + bookmark.getName() + ")");
+    public Observable<String> saveBookmark(final Bookmark bookmark) {
+        return Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                LocalDatabaseHelper.getInstance(context)
+                        .getWritableDatabase()
+                        .execSQL("INSERT INTO Bookmarks (url,name) " +
+                                "VALUES("
+                                + bookmark.getUrl() + ","
+                                + bookmark.getName() + ")");
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+
     }
 
     public List<Bookmark> getAllBookmarks() {

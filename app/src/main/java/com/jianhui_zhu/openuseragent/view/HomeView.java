@@ -71,7 +71,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface, Vie
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        presenter=new HomePresenter(this);
+        presenter = new HomePresenter(this, getContext());
     }
     @Nullable
     @Override
@@ -111,6 +111,11 @@ public class HomeView extends AbstractFragment implements HomeViewInterface, Vie
         }else{
             this.webHolder.loadUrl("http://www.google.com");
         }
+    }
+
+    @Override
+    public void showTag(String info) {
+        Toast.makeText(getActivity(), info, Toast.LENGTH_SHORT).show();
     }
 
     @Override
