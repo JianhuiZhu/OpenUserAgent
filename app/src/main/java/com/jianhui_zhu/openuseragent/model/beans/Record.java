@@ -3,17 +3,20 @@ package com.jianhui_zhu.openuseragent.model.beans;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.jianhui_zhu.openuseragent.util.TimeStamp;
-
-import java.sql.Timestamp;
-
 /**
  * Created by Jianhui Zhu on 2016-02-06.
  */
 public class Record implements Parcelable {
     String rID;
     String url;
-    TimeStamp timestamp;
+    long timestamp;
+
+
+    protected Record(Parcel in) {
+        rID = in.readString();
+        url = in.readString();
+        timestamp = in.readLong();
+    }
 
     public static final Creator<Record> CREATOR = new Creator<Record>() {
         @Override
@@ -35,21 +38,14 @@ public class Record implements Parcelable {
         this.rID = rID;
     }
 
-    public void setTimestamp(TimeStamp timestamp) {
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
-
-    public Record() {
-    }
-    public Record(String url) {
-        this.url = url;
-    }
-
-    protected Record(Parcel in) {
-        url = in.readString();
-        timestamp = in.readParcelable(TimeStamp.class.getClassLoader());
-    }
-
 
     public String getUrl() {
         return url;
@@ -59,9 +55,6 @@ public class Record implements Parcelable {
         this.url = url;
     }
 
-    public TimeStamp getTimestamp() {
-        return timestamp;
-    }
 
     @Override
     public int describeContents() {
@@ -72,6 +65,6 @@ public class Record implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(rID);
         dest.writeString(url);
-        dest.writeParcelable(timestamp, flags);
+        dest.writeLong(timestamp);
     }
 }
