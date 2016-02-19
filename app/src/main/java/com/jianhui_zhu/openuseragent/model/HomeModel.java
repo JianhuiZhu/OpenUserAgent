@@ -1,9 +1,11 @@
 package com.jianhui_zhu.openuseragent.model;
 
-import com.firebase.client.Firebase;
+import android.content.Context;
+
 import com.jianhui_zhu.openuseragent.model.beans.Record;
 import com.jianhui_zhu.openuseragent.model.beans.User;
-import com.jianhui_zhu.openuseragent.util.Constant;
+import com.jianhui_zhu.openuseragent.util.LocalDatabaseSingleton;
+import com.jianhui_zhu.openuseragent.util.RemoteDatabaseSingleton;
 
 /**
  * Created by jianhuizhu on 2016-02-16.
@@ -11,13 +13,20 @@ import com.jianhui_zhu.openuseragent.util.Constant;
 public class HomeModel {
     private static boolean userLoggedIn = false;
     private User user;
+    private Context context;
 
-    public void saveHistory(Record record) {
-        Firebase ref = new Firebase(Constant.urlRoot);
+    public HomeModel(Context context) {
+        this.context = context;
+    }
+
+    public void saveHistory(String url, String uID) {
+        Record record = new Record();
+        record.setUrl(url);
+        record.setTimestamp(System.currentTimeMillis());
         if (userLoggedIn) {
-            ref.child(user.getuID()).child("records").push().setValue(record);
+            RemoteDatabaseSingleton.getInstance(user.getuID()).saveHistory(record);
         } else {
-
+            LocalDatabaseSingleton.getInstance(context).saveHistory(record);
         }
     }
 

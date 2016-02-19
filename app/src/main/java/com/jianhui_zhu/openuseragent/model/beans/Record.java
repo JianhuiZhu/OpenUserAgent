@@ -38,7 +38,9 @@ public class Record implements Parcelable {
         this.rID = rID;
     }
 
+    public Record() {
 
+    }
     public long getTimestamp() {
         return timestamp;
     }
