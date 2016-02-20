@@ -25,16 +25,7 @@ public class HomeModel {
     public void setUserLoggedIn(boolean isLoggedIn) {
         this.userLoggedIn = isLoggedIn;
     }
-    public void saveHistory(String url, String uID) {
-        Record record = new Record();
-        record.setUrl(url);
-        record.setTimestamp(System.currentTimeMillis());
-        if (uID != null) {
-            RemoteDatabaseSingleton.getInstance(user.getuID()).saveHistory(record);
-        } else {
-            LocalDatabaseSingleton.getInstance(context).saveHistory(record);
-        }
-    }
+
 
     public Observable<String> saveBookmark(String url, String name, String uID) {
         Bookmark bookmark = new Bookmark();
@@ -45,5 +36,15 @@ public class HomeModel {
         }
         return LocalDatabaseSingleton.getInstance(context).saveBookmark(bookmark);
 
+    }
+
+    public Observable<String> saveHistory(String url, String uID) {
+        Record record = new Record();
+        record.setUrl(url);
+        record.setTimestamp(System.currentTimeMillis());
+        if (uID != null) {
+            return RemoteDatabaseSingleton.getInstance(uID).saveHistory(record);
+        }
+        return LocalDatabaseSingleton.getInstance(context).saveHistory(record);
     }
 }

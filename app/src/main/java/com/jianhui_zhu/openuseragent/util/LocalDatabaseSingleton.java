@@ -33,13 +33,21 @@ public class LocalDatabaseSingleton {
         return instance;
     }
 
-    public void saveHistory(Record record) {
-        LocalDatabaseHelper.getInstance(context)
-                .getWritableDatabase()
-                .execSQL("INSERT INTO Records (url,timestamp) " +
-                        "VALUES(\""
-                        + record.getUrl() + "\","
-                        + record.getTimestamp() + ")");
+    public Observable<String> saveHistory(final Record record) {
+        return Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                LocalDatabaseHelper.getInstance(context)
+                        .getWritableDatabase()
+                        .execSQL("INSERT INTO Records (url,timestamp) " +
+                                "VALUES(\""
+                                + record.getUrl() + "\","
+                                + record.getTimestamp() + ")");
+                subscriber.onNext("DONE");
+                subscriber.onCompleted();
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+
     }
 
     public Observable<String> saveBookmark(final Bookmark bookmark) {
@@ -52,6 +60,8 @@ public class LocalDatabaseSingleton {
                                 "VALUES(\""
                                 + bookmark.getUrl() + "\",\""
                                 + bookmark.getName() + "\")");
+                subscriber.onNext("DONE");
+                subscriber.onCompleted();
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 
