@@ -37,8 +37,8 @@ public class LocalDatabaseSingleton {
         LocalDatabaseHelper.getInstance(context)
                 .getWritableDatabase()
                 .execSQL("INSERT INTO Records (url,timestamp) " +
-                        "VALUES("
-                        + record.getUrl() + ","
+                        "VALUES(\""
+                        + record.getUrl() + "\","
                         + record.getTimestamp() + ")");
     }
 
@@ -49,9 +49,9 @@ public class LocalDatabaseSingleton {
                 LocalDatabaseHelper.getInstance(context)
                         .getWritableDatabase()
                         .execSQL("INSERT INTO Bookmarks (url,name) " +
-                                "VALUES("
-                                + bookmark.getUrl() + ","
-                                + bookmark.getName() + ")");
+                                "VALUES(\""
+                                + bookmark.getUrl() + "\",\""
+                                + bookmark.getName() + "\")");
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 
@@ -96,7 +96,7 @@ public class LocalDatabaseSingleton {
     }
 
     private static class LocalDatabaseHelper extends SQLiteOpenHelper {
-        private static final String dbName = "browsingRecords";
+        private static final String dbName = "DBRecords";
         private static final int numberOfDatabase = 1;
         private static LocalDatabaseHelper instance = null;
 
@@ -114,14 +114,13 @@ public class LocalDatabaseSingleton {
         @Override
         public void onCreate(SQLiteDatabase db) {
             String createBookmarksTable = "CREATE TABLE IF NOT EXISTS Bookmarks(" +
-                    "id INT NOT NULL AUTO_INCREMENT," +
+                    "id INTEGER NOT NULL PRIMARY KEY," +
                     "name VARCHAR(50) NOT NULL," +
-                    "url VARCHAR(300) NOT NULL," +
-                    "PRIMARY KEY(id))ENGINE=InnoDB";
+                    "url VARCHAR(300) NOT NULL)";
             String createRecordsTable = "CREATE TABLE IF NOT EXISTS Records(" +
                     "url VARCHAR(300) NOT NULL," +
                     "timestamp INT NOT NULL," +
-                    "PRIMARY KEY(timestamp))ENGINE=InnoDB";
+                    "PRIMARY KEY(timestamp))";
             db.execSQL(createBookmarksTable);
             db.execSQL(createRecordsTable);
         }

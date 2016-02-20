@@ -41,7 +41,7 @@ public class HomeModel {
         bookmark.setUrl(url);
         bookmark.setName(name);
         if (uID != null) {
-            return RemoteDatabaseSingleton.getInstance(user.getuID()).saveBookmark(bookmark);
+            return RemoteDatabaseSingleton.getInstance(uID).saveBookmark(bookmark);
         }
         return LocalDatabaseSingleton.getInstance(context).saveBookmark(bookmark);
 

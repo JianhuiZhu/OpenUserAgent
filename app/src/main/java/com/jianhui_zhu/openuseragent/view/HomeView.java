@@ -50,6 +50,11 @@ public class HomeView extends AbstractFragment implements HomeViewInterface, Vie
             case R.id.add_bookmark_icon:
                 String url = webHolder.getUrl();
                 String urlTitle = webHolder.getTitle();
+                if (user == null) {
+                    presenter.saveBookmark(url, urlTitle, null);
+                } else {
+                    presenter.saveBookmark(url, urlTitle, user.getuID());
+                }
                 Toast.makeText(getActivity(), "current url is " + url + " \n current title is " + urlTitle, Toast.LENGTH_LONG).show();
                 //TO-DO add bookmark function
                 break;
@@ -71,7 +76,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface, Vie
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        presenter = new HomePresenter(this, getContext());
+        presenter = new HomePresenter(this, getActivity());
     }
     @Nullable
     @Override
