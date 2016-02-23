@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
 import com.jianhui_zhu.openuseragent.model.beans.Record;
 
-import java.util.ArrayList;
+import java.lang.Override;import java.lang.String;import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 

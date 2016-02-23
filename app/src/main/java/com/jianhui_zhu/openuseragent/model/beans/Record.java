@@ -3,10 +3,12 @@ package com.jianhui_zhu.openuseragent.model.beans;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serializable;
+
 /**
  * Created by Jianhui Zhu on 2016-02-06.
  */
-public class Record implements Parcelable {
+public class Record implements Parcelable{
     String rID;
     String url;
     long timestamp;

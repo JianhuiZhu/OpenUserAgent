@@ -2,7 +2,7 @@ package com.jianhui_zhu.openuseragent.util;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
+import android.util.Log;import java.lang.Override;
 
 //import de.greenrobot.event.EventBus;
 

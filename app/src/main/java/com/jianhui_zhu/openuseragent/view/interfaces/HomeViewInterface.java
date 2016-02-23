@@ -6,6 +6,5 @@ package com.jianhui_zhu.openuseragent.view.interfaces;
 public interface HomeViewInterface {
     void initBrowserSettings();
     void loadTargetUrl(String url);
-
     void showTag(String info);
 }

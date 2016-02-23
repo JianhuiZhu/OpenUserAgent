@@ -7,7 +7,7 @@ import com.crashlytics.android.ndk.CrashlyticsNdk;
 import com.firebase.client.Firebase;
 import com.firebase.client.Logger;
 
-import io.fabric.sdk.android.Fabric;
+import java.lang.Override;import io.fabric.sdk.android.Fabric;
 
 
 /**

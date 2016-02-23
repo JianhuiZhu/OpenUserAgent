@@ -47,4 +47,6 @@ public class HomeModel {
         }
         return LocalDatabaseSingleton.getInstance(context).saveHistory(record);
     }
+
+
 }

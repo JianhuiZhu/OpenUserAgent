@@ -1,5 +1,6 @@
 package com.jianhui_zhu.openuseragent.view;
 
+import android.graphics.Bitmap;
 import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,6 +12,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -104,9 +106,11 @@ public class HomeView extends AbstractFragment implements HomeViewInterface, Vie
     public void initBrowserSettings() {
         WebSettings settings = this.webHolder.getSettings();
         WebViewClient client = new CustomWebView();
+        WebChromeClient chromeClient=new CustomWebChrome();
         settings.setDefaultTextEncodingName("UTF-8");
         settings.setJavaScriptEnabled(true);
         this.webHolder.setWebViewClient(client);
+        this.webHolder.setWebChromeClient(chromeClient);
     }
 
     @Override
@@ -139,9 +143,25 @@ public class HomeView extends AbstractFragment implements HomeViewInterface, Vie
             view.loadUrl(url);
             return true;
         }
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favicon) {
+        }
+
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+
+
+        }
+
 
     }
+    private class CustomWebChrome extends WebChromeClient{
+        @Override
+        public void onProgressChanged(WebView view, int newProgress){
 
+        }
+    }
     public static AbstractFragment newInstanceWithUser(User user) {
         Bundle bundle = new Bundle();
         bundle.putBoolean("hasUser", true);

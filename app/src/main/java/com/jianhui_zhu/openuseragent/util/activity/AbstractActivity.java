@@ -3,7 +3,7 @@ package com.jianhui_zhu.openuseragent.util.activity;
 import android.app.Activity;
 import android.os.Bundle;
 
-import com.squareup.otto.Bus;
+import com.squareup.otto.Bus;import java.lang.Override;
 
 
 /**
