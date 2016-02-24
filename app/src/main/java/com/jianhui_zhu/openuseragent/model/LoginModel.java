@@ -18,6 +18,7 @@ import com.google.android.gms.plus.Plus;
 import com.jianhui_zhu.openuseragent.model.beans.User;
 import com.jianhui_zhu.openuseragent.model.interfaces.LoginModelInterface;
 import com.jianhui_zhu.openuseragent.util.Constant;
+import com.jianhui_zhu.openuseragent.util.RemoteDatabaseSingleton;
 
 import java.io.IOException;
 
@@ -25,89 +26,33 @@ import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 /**
  * Created by Jianhui Zhu on 2016-02-06.
  */
-public class LoginModel implements LoginModelInterface,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class LoginModel {
     private Context context;
     private String TAG;
+    private User user;
     private GoogleApiClient googleApiClient;
     private ConnectionResult mGoogleConnectionResult;
     public LoginModel(Context context){
         this.context=context;
-        this.googleApiClient = new GoogleApiClient.Builder(context)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(Plus.API)
-                .addScope(Plus.SCOPE_PLUS_LOGIN)
-                .build();
-        this.googleApiClient.connect();
     }
+    public User attemptLogin() {
 
-
-
-    @Override
-    public User getUserObject(DataSnapshot currentPath, AuthData authData, Firebase ref) {
-        User user;
-        if (currentPath.hasChild(authData.getUid())) {
-            user = currentPath.child(authData.getUid()).getValue(User.class);
-        } else {
-            user = new User();
-            user.setuID(authData.getUid());
-            user.setUsername(authData.getProviderData().get(Constant.nameInGoogle).toString());
-            user.setAvatarUrl(authData.getProviderData().get(Constant.avatarInGoogle).toString());
-            ref.child(authData.getUid()).setValue(user);
-        }
+        RemoteDatabaseSingleton.getInstance(context).login().subscribe(new Action1<User>() {
+            @Override
+            public void call(User userIn) {
+                user=userIn;
+            }
+        });
         return user;
     }
-
-    public Observable<String> attemptLogin() {
-
-        return Observable.create(new Observable.OnSubscribe<String>() {
-            @Override
-            public void call(Subscriber<? super String> subscriber) {
-                if (!googleApiClient.isConnected()) {
-                    googleApiClient.connect();
-                } else {
-                    try {
-                        String scope = String.format("oauth2:%s", Scopes.PLUS_LOGIN);
-                        String token = GoogleAuthUtil.getToken(context, Plus.AccountApi.getAccountName(googleApiClient), scope);
-                        subscriber.onNext(token);
-                        subscriber.onCompleted();
-                    } catch (IOException transientEx) {
-                    /* Network or server error */
-                        Log.e(TAG, "Error authenticating with Google: " + transientEx);
-                    } catch (UserRecoverableAuthException e) {
-                        Log.w(TAG, "Recoverable Google OAuth error: " + e.toString());
-                    } catch (GoogleAuthException authEx) {
-                    /* The call is not ever expected to succeed assuming you have already verified that
-                     * Google Play services is installed. */
-                        Log.e(TAG, "Error authenticating with Google: " + authEx.getMessage(), authEx);
-                    }
-                }
-            }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
-    }
-
-    @Override
-    public void logout() {
+    public void logout(){
 
     }
 
-    @Override
-    public void onConnected(Bundle bundle) {
-        attemptLogin();
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        logout();
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        mGoogleConnectionResult=connectionResult;
-    }
 }

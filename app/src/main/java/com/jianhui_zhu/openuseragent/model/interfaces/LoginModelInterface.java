@@ -13,6 +13,5 @@ import rx.Observer;
  */
 public interface LoginModelInterface {
 
-     User getUserObject(DataSnapshot currentPath, AuthData authData, Firebase ref);
      void logout();
 }

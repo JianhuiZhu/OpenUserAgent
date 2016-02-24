@@ -16,6 +16,7 @@ public class User implements Parcelable {
     String uID;
     String username;
     String avatarUrl;
+    String homepage;
     Map<String, Bookmark> bookmarks;
     Map<String, Record> records;
 
@@ -23,11 +24,19 @@ public class User implements Parcelable {
 
     }
 
+    public String getHomepage() {
+        return homepage;
+    }
+
+    public void setHomepage(String homepage) {
+        this.homepage = homepage;
+    }
 
     protected User(Parcel in) {
         uID = in.readString();
         username = in.readString();
         avatarUrl = in.readString();
+        homepage=in.readString();
         Bundle bundle = in.readBundle();
         bookmarks = MapUtil.fromBundle(bundle.getBundle("bookmarks"), Bookmark.class);
         records = MapUtil.fromBundle(bundle.getBundle("records"), Record.class);
@@ -97,6 +106,7 @@ public class User implements Parcelable {
         dest.writeString(uID);
         dest.writeString(username);
         dest.writeString(avatarUrl);
+        dest.writeString(homepage);
         Bundle bundle = new Bundle();
         bundle.putBundle("bookmarks", MapUtil.toBundle(bookmarks));
         bundle.putBundle("records", MapUtil.toBundle(records));
