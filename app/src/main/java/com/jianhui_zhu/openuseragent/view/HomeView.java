@@ -169,7 +169,6 @@ public class HomeView extends AbstractFragment implements HomeViewInterface, Vie
         HomeView homeView = new HomeView();
         homeView.setArguments(bundle);
         return homeView;
-
     }
 
     public static AbstractFragment newInstance() {
@@ -179,6 +178,12 @@ public class HomeView extends AbstractFragment implements HomeViewInterface, Vie
         homeView.setArguments(bundle);
         return homeView;
     }
-
+    public static AbstractFragment newInstanceWithUrl(String url){
+        HomeView homeView=new HomeView();
+        Bundle bundle=new Bundle();
+        bundle.putString("hasUrl",url);
+        homeView.setArguments(bundle);
+        return homeView;
+    }
 
 }

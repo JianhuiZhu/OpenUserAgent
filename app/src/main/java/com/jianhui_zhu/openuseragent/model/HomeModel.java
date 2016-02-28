@@ -32,7 +32,7 @@ public class HomeModel {
         bookmark.setUrl(url);
         bookmark.setName(name);
         if (uID != null) {
-            return RemoteDatabaseSingleton.getInstance(uID).saveBookmark(bookmark);
+            return RemoteDatabaseSingleton.getInstance(context).saveBookmark(bookmark);
         }
         return LocalDatabaseSingleton.getInstance(context).saveBookmark(bookmark);
 
@@ -43,7 +43,7 @@ public class HomeModel {
         record.setUrl(url);
         record.setTimestamp(System.currentTimeMillis());
         if (uID != null) {
-            return RemoteDatabaseSingleton.getInstance(uID).saveHistory(record);
+            return RemoteDatabaseSingleton.getInstance(context).saveHistory(record);
         }
         return LocalDatabaseSingleton.getInstance(context).saveHistory(record);
     }
