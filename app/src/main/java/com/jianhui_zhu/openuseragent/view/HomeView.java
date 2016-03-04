@@ -10,6 +10,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
@@ -23,6 +24,8 @@ import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.User;
 import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
 import com.jianhui_zhu.openuseragent.util.AbstractFragment;
+import com.jianhui_zhu.openuseragent.util.FragmenUtil;
+import com.jianhui_zhu.openuseragent.util.RemoteDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 import com.squareup.picasso.Picasso;
 
@@ -50,6 +53,9 @@ public class HomeView extends AbstractFragment implements HomeViewInterface, Vie
                 webHolder.reload();
                 break;
             case R.id.add_bookmark_icon:
+                if (RemoteDatabaseSingleton.getInstance(getActivity()).isUserLoggedIn()) {
+                    this.user=RemoteDatabaseSingleton.getInstance(getActivity()).getUser();
+                }
                 String url = webHolder.getUrl();
                 String urlTitle = webHolder.getTitle();
                 if (user == null) {
@@ -61,6 +67,9 @@ public class HomeView extends AbstractFragment implements HomeViewInterface, Vie
                 //TO-DO add bookmark function
                 break;
             case R.id.home_menu_icon:
+                if (RemoteDatabaseSingleton.getInstance(getActivity()).isUserLoggedIn()) {
+                    this.user=RemoteDatabaseSingleton.getInstance(getActivity()).getUser();
+                }
                 if (user != null) {
                     CircleImageView avatar = (CircleImageView) getActivity().findViewById(R.id.home_avatar);
                     TextView username = (TextView) getActivity().findViewById(R.id.home_name);
@@ -92,14 +101,28 @@ public class HomeView extends AbstractFragment implements HomeViewInterface, Vie
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Bundle bundle = getArguments();
-        if (bundle.getBoolean("hasUser")) {
-            this.user = bundle.getParcelable("user");
-            //Picasso.with(getActivity()).load(user.getAvatarUrl()).fit().into(avatar);
-            // username.setText(user.getUsername());
+        if (RemoteDatabaseSingleton.getInstance(getActivity()).isUserLoggedIn()) {
+            this.user=RemoteDatabaseSingleton.getInstance(getActivity()).getUser();
         }
         settingDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         initBrowserSettings();
         loadTargetUrl("");
+        profileTitle.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+                switch(item.getItemId()){
+                    case R.id.setting_option:
+                        break;
+                    case R.id.bookmark_option:
+                        FragmenUtil.switchToFragment(getActivity(),new BookmarkView());
+                        break;
+                    case R.id.history_option:
+                        FragmenUtil.switchToFragment(getActivity(),new HistoryView());
+                        break;
+                }
+                return true;
+            }
+        });
     }
 
     @Override
@@ -162,20 +185,9 @@ public class HomeView extends AbstractFragment implements HomeViewInterface, Vie
 
         }
     }
-    public static AbstractFragment newInstanceWithUser(User user) {
-        Bundle bundle = new Bundle();
-        bundle.putBoolean("hasUser", true);
-        bundle.putParcelable("user", user);
-        HomeView homeView = new HomeView();
-        homeView.setArguments(bundle);
-        return homeView;
-    }
 
     public static AbstractFragment newInstance() {
         HomeView homeView = new HomeView();
-        Bundle bundle = new Bundle();
-        bundle.putBoolean("hasUser", false);
-        homeView.setArguments(bundle);
         return homeView;
     }
     public static AbstractFragment newInstanceWithUrl(String url){

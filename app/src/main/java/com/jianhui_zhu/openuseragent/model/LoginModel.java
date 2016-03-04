@@ -49,6 +49,7 @@ public class LoginModel {
                 user=userIn;
             }
         });
+
         return user;
     }
     public void logout(){

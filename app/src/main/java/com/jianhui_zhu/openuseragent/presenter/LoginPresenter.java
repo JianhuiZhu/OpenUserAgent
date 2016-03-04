@@ -31,6 +31,6 @@ public class LoginPresenter {
 
     public void login() {
         User user=loginModel.attemptLogin();
-        FragmenUtil.switchToFragment(context, HomeView.newInstanceWithUser(user));
+        FragmenUtil.switchToFragment(context, HomeView.newInstance());
     }
 }

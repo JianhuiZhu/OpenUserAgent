@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.jianhui_zhu.openuseragent.R;
@@ -51,14 +52,15 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
         return bookmarks==null?0:bookmarks.size();
     }
 
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.bookmark_name)
         TextView name;
         @Bind(R.id.bookmark_url)
         TextView url;
         @OnClick(R.id.bookmark_url)
-        public void click(View view){
-            //FragmenUtil.switchToFragment(context, );
+        public void click(TextView view){
+            FragmenUtil.switchToFragment(context, HomeView.newInstanceWithUrl(view.getText().toString()));
         }
         public ViewHolder(View itemView) {
             super(itemView);

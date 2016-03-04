@@ -89,6 +89,6 @@ public class LoginView extends AbstractFragment implements LoginViewInterface{
 
     @Override
     public void switchFragmentWithUser(User user) {
-        FragmenUtil.switchToFragment(getActivity(), HomeView.newInstanceWithUser(user));
+        FragmenUtil.switchToFragment(getActivity(), HomeView.newInstance());
     }
 }

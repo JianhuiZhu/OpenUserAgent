@@ -60,6 +60,7 @@ public class RemoteDatabaseSingleton implements GoogleApiClient.ConnectionCallba
     }
 
     public Observable<String> saveBookmark(final Bookmark bookmark) {
+
         return Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
@@ -111,8 +112,8 @@ public class RemoteDatabaseSingleton implements GoogleApiClient.ConnectionCallba
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     bookmarks = new ArrayList<>((int) dataSnapshot.getChildrenCount());
                     for (DataSnapshot child : dataSnapshot.getChildren()) {
-                        Record record = child.getValue(Record.class);
-                        records.add(record);
+                        Bookmark record = child.getValue(Bookmark.class);
+                        bookmarks.add(record);
                     }
                 }
 
@@ -207,5 +208,8 @@ public class RemoteDatabaseSingleton implements GoogleApiClient.ConnectionCallba
             return false;
         }
         return true;
+    }
+    public User getUser(){
+        return user;
     }
 }
