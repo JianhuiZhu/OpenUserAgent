@@ -21,4 +21,5 @@ public class BookmarkPresenter {
     public List<Bookmark> getAllBookmarks(){
         return bookmarkModel.getAllBookmarks();
     }
+
 }

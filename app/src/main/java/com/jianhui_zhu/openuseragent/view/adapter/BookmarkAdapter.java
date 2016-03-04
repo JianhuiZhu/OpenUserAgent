@@ -24,12 +24,13 @@ import butterknife.OnClick;
  * Created by Jianhui Zhu on 2016-02-05.
  */
 public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHolder>{
+    List<Bookmark> bookmarks;
+    Context context;
     public  BookmarkAdapter(List<Bookmark> bookmarks,Context context){
         this.bookmarks=bookmarks;
         this.context=context;
     }
-    List<Bookmark> bookmarks;
-    Context context;
+
     @Override
     public BookmarkAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         this.context = parent.getContext();
@@ -53,18 +54,26 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
     }
 
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener,View.OnClickListener{
         @Bind(R.id.bookmark_name)
         TextView name;
         @Bind(R.id.bookmark_url)
         TextView url;
-        @OnClick(R.id.bookmark_url)
-        public void click(TextView view){
-            FragmenUtil.switchToFragment(context, HomeView.newInstanceWithUrl(view.getText().toString()));
-        }
         public ViewHolder(View itemView) {
             super(itemView);
+            itemView.setOnLongClickListener(this);
+            itemView.setOnClickListener(this);
             ButterKnife.bind(this,itemView);
+        }
+
+        @Override
+        public void onClick(View v) {
+            FragmenUtil.switchToFragment(context,HomeView.newInstanceWithUrl(url.getText().toString()));
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            return false;
         }
     }
 
