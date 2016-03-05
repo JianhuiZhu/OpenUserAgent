@@ -1,34 +1,35 @@
 package com.jianhui_zhu.openuseragent.view.adapter;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.view.HomeView;
+import com.jianhui_zhu.openuseragent.view.dialogs.BookmarkDialog;
+import com.jianhui_zhu.openuseragent.view.interfaces.BookmarkAdapterInterface;
 
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 /**
  * Created by Jianhui Zhu on 2016-02-05.
  */
-public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHolder>{
+public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHolder> implements BookmarkAdapterInterface{
     List<Bookmark> bookmarks;
     Context context;
-    public  BookmarkAdapter(List<Bookmark> bookmarks,Context context){
+    RecyclerView recyclerView;
+    public  BookmarkAdapter(List<Bookmark> bookmarks,Context context,RecyclerView recyclerView){
         this.bookmarks=bookmarks;
         this.context=context;
+        this.recyclerView=recyclerView;
     }
 
     @Override
@@ -41,11 +42,13 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
         return new ViewHolder(view);
     }
 
+
     @Override
     public void onBindViewHolder(BookmarkAdapter.ViewHolder holder, int position) {
         Bookmark bookmark=bookmarks.get(position);
         holder.name.setText(bookmark.getName());
         holder.url.setText(bookmark.getUrl());
+        holder.location=position;
     }
 
     @Override
@@ -53,8 +56,26 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
         return bookmarks==null?0:bookmarks.size();
     }
 
+    @Override
+    public void updatedBookmark(int position, Bookmark bookmark) {
+        Bookmark cur=bookmarks.get(position);
+        cur.setName(bookmark.getName());
+        cur.setUrl(bookmark.getUrl());
+        this.notifyItemChanged(position);
+    }
+
+    @Override
+    public void deletedBookmark(int position) {
+        bookmarks.remove(position);
+        recyclerView.removeViewAt(position);
+        this.notifyItemRemoved(position);
+        this.notifyItemRangeChanged(position,bookmarks.size());
+
+    }
+
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener,View.OnClickListener{
+        int location;
         @Bind(R.id.bookmark_name)
         TextView name;
         @Bind(R.id.bookmark_url)
@@ -73,7 +94,8 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
 
         @Override
         public boolean onLongClick(View v) {
-            return false;
+           FragmenUtil.switchToFragment(context,BookmarkDialog.newInstance(bookmarks.get(location),location));
+            return true;
         }
     }
 

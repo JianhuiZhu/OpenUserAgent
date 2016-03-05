@@ -15,6 +15,7 @@ import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.data.DataBufferObserver;
 import com.google.android.gms.plus.Plus;
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
 import com.jianhui_zhu.openuseragent.model.beans.Record;
@@ -22,7 +23,9 @@ import com.jianhui_zhu.openuseragent.model.beans.User;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Observer;
 
 import rx.Observable;
@@ -58,7 +61,6 @@ public class RemoteDatabaseSingleton implements GoogleApiClient.ConnectionCallba
         }
         return remoteDB;
     }
-
     public Observable<String> saveBookmark(final Bookmark bookmark) {
 
         return Observable.create(new Observable.OnSubscribe<String>() {
@@ -211,5 +213,72 @@ public class RemoteDatabaseSingleton implements GoogleApiClient.ConnectionCallba
     }
     public User getUser(){
         return user;
+    }
+
+    public Observable<Bookmark> updateBookmark(final Bookmark bookmark){
+        return Observable.create(new Observable.OnSubscribe<Bookmark>() {
+            @Override
+            public void call(final Subscriber<? super Bookmark> subscriber) {
+                Firebase ref=new Firebase(Constant.urlRoot).child(user.getuID()).child("bookmarks").child(bookmark.getbID());
+                Map<String,Object> updated=new HashMap<String, Object>();
+                updated.put("name",bookmark.getName());
+                updated.put("url",bookmark.getUrl());
+                ref.updateChildren(updated, new Firebase.CompletionListener() {
+                    @Override
+                    public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                        subscriber.onNext(bookmark);
+                        subscriber.onCompleted();
+                    }
+                });
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Observable<Record> updateHistory(final Record record){
+        return Observable.create(new Observable.OnSubscribe<Record>() {
+            @Override
+            public void call(final Subscriber<? super Record> subscriber) {
+                Firebase ref=new Firebase(Constant.urlRoot).child(user.getuID()).child("histories").child(record.getrID());
+                Map<String,Object> updated=new HashMap<String, Object>();
+                updated.put("url",record.getUrl());
+                ref.updateChildren(updated, new Firebase.CompletionListener() {
+                    @Override
+                    public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                        subscriber.onNext(record);
+                        subscriber.onCompleted();
+                    }
+                });
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+    }
+    public Observable<String> removeBookmark(final Bookmark bookmark){
+        return Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(final Subscriber<? super String> subscriber) {
+                Firebase ref=new Firebase(Constant.urlRoot).child(user.getuID()).child("bookmarks").child(bookmark.getbID());
+                ref.removeValue(new Firebase.CompletionListener() {
+                    @Override
+                    public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                        subscriber.onNext("Bookmark was deleted");
+                        subscriber.onCompleted();
+                    }
+                });
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+    }
+    public Observable<String> removeHistory(final Record record){
+        return Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(final Subscriber<? super String> subscriber) {
+                Firebase ref=new Firebase(Constant.urlRoot).child(user.getuID()).child("histories").child(record.getrID());
+                ref.removeValue(new Firebase.CompletionListener() {
+                    @Override
+                    public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                        subscriber.onNext("history was deleted");
+                        subscriber.onCompleted();
+                    }
+                });
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
 }

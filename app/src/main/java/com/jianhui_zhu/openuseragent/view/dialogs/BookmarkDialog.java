@@ -20,6 +20,7 @@ import butterknife.OnClick;
  * Created by jianhuizhu on 2016-03-04.
  */
 public class BookmarkDialog extends AbstractDialogFragment {
+    int position;
     Bookmark bookmark;
     @Bind(R.id.name)
     EditText name;
@@ -37,6 +38,7 @@ public class BookmarkDialog extends AbstractDialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         bookmark=getArguments().getParcelable("bookmark");
+        position=getArguments().getInt("position");
     }
 
     @Nullable
@@ -54,10 +56,11 @@ public class BookmarkDialog extends AbstractDialogFragment {
         url.setText(bookmark.getUrl());
     }
 
-    public static BookmarkDialog newInstance(Bookmark bookmark) {
+    public static BookmarkDialog newInstance(Bookmark bookmark,int position) {
 
         Bundle args = new Bundle();
         args.putParcelable("bookmark",bookmark);
+        args.putInt("position",position);
         BookmarkDialog fragment = new BookmarkDialog();
         fragment.setArguments(args);
         return fragment;
