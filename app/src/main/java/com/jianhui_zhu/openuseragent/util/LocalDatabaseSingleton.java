@@ -54,7 +54,7 @@ public class LocalDatabaseSingleton {
         return Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
-                LocalDatabaseHelper.getInstance(context).getWritableDatabase().delete("Bookmark","id="+bookmark.getbID(),null);
+                LocalDatabaseHelper.getInstance(context).getWritableDatabase().delete("Bookmarks","id="+bookmark.getbID(),null);
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 

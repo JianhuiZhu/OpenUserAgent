@@ -3,6 +3,7 @@ package com.jianhui_zhu.openuseragent.model;
 import android.content.Context;
 
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
+import com.jianhui_zhu.openuseragent.util.DataValidationUtil;
 import com.jianhui_zhu.openuseragent.util.LocalDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.util.RemoteDatabaseSingleton;
 
@@ -38,7 +39,7 @@ public class BookmarkModel {
     }
 
     public Observable updateBookmark(Bookmark bookmark){
-        if(RemoteDatabaseSingleton.getInstance(context).isUserLoggedIn()){
+        if(RemoteDatabaseSingleton.getInstance(context).isUserLoggedIn()&& !DataValidationUtil.isInteger(bookmark.getbID())){
             return RemoteDatabaseSingleton.getInstance(context).updateBookmark(bookmark);
         }else{
             return LocalDatabaseSingleton.getInstance(context).updateBookmark(bookmark);
@@ -46,7 +47,7 @@ public class BookmarkModel {
     }
 
     public Observable deleteBookmark(Bookmark bookmark){
-        if(RemoteDatabaseSingleton.getInstance(context).isUserLoggedIn()){
+        if(RemoteDatabaseSingleton.getInstance(context).isUserLoggedIn()&& !DataValidationUtil.isInteger(bookmark.getbID())){
             return RemoteDatabaseSingleton.getInstance(context).removeBookmark(bookmark);
         }else{
             return LocalDatabaseSingleton.getInstance(context).deleteBookmark(bookmark);
