@@ -15,20 +15,16 @@ import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.data.DataBufferObserver;
 import com.google.android.gms.plus.Plus;
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
 import com.jianhui_zhu.openuseragent.model.beans.Record;
 import com.jianhui_zhu.openuseragent.model.beans.User;
 
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Observer;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -157,8 +153,8 @@ public class RemoteDatabaseSingleton implements GoogleApiClient.ConnectionCallba
                                             } else {
                                                 user = new User();
                                                 user.setuID(uid);
-                                                user.setUsername(authData.getProviderData().get(Constant.nameInGoogle).toString());
-                                                user.setAvatarUrl(authData.getProviderData().get(Constant.avatarInGoogle).toString());
+                                                user.setUsername(authData.getProviderData().get(Constant.NAME_IN_GOOGLE).toString());
+                                                user.setAvatarUrl(authData.getProviderData().get(Constant.AVATAR_IN_GOOGLE).toString());
                                                 ref.child(uid).setValue(user);
                                             }
                                             getAllBookmarks();

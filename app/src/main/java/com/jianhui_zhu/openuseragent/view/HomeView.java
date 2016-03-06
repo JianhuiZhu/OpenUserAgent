@@ -3,20 +3,21 @@ package com.jianhui_zhu.openuseragent.view;
 import android.graphics.Bitmap;
 import android.media.Image;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +27,7 @@ import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
 import com.jianhui_zhu.openuseragent.util.AbstractFragment;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.RemoteDatabaseSingleton;
+import com.jianhui_zhu.openuseragent.util.SettingSingleton;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 import com.squareup.picasso.Picasso;
 
@@ -37,7 +39,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * Created by Jianhui Zhu on 2016-01-27.
  */
-public class HomeView extends AbstractFragment implements HomeViewInterface, View.OnClickListener {
+public class HomeView extends AbstractFragment implements HomeViewInterface {
     User user;
     private boolean drawerIsOpen = false;
     @Bind(R.id.web_container) WebView webHolder;
@@ -45,8 +47,9 @@ public class HomeView extends AbstractFragment implements HomeViewInterface, Vie
     DrawerLayout settingDrawer;
     @Bind(R.id.profile_title)
     NavigationView profileTitle;
-
-    @OnClick({R.id.home_refresh_icon, R.id.add_bookmark_icon, R.id.home_menu_icon, R.id.home_url_bar})
+    @Bind(R.id.home_url_bar)
+    EditText urlBar;
+    @OnClick({R.id.home_refresh_icon, R.id.add_bookmark_icon, R.id.home_menu_icon})
     public void click(View view) {
         switch (view.getId()) {
             case R.id.home_refresh_icon:
@@ -63,8 +66,8 @@ public class HomeView extends AbstractFragment implements HomeViewInterface, Vie
                 } else {
                     presenter.saveBookmark(url, urlTitle, user.getuID());
                 }
-                Toast.makeText(getActivity(), "current url is " + url + " \n current title is " + urlTitle, Toast.LENGTH_LONG).show();
-                //TO-DO add bookmark function
+                //Toast.makeText(getActivity(), "current url is " + url + " \n current title is " + urlTitle, Toast.LENGTH_LONG).show();
+
                 break;
             case R.id.home_menu_icon:
                 if (RemoteDatabaseSingleton.getInstance(getActivity()).isUserLoggedIn()) {
@@ -78,8 +81,6 @@ public class HomeView extends AbstractFragment implements HomeViewInterface, Vie
                 }
                 settingDrawer.openDrawer(Gravity.RIGHT);
                 drawerIsOpen = true;
-                break;
-            case R.id.home_url_bar:
                 break;
         }
     }
@@ -100,13 +101,17 @@ public class HomeView extends AbstractFragment implements HomeViewInterface, Vie
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Bundle bundle = getArguments();
         if (RemoteDatabaseSingleton.getInstance(getActivity()).isUserLoggedIn()) {
             this.user=RemoteDatabaseSingleton.getInstance(getActivity()).getUser();
         }
         settingDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         initBrowserSettings();
-        loadTargetUrl("");
+        boolean hasUrl=getArguments().getBoolean("hasUrl");
+        if(hasUrl){
+            loadTargetUrl(getArguments().getString("url"));
+        }else {
+            loadTargetUrl("");
+        }
         profileTitle.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
@@ -119,6 +124,23 @@ public class HomeView extends AbstractFragment implements HomeViewInterface, Vie
                     case R.id.history_option:
                         FragmenUtil.switchToFragment(getActivity(),new HistoryView());
                         break;
+                }
+                return true;
+            }
+        });
+
+        urlBar.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if(event.getKeyCode()== EditorInfo.IME_ACTION_SEARCH||event.getKeyCode()==EditorInfo.IME_ACTION_DONE||event.getKeyCode()==KeyEvent.KEYCODE_ENTER){
+                    String url=urlBar.getText().toString();
+                    if(!url.equals("")){
+                        if(android.webkit.URLUtil.isValidUrl(url)) {
+                            loadTargetUrl(url);
+                        }else{
+                            loadTargetUrl(SettingSingleton.getInstance(getActivity()).getSearchEngine()+url);
+                        }
+                    }
                 }
                 return true;
             }
@@ -141,7 +163,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface, Vie
         if(url!=null&&!url.equals("")){
             this.webHolder.loadUrl(url);
         }else{
-            this.webHolder.loadUrl("http://www.google.com");
+            this.webHolder.loadUrl(SettingSingleton.getInstance(getActivity()).getHomePage());
         }
     }
 
@@ -150,14 +172,14 @@ public class HomeView extends AbstractFragment implements HomeViewInterface, Vie
         Toast.makeText(getActivity(), info, Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    public void onClick(View v) {
-
-        if (drawerIsOpen) {
-            settingDrawer.closeDrawer(Gravity.LEFT);
-            drawerIsOpen = false;
-        }
-    }
+//    @Override
+//    public void onClick(View v) {
+//
+//        if (drawerIsOpen) {
+//            settingDrawer.closeDrawer(Gravity.LEFT);
+//            drawerIsOpen = false;
+//        }
+//    }
 
     private class CustomWebView extends WebViewClient{
 
@@ -188,12 +210,16 @@ public class HomeView extends AbstractFragment implements HomeViewInterface, Vie
 
     public static AbstractFragment newInstance() {
         HomeView homeView = new HomeView();
+        Bundle bundle=new Bundle();
+        bundle.putBoolean("hasUrl",false);
+        homeView.setArguments(bundle);
         return homeView;
     }
     public static AbstractFragment newInstanceWithUrl(String url){
         HomeView homeView=new HomeView();
         Bundle bundle=new Bundle();
-        bundle.putString("hasUrl",url);
+        bundle.putBoolean("hasUrl",true);
+        bundle.putString("url",url);
         homeView.setArguments(bundle);
         return homeView;
     }

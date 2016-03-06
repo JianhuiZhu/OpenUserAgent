@@ -25,6 +25,7 @@ private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 		Firebase.setAndroidContext(this);
 		Firebase.getDefaultConfig().setLogLevel(Logger.Level.DEBUG);
 		Firebase.getDefaultConfig().enablePersistence();
+		SettingSingleton.getInstance(getApplicationContext());
 //		manager.registerGcm(this).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).subscribe(new Action1<Boolean>() {
 //			@Override
 //			public void call(Boolean succeed) {
