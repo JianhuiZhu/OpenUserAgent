@@ -1,5 +1,6 @@
 package com.jianhui_zhu.openuseragent.util;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
@@ -32,7 +33,32 @@ public class LocalDatabaseSingleton {
         LocalDatabaseSingleton.context = context;
         return instance;
     }
+    public Observable<String> updateBookmark(final Bookmark bookmark){
+        return Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                Cursor cursor=LocalDatabaseHelper.getInstance(context)
+                        .getReadableDatabase()
+                        .rawQuery("SELECT * FROM Bookmarks WHERE id=?", new String[]{bookmark.getbID()});
+                if(cursor.getCount()>0){
+                    ContentValues newValues = new ContentValues();
+                    newValues.put("name",bookmark.getName());
+                    newValues.put("url",bookmark.getUrl());
+                    LocalDatabaseHelper.getInstance(context).getWritableDatabase()
+                            .update("Bookmarks",newValues,"id="+bookmark.getbID(),null);
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+    }
+    public Observable<String> deleteBookmark(final Bookmark bookmark){
+        return Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                LocalDatabaseHelper.getInstance(context).getWritableDatabase().delete("Bookmark","id="+bookmark.getbID(),null);
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 
+    }
     public Observable<String> saveHistory(final Record record) {
         return Observable.create(new Observable.OnSubscribe<String>() {
             @Override
@@ -49,7 +75,6 @@ public class LocalDatabaseSingleton {
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 
     }
-
     public Observable<String> saveBookmark(final Bookmark bookmark) {
         return Observable.create(new Observable.OnSubscribe<String>() {
             @Override
@@ -75,6 +100,7 @@ public class LocalDatabaseSingleton {
         if (cursor.moveToFirst()) {
             do {
                 Bookmark bookmark = new Bookmark();
+                bookmark.setbID(cursor.getString(0));
                 bookmark.setName(cursor.getString(1));
                 bookmark.setUrl(cursor.getString(2));
                 result.add(bookmark);

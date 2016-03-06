@@ -5,18 +5,19 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerView.SimpleOnItemTouchListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
+import android.widget.Toast;
 
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
+import com.jianhui_zhu.openuseragent.presenter.BookmarkPresenter;
 import com.jianhui_zhu.openuseragent.util.AbstractFragment;
 import com.jianhui_zhu.openuseragent.util.LocalDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.util.RemoteDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.view.adapter.BookmarkAdapter;
+import com.jianhui_zhu.openuseragent.view.interfaces.BookmarkViewInterface;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,13 +28,14 @@ import butterknife.ButterKnife;
 /**
  * Created by Jianhui Zhu on 2016-02-06.
  */
-public class BookmarkView extends AbstractFragment{
+public class BookmarkView extends AbstractFragment implements BookmarkViewInterface{
     @Bind(R.id.list)
     RecyclerView bookmarkList;
-
+    BookmarkPresenter bookmarkPresenter;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        bookmarkPresenter=new BookmarkPresenter(getActivity(),this);
     }
 
     @Nullable
@@ -52,13 +54,17 @@ public class BookmarkView extends AbstractFragment{
             bookmarks.addAll(RemoteDatabaseSingleton.getInstance(getActivity()).getAllBookmarks());
         }
         bookmarks.addAll(LocalDatabaseSingleton.getInstance(getActivity()).getAllBookmarks());
+
         bookmarkList.setLayoutManager(new LinearLayoutManager(getActivity()));
         bookmarkList.setItemAnimator(new DefaultItemAnimator());
         bookmarkList.setHasFixedSize(true);
-        BookmarkAdapter bookmarkAdapter=new BookmarkAdapter(bookmarks,getActivity(),bookmarkList);
+        BookmarkAdapter bookmarkAdapter=new BookmarkAdapter(bookmarks,getActivity(),bookmarkList,bookmarkPresenter);
         bookmarkList.setAdapter(bookmarkAdapter);
-
     }
 
 
+    @Override
+    public void showTag(String str) {
+        Toast.makeText(getActivity(),str,Toast.LENGTH_LONG).show();
+    }
 }

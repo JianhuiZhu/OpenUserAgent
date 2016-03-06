@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
+import com.jianhui_zhu.openuseragent.presenter.BookmarkPresenter;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.view.HomeView;
 import com.jianhui_zhu.openuseragent.view.dialogs.BookmarkDialog;
@@ -26,10 +27,14 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
     List<Bookmark> bookmarks;
     Context context;
     RecyclerView recyclerView;
-    public  BookmarkAdapter(List<Bookmark> bookmarks,Context context,RecyclerView recyclerView){
+    private BookmarkAdapter adapterInterface;
+    private BookmarkPresenter bookmarkPresenter;
+    public  BookmarkAdapter(List<Bookmark> bookmarks,Context context,RecyclerView recyclerView,BookmarkPresenter bookmarkPresenter){
         this.bookmarks=bookmarks;
         this.context=context;
         this.recyclerView=recyclerView;
+        this.bookmarkPresenter=bookmarkPresenter;
+        adapterInterface=this;
     }
 
     @Override
@@ -59,6 +64,7 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
     @Override
     public void updatedBookmark(int position, Bookmark bookmark) {
         Bookmark cur=bookmarks.get(position);
+        bookmarkPresenter.updateBookmark(bookmark);
         cur.setName(bookmark.getName());
         cur.setUrl(bookmark.getUrl());
         this.notifyItemChanged(position);
@@ -66,6 +72,9 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
 
     @Override
     public void deletedBookmark(int position) {
+        Bookmark bookmark=bookmarks.get(position);
+        bookmarkPresenter.deleteBookmark(bookmark);
+
         bookmarks.remove(position);
         recyclerView.removeViewAt(position);
         this.notifyItemRemoved(position);
@@ -94,7 +103,7 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
 
         @Override
         public boolean onLongClick(View v) {
-           FragmenUtil.switchToFragment(context,BookmarkDialog.newInstance(bookmarks.get(location),location));
+           FragmenUtil.switchToFragment(context,BookmarkDialog.newInstance(bookmarks.get(location),location,adapterInterface));
             return true;
         }
     }

@@ -8,6 +8,8 @@ import com.jianhui_zhu.openuseragent.util.RemoteDatabaseSingleton;
 
 import java.util.List;
 
+import rx.Observable;
+
 /**
  * Created by jianhuizhu on 2016-02-16.
  */
@@ -33,5 +35,21 @@ public class BookmarkModel {
             bookmarks=LocalDatabaseSingleton.getInstance(context).getAllBookmarks();
         }
         return bookmarks;
+    }
+
+    public Observable updateBookmark(Bookmark bookmark){
+        if(RemoteDatabaseSingleton.getInstance(context).isUserLoggedIn()){
+            return RemoteDatabaseSingleton.getInstance(context).updateBookmark(bookmark);
+        }else{
+            return LocalDatabaseSingleton.getInstance(context).updateBookmark(bookmark);
+        }
+    }
+
+    public Observable deleteBookmark(Bookmark bookmark){
+        if(RemoteDatabaseSingleton.getInstance(context).isUserLoggedIn()){
+            return RemoteDatabaseSingleton.getInstance(context).removeBookmark(bookmark);
+        }else{
+            return LocalDatabaseSingleton.getInstance(context).deleteBookmark(bookmark);
+        }
     }
 }

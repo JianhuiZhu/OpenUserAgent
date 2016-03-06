@@ -2,6 +2,8 @@ package com.jianhui_zhu.openuseragent.view.dialogs;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,7 @@ import android.widget.EditText;
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
 import com.jianhui_zhu.openuseragent.util.AbstractDialogFragment;
+import com.jianhui_zhu.openuseragent.view.interfaces.BookmarkAdapterInterface;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -20,6 +23,7 @@ import butterknife.OnClick;
  * Created by jianhuizhu on 2016-03-04.
  */
 public class BookmarkDialog extends AbstractDialogFragment {
+    BookmarkAdapterInterface adapterInterface;
     int position;
     Bookmark bookmark;
     @Bind(R.id.name)
@@ -28,11 +32,15 @@ public class BookmarkDialog extends AbstractDialogFragment {
     EditText url;
     @OnClick(R.id.done_bookmark)
     public void done(){
-        //use id to update
+        bookmark.setName(name.getText().toString());
+        bookmark.setUrl(url.getText().toString());
+        adapterInterface.updatedBookmark(position,bookmark);
+        dismiss();
     }
     @OnClick(R.id.delete_bookmark)
     public void delete(){
-        //use id to delete
+        adapterInterface.deletedBookmark(position);
+        dismiss();
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,13 +64,16 @@ public class BookmarkDialog extends AbstractDialogFragment {
         url.setText(bookmark.getUrl());
     }
 
-    public static BookmarkDialog newInstance(Bookmark bookmark,int position) {
+    public static BookmarkDialog newInstance(Bookmark bookmark, int position, BookmarkAdapterInterface adapterInterface) {
 
         Bundle args = new Bundle();
         args.putParcelable("bookmark",bookmark);
         args.putInt("position",position);
         BookmarkDialog fragment = new BookmarkDialog();
+        fragment.adapterInterface=adapterInterface;
         fragment.setArguments(args);
         return fragment;
     }
+
+
 }

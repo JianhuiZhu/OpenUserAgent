@@ -22,6 +22,8 @@ import com.jianhui_zhu.openuseragent.model.beans.Record;
 import com.jianhui_zhu.openuseragent.model.beans.User;
 
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -149,14 +151,15 @@ public class RemoteDatabaseSingleton implements GoogleApiClient.ConnectionCallba
                                     ref.addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(DataSnapshot currentPath) {
-                                            if (currentPath.hasChild(authData.getUid())) {
-                                                user = currentPath.child(authData.getUid()).getValue(User.class);
+                                            String uid=EncryptionUtil.hash(authData.getUid());
+                                            if (currentPath.hasChild(uid)) {
+                                                user = currentPath.child(uid).getValue(User.class);
                                             } else {
                                                 user = new User();
-                                                user.setuID(authData.getUid());
+                                                user.setuID(uid);
                                                 user.setUsername(authData.getProviderData().get(Constant.nameInGoogle).toString());
                                                 user.setAvatarUrl(authData.getProviderData().get(Constant.avatarInGoogle).toString());
-                                                ref.child(authData.getUid()).setValue(user);
+                                                ref.child(uid).setValue(user);
                                             }
                                             getAllBookmarks();
                                             subscriber.onNext(user);
@@ -226,8 +229,12 @@ public class RemoteDatabaseSingleton implements GoogleApiClient.ConnectionCallba
                 ref.updateChildren(updated, new Firebase.CompletionListener() {
                     @Override
                     public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                        if(firebaseError!=null){
+                            Log.e("remote database",firebaseError.getDetails());
+                        }
                         subscriber.onNext(bookmark);
                         subscriber.onCompleted();
+
                     }
                 });
             }
