@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:background="@android:color/transparent"
     android:layout_height="40dp">
-
-    <EditText
+    <SearchView
         android:id="@+id/home_url_bar"
         android:layout_gravity="center"
         app:layout_widthPercent="60%"
