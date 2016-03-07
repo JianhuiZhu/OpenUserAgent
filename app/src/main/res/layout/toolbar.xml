@@ -13,7 +13,6 @@
         android:hint="Type url or keyword"
         android:background="@android:color/transparent"
         android:imeOptions="actionSearch"
-        android:layout_margin="8dp"
         android:layout_width="0dp"
         android:layout_height="0dp" />
 

@@ -1,6 +1,8 @@
 package com.jianhui_zhu.openuseragent.model;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.provider.Settings;
 
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
 import com.jianhui_zhu.openuseragent.model.beans.Record;
@@ -47,6 +49,14 @@ public class HomeModel {
         }
         return LocalDatabaseSingleton.getInstance(context).saveHistory(record);
     }
-
-
+    public void saveHistoryLocal(String url,String name){
+        Record record=new Record();
+        record.setName(name);
+        record.setUrl(url);
+        record.setTimestamp(System.currentTimeMillis());
+        LocalDatabaseSingleton.getInstance(context).saveHistory(record);
+    }
+    public void incrementRecordLocally(Cursor cursor){
+        LocalDatabaseSingleton.getInstance(context).incrementQueryRecordCount(cursor);
+    }
 }

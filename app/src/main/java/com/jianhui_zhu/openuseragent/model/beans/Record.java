@@ -10,12 +10,23 @@ import java.io.Serializable;
  */
 public class Record implements Parcelable{
     String rID;
+    String name;
     String url;
     long timestamp;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
 
 
     protected Record(Parcel in) {
         rID = in.readString();
+        name=in.readString();
         url = in.readString();
         timestamp = in.readLong();
     }
@@ -68,6 +79,7 @@ public class Record implements Parcelable{
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(rID);
+        dest.writeString(name);
         dest.writeString(url);
         dest.writeLong(timestamp);
     }

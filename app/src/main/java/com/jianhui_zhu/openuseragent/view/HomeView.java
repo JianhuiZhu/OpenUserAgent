@@ -2,6 +2,7 @@ package com.jianhui_zhu.openuseragent.view;
 
 import android.graphics.Bitmap;
 import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -13,11 +14,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +28,7 @@ import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.User;
 import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
 import com.jianhui_zhu.openuseragent.util.AbstractFragment;
+import com.jianhui_zhu.openuseragent.util.Constant;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.RemoteDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.util.SettingSingleton;
@@ -48,7 +52,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
     @Bind(R.id.profile_title)
     NavigationView profileTitle;
     @Bind(R.id.home_url_bar)
-    EditText urlBar;
+    SearchView urlBar;
     @OnClick({R.id.home_refresh_icon, R.id.add_bookmark_icon, R.id.home_menu_icon})
     public void click(View view) {
         switch (view.getId()) {
@@ -128,23 +132,28 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
                 return true;
             }
         });
-
-        urlBar.setOnKeyListener(new View.OnKeyListener() {
+        urlBar.setIconifiedByDefault(true);
+        urlBar.setSubmitButtonEnabled(true);
+        urlBar.onActionViewExpanded();
+        urlBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if(event.getKeyCode()== EditorInfo.IME_ACTION_SEARCH||event.getKeyCode()==EditorInfo.IME_ACTION_DONE||event.getKeyCode()==KeyEvent.KEYCODE_ENTER){
-                    String url=urlBar.getText().toString();
-                    if(!url.equals("")){
-                        if(android.webkit.URLUtil.isValidUrl(url)) {
-                            loadTargetUrl(url);
-                        }else{
-                            loadTargetUrl(SettingSingleton.getInstance(getActivity()).getSearchEngine()+url);
-                        }
-                    }
+            public boolean onQueryTextSubmit(String query) {
+                if(URLUtil.isValidUrl(query)){
+                    loadTargetUrl(query);
+                }
+                else{
+                    loadTargetUrl(Constant.GOOGLE_PREFIX+query);
                 }
                 return true;
             }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+
+                return false;
+            }
         });
+
     }
 
     @Override
@@ -165,6 +174,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
         }else{
             this.webHolder.loadUrl(SettingSingleton.getInstance(getActivity()).getHomePage());
         }
+
     }
 
     @Override
@@ -195,7 +205,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
 
         @Override
         public void onPageFinished(WebView view, String url) {
-
+            presenter.saveRecordLocally(view.getUrl(),view.getTitle());
 
         }
 

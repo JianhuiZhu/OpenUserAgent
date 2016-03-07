@@ -5,6 +5,7 @@
     style="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/transparent"
     android:layout_gravity="end"
     android:fitsSystemWindows="true">
 
