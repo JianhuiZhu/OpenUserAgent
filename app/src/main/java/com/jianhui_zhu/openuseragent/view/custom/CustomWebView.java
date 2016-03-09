@@ -3,13 +3,18 @@ package com.jianhui_zhu.openuseragent.view.custom;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.webkit.WebView;
-import android.widget.Toast;
+
+import com.jianhui_zhu.openuseragent.view.interfaces.OnScollTopInterface;
 
 /**
  * Created by jianhuizhu on 2016-03-09.
  */
 public class CustomWebView extends WebView {
+    public void setOnScollTopInterface(OnScollTopInterface onScollTopInterface) {
+        this.onScollTopInterface = onScollTopInterface;
+    }
 
+    OnScollTopInterface onScollTopInterface;
 
     public CustomWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -32,10 +37,9 @@ public class CustomWebView extends WebView {
     }
 
     @Override
-    protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
-        super.onOverScrolled(scrollX, scrollY, clampedX, clampedY);
-        if(scrollY<=this.getHeight()){
-            Toast.makeText(getContext(),"At the top",Toast.LENGTH_LONG).show();
-        }
+    protected void onScrollChanged(int l, int t, int oldl, int oldt) {
+        super.onScrollChanged(l, t, oldl, oldt);
+        onScollTopInterface.onSChanged(l,t,oldl,oldt);
     }
+
 }

@@ -33,6 +33,7 @@ import com.jianhui_zhu.openuseragent.util.SettingSingleton;
 import com.jianhui_zhu.openuseragent.view.adapter.SearchSuggestionAdapter;
 import com.jianhui_zhu.openuseragent.view.custom.CustomWebView;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
+import com.jianhui_zhu.openuseragent.view.interfaces.OnScollTopInterface;
 import com.squareup.picasso.Picasso;
 
 import butterknife.Bind;
@@ -59,6 +60,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
     @Bind(R.id.search_suggestion_list)
     ListView suggestionList;
     SearchSuggestionAdapter suggestionAdapter;
+
     @OnClick({R.id.home_refresh_icon, R.id.add_bookmark_icon, R.id.home_menu_icon})
     public void click(View view) {
         switch (view.getId()) {
@@ -67,7 +69,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
                 break;
             case R.id.add_bookmark_icon:
                 if (RemoteDatabaseSingleton.getInstance(getActivity()).isUserLoggedIn()) {
-                    this.user=RemoteDatabaseSingleton.getInstance(getActivity()).getUser();
+                    this.user = RemoteDatabaseSingleton.getInstance(getActivity()).getUser();
                 }
                 String url = webHolder.getUrl();
                 String urlTitle = webHolder.getTitle();
@@ -80,7 +82,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
                 break;
             case R.id.home_menu_icon:
                 if (RemoteDatabaseSingleton.getInstance(getActivity()).isUserLoggedIn()) {
-                    this.user=RemoteDatabaseSingleton.getInstance(getActivity()).getUser();
+                    this.user = RemoteDatabaseSingleton.getInstance(getActivity()).getUser();
                 }
                 if (user != null) {
                     CircleImageView avatar = (CircleImageView) getActivity().findViewById(R.id.home_avatar);
@@ -93,17 +95,20 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
                 break;
         }
     }
+
     private HomePresenter presenter;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         presenter = new HomePresenter(this, getActivity());
-        suggestionAdapter=new SearchSuggestionAdapter(getActivity(),presenter);
+        suggestionAdapter = new SearchSuggestionAdapter(getActivity(), presenter);
     }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view= inflater.inflate(R.layout.view_home,container,false);
+        View view = inflater.inflate(R.layout.view_home, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
@@ -111,28 +116,40 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        webHolder.setOnScollTopInterface(new OnScollTopInterface() {
+            @Override
+            public void onSChanged(int l, int t, int oldl, int oldt) {
+
+                float webcontent = webHolder.getContentHeight() * webHolder.getScale();
+                float webnow = webHolder.getHeight() + webHolder.getScrollY();
+
+                if (webHolder.getScaleY() == 0&&(l-oldl)>=0) {
+                    toolBarArea.setVisibility(View.VISIBLE);
+                }
+            }
+        });
         if (RemoteDatabaseSingleton.getInstance(getActivity()).isUserLoggedIn()) {
-            this.user=RemoteDatabaseSingleton.getInstance(getActivity()).getUser();
+            this.user = RemoteDatabaseSingleton.getInstance(getActivity()).getUser();
         }
         settingDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         initBrowserSettings();
-        boolean hasUrl=getArguments().getBoolean("hasUrl");
-        if(hasUrl){
+        boolean hasUrl = getArguments().getBoolean("hasUrl");
+        if (hasUrl) {
             loadTargetUrl(getArguments().getString("url"));
-        }else {
+        } else {
             loadTargetUrl("");
         }
         profileTitle.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
-                switch(item.getItemId()){
+                switch (item.getItemId()) {
                     case R.id.setting_option:
                         break;
                     case R.id.bookmark_option:
-                        FragmenUtil.switchToFragment(getActivity(),new BookmarkView());
+                        FragmenUtil.switchToFragment(getActivity(), new BookmarkView());
                         break;
                     case R.id.history_option:
-                        FragmenUtil.switchToFragment(getActivity(),new HistoryView());
+                        FragmenUtil.switchToFragment(getActivity(), new HistoryView());
                         break;
                 }
                 return true;
@@ -145,14 +162,13 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
         urlBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if(URLUtil.isValidUrl(query)){
+                if (URLUtil.isValidUrl(query)) {
                     loadTargetUrl(query);
                     suggestionAdapter.changeCursor(null);
                     toolBarArea.setVisibility(View.GONE);
 
-                }
-                else{
-                    loadTargetUrl(Constant.GOOGLE_PREFIX+query);
+                } else {
+                    loadTargetUrl(Constant.GOOGLE_PREFIX + query);
 
                 }
                 presenter.saveQuery(query);
@@ -162,9 +178,9 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if(newText.equals("")){
+                if (newText.equals("")) {
                     suggestionAdapter.changeCursor(null);
-                }else {
+                } else {
                     presenter.queryText(newText);
                 }
                 return true;
@@ -177,7 +193,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
     public void initBrowserSettings() {
         WebSettings settings = this.webHolder.getSettings();
         WebViewClient client = new CustomWebViewClient();
-        WebChromeClient chromeClient=new CustomWebChrome();
+        WebChromeClient chromeClient = new CustomWebChrome();
         settings.setDefaultTextEncodingName("UTF-8");
         settings.setJavaScriptEnabled(true);
         this.webHolder.setWebViewClient(client);
@@ -186,9 +202,9 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
 
     @Override
     public void loadTargetUrl(String url) {
-        if(url!=null&&!url.equals("")){
+        if (url != null && !url.equals("")) {
             this.webHolder.loadUrl(url);
-        }else{
+        } else {
             this.webHolder.loadUrl(SettingSingleton.getInstance(getActivity()).getHomePage());
         }
 
@@ -207,17 +223,18 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
 
     @Override
     public void searchTargetWord(String word) {
-        loadTargetUrl(SettingSingleton.getInstance(getActivity()).getSearchEngine()+word);
+        loadTargetUrl(SettingSingleton.getInstance(getActivity()).getSearchEngine() + word);
     }
 
     @Override
     public void changeToolBarVisibility() {
-        if(toolBarArea.getVisibility()==View.GONE){
+        if (toolBarArea.getVisibility() == View.GONE) {
             toolBarArea.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             toolBarArea.setVisibility(View.GONE);
         }
     }
+
 
 //    @Override
 //    public void onClick(View v) {
@@ -228,13 +245,14 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
 //        }
 //    }
 
-    private class CustomWebViewClient extends WebViewClient{
+    private class CustomWebViewClient extends WebViewClient {
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             view.loadUrl(url);
             return true;
         }
+
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
         }
@@ -242,31 +260,33 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
 
         @Override
         public void onPageFinished(WebView view, String url) {
-            presenter.saveRecordLocally(view.getUrl(),view.getTitle());
+            presenter.saveRecordLocally(view.getUrl(), view.getTitle());
 
         }
 
 
     }
-    private class CustomWebChrome extends WebChromeClient{
+
+    private class CustomWebChrome extends WebChromeClient {
         @Override
-        public void onProgressChanged(WebView view, int newProgress){
+        public void onProgressChanged(WebView view, int newProgress) {
 
         }
     }
 
     public static AbstractFragment newInstance() {
         HomeView homeView = new HomeView();
-        Bundle bundle=new Bundle();
-        bundle.putBoolean("hasUrl",false);
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("hasUrl", false);
         homeView.setArguments(bundle);
         return homeView;
     }
-    public static AbstractFragment newInstanceWithUrl(String url){
-        HomeView homeView=new HomeView();
-        Bundle bundle=new Bundle();
-        bundle.putBoolean("hasUrl",true);
-        bundle.putString("url",url);
+
+    public static AbstractFragment newInstanceWithUrl(String url) {
+        HomeView homeView = new HomeView();
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("hasUrl", true);
+        bundle.putString("url", url);
         homeView.setArguments(bundle);
         return homeView;
     }
