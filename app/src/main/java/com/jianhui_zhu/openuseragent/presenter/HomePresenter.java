@@ -2,6 +2,7 @@ package com.jianhui_zhu.openuseragent.presenter;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.webkit.URLUtil;
 
 import com.jianhui_zhu.openuseragent.model.HomeModel;
 import com.jianhui_zhu.openuseragent.model.LoginModel;
@@ -23,7 +24,13 @@ public class HomePresenter {
         this.homeView=homeView;
         this.homeModel = new HomeModel(context);
     }
-
+    public void validateAndLoad(String word){
+        if(URLUtil.isValidUrl(word)){
+            homeView.loadTargetUrl(word);
+        }else{
+            homeView.searchTargetWord(word);
+        }
+    }
     public void saveBookmark(String url, String name, String uID) {
         Observable<String> observable;
         if (uID != null) {
@@ -41,7 +48,20 @@ public class HomePresenter {
     public void saveRecordLocally(String url,String name){
         homeModel.saveHistoryLocal(url,name);
     }
-    public void incrementRecordLocally(Cursor cursor){
-        homeModel.incrementRecordLocally(cursor);
+    public void incrementRecordLocally(int id,int count){
+        homeModel.incrementRecordLocally(id,count);
+    }
+    public void queryText(String text){
+        text=text.toLowerCase();
+        homeModel.queryText(text).subscribe(new Action1<Cursor>() {
+            @Override
+            public void call(Cursor cursor) {
+                homeView.swapCursor(cursor);
+            }
+        });
+    }
+    public void saveQuery(String query){
+        query=query.toLowerCase();
+        homeModel.saveQueryText(query);
     }
 }

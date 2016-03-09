@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
 import com.jianhui_zhu.openuseragent.model.beans.Record;
@@ -76,17 +77,29 @@ public class LocalDatabaseSingleton {
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 
     }
-    public void addQueryRecord(final String query){
-        Observable.create(new Observable.OnSubscribe<Object>() {
-            @Override
-            public void call(Subscriber<? super Object> subscriber) {
-                LocalDatabaseHelper
+    public void saveQueryRecord(final String query){
+//        Observable.create(new Observable.OnSubscribe<Object>() {
+//            @Override
+//            public void call(Subscriber<? super Object> subscriber) {
+                ContentValues newValue=new ContentValues();
+                newValue.put("query",query);
+                long result=LocalDatabaseHelper
                         .getInstance(context)
                         .getWritableDatabase()
-                        .execSQL("INSERT INTO QueryRecords(query) "
-                        +"VALUES("+"\""+query+"\")");
+                        .insert("QueryRecords",null,newValue);
+        Log.d(this.getClass().getSimpleName(),"result is  "+result);
+//            }
+//        }).subscribeOn(Schedulers.io());
+    }
+    public Observable<Cursor> getSimilarHistory(final String query){
+        return Observable.create(new Observable.OnSubscribe<Cursor>() {
+            @Override
+            public void call(Subscriber<? super Cursor> subscriber) {
+                LocalDatabaseHelper.getInstance(context)
+                        .getReadableDatabase()
+                        .query("Records",null,"name=?",new String[]{"%"+query+"%"},null,null,"timestamp DESC","3");
             }
-        }).subscribeOn(Schedulers.io());
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
     public Observable<Cursor> getQueryRecord(final String query){
         return Observable.create(new Observable.OnSubscribe<Cursor>() {
@@ -95,7 +108,9 @@ public class LocalDatabaseSingleton {
                 Cursor c=LocalDatabaseHelper
                         .getInstance(context)
                         .getReadableDatabase()
-                        .rawQuery("SELECT query FROM QueryRecords WHERE query LIKE %?% ORDER BY count DESC",new String[]{query} );
+                        .query("QueryRecords",null,"query LIKE ?",new String[]{"%"+query+"%"},null,null,"count DESC","3");
+                int count=c.getCount();
+                Log.e(this.getClass().getSimpleName(),"query result is "+count);
                 subscriber.onNext(c);
                 subscriber.onCompleted();
             }
@@ -103,14 +118,11 @@ public class LocalDatabaseSingleton {
 
     }
 
-    public void incrementQueryRecordCount(Cursor cursor){
+    public void incrementQueryRecordCount(int id, int count){
         ContentValues newValue=new ContentValues();
-        int count=cursor.getInt(1);
-        ++count;
-        newValue.put("count",count);
-        LocalDatabaseHelper.getInstance(context)
-                .getWritableDatabase()
-                .update("QueryRecords",newValue,"query=?",new String[]{cursor.getString(0)});
+        newValue.put("count",(count+1));
+        LocalDatabaseHelper.getInstance(context).getWritableDatabase()
+                .update("QueryRecords",newValue,"_id=?",new String[]{id+""});
     }
     public Observable<String> saveBookmark(final Bookmark bookmark) {
         return Observable.create(new Observable.OnSubscribe<String>() {
@@ -157,8 +169,9 @@ public class LocalDatabaseSingleton {
         if (cursor.moveToFirst()) {
             do {
                 Record record = new Record();
-                record.setTimestamp(cursor.getLong(1));
-                record.setUrl(cursor.getString(0));
+                record.setrID(cursor.getColumnName(0));
+                record.setTimestamp(cursor.getLong(3));
+                record.setUrl(cursor.getString(2));
                 result.add(record);
             } while (cursor.moveToNext());
         }
@@ -187,20 +200,19 @@ public class LocalDatabaseSingleton {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            String dropHistory ="DROP TABLE IF EXIST Records";
             String createBookmarksTable = "CREATE TABLE IF NOT EXISTS Bookmarks(" +
                     "id INTEGER NOT NULL PRIMARY KEY," +
                     "name VARCHAR(50) NOT NULL," +
                     "url VARCHAR(300) NOT NULL)";
             String createRecordsTable = "CREATE TABLE IF NOT EXISTS Records(" +
+                    "_id INTEGER NOT NULL PRIMARY KEY,"+
                     "name VARCHAR(50) NOT NULL,"+
                     "url VARCHAR(300) NOT NULL," +
-                    "timestamp INT NOT NULL," +
-                    "PRIMARY KEY(timestamp))";
-            String createQueryTable="CREATE TABLE IF NOT EXISTS QueryRecords)" +
+                    "timestamp INT NOT NULL)";
+            String createQueryTable="CREATE TABLE IF NOT EXISTS QueryRecords(" +
+                    "_id INTEGER NOT NULL PRIMARY KEY,"+
                     "query VARCHAR(400) NOT NULL," +
                     "count INT NOT NULL DEFAULT 1)";
-            db.execSQL(dropHistory);
             db.execSQL(createQueryTable);
             db.execSQL(createBookmarksTable);
             db.execSQL(createRecordsTable);

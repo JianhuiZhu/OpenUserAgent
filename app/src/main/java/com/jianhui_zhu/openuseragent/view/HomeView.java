@@ -1,25 +1,23 @@
 package com.jianhui_zhu.openuseragent.view;
 
+import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.media.Image;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.percent.PercentRelativeLayout;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,6 +30,8 @@ import com.jianhui_zhu.openuseragent.util.Constant;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.RemoteDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.util.SettingSingleton;
+import com.jianhui_zhu.openuseragent.view.adapter.SearchSuggestionAdapter;
+import com.jianhui_zhu.openuseragent.view.custom.CustomWebView;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 import com.squareup.picasso.Picasso;
 
@@ -46,13 +46,19 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class HomeView extends AbstractFragment implements HomeViewInterface {
     User user;
     private boolean drawerIsOpen = false;
-    @Bind(R.id.web_container) WebView webHolder;
+    @Bind(R.id.tool_bar_area)
+    PercentRelativeLayout toolBarArea;
+    @Bind(R.id.web_container)
+    CustomWebView webHolder;
     @Bind(R.id.setting_drawer)
     DrawerLayout settingDrawer;
     @Bind(R.id.profile_title)
     NavigationView profileTitle;
     @Bind(R.id.home_url_bar)
     SearchView urlBar;
+    @Bind(R.id.search_suggestion_list)
+    ListView suggestionList;
+    SearchSuggestionAdapter suggestionAdapter;
     @OnClick({R.id.home_refresh_icon, R.id.add_bookmark_icon, R.id.home_menu_icon})
     public void click(View view) {
         switch (view.getId()) {
@@ -70,7 +76,6 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
                 } else {
                     presenter.saveBookmark(url, urlTitle, user.getuID());
                 }
-                //Toast.makeText(getActivity(), "current url is " + url + " \n current title is " + urlTitle, Toast.LENGTH_LONG).show();
 
                 break;
             case R.id.home_menu_icon:
@@ -93,6 +98,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         presenter = new HomePresenter(this, getActivity());
+        suggestionAdapter=new SearchSuggestionAdapter(getActivity(),presenter);
     }
     @Nullable
     @Override
@@ -134,23 +140,34 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
         });
         urlBar.setIconifiedByDefault(true);
         urlBar.setSubmitButtonEnabled(true);
+        suggestionList.setAdapter(suggestionAdapter);
         urlBar.onActionViewExpanded();
         urlBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 if(URLUtil.isValidUrl(query)){
                     loadTargetUrl(query);
+                    suggestionAdapter.changeCursor(null);
+                    toolBarArea.setVisibility(View.GONE);
+
                 }
                 else{
                     loadTargetUrl(Constant.GOOGLE_PREFIX+query);
+
                 }
+                presenter.saveQuery(query);
+                suggestionAdapter.changeCursor(null);
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-
-                return false;
+                if(newText.equals("")){
+                    suggestionAdapter.changeCursor(null);
+                }else {
+                    presenter.queryText(newText);
+                }
+                return true;
             }
         });
 
@@ -159,7 +176,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
     @Override
     public void initBrowserSettings() {
         WebSettings settings = this.webHolder.getSettings();
-        WebViewClient client = new CustomWebView();
+        WebViewClient client = new CustomWebViewClient();
         WebChromeClient chromeClient=new CustomWebChrome();
         settings.setDefaultTextEncodingName("UTF-8");
         settings.setJavaScriptEnabled(true);
@@ -182,6 +199,26 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
         Toast.makeText(getActivity(), info, Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void swapCursor(Cursor cursor) {
+        suggestionAdapter.changeCursor(cursor);
+        suggestionAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void searchTargetWord(String word) {
+        loadTargetUrl(SettingSingleton.getInstance(getActivity()).getSearchEngine()+word);
+    }
+
+    @Override
+    public void changeToolBarVisibility() {
+        if(toolBarArea.getVisibility()==View.GONE){
+            toolBarArea.setVisibility(View.VISIBLE);
+        }else{
+            toolBarArea.setVisibility(View.GONE);
+        }
+    }
+
 //    @Override
 //    public void onClick(View v) {
 //
@@ -191,7 +228,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
 //        }
 //    }
 
-    private class CustomWebView extends WebViewClient{
+    private class CustomWebViewClient extends WebViewClient{
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {

@@ -18,25 +18,14 @@ import java.util.List;
 /**
  * Created by jianhuizhu on 2016-03-07.
  */
-public class SearchSuggestionAdapter extends CursorAdapter {
+public class SearchSuggestionAdapter extends SimpleCursorAdapter {
     HomePresenter homePresenter;
 
-
-
-    public SearchSuggestionAdapter(Context context, Cursor c,HomePresenter homePresenter) {
-        super(context, c, 0);
+    public SearchSuggestionAdapter(Context context,HomePresenter homePresenter) {
+        super(context, android.R.layout.simple_list_item_1, null, new String[]{"query"},new int[]{android.R.id.text1} , 0);
         this.homePresenter=homePresenter;
-    }
 
-    public List<Cursor> getSuggestions() {
-        return suggestions;
     }
-
-    public void setSuggestions(List<Cursor> suggestions) {
-        this.suggestions = suggestions;
-    }
-
-    List<Cursor> suggestions;
 
 
     @Override
@@ -47,12 +36,19 @@ public class SearchSuggestionAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, final Cursor cursor) {
         TextView tv=(TextView)view.findViewById(android.R.id.text1);
-        tv.setText(cursor.getString(0));
-        tv.setOnClickListener(new View.OnClickListener() {
+        final int id=cursor.getInt(0);
+        final String suggestion= cursor.getString(1);
+        final int count=cursor.getInt(2);
+        tv.setText(suggestion);
+        view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                homePresenter.incrementRecordLocally(cursor);
+                homePresenter.incrementRecordLocally(id,count);
+                homePresenter.validateAndLoad(suggestion);
+                changeCursor(null);
             }
         });
     }
+
+
 }

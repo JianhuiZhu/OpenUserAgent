@@ -21,16 +21,33 @@
         app:menu="@menu/menu_settings" />
 
     <LinearLayout
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <include layout="@layout/toolbar" />
-    <WebView
-        android:id="@+id/web_container"
-        android:layout_margin="0dp"
-        android:padding="0dp"
-        android:background="@android:color/transparent"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-</LinearLayout>
+        android:layout_height="match_parent">
+
+        <include layout="@layout/toolbar" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+
+            <com.jianhui_zhu.openuseragent.view.custom.CustomWebView
+                android:id="@+id/web_container"
+                android:layout_margin="0dp"
+                android:padding="0dp"
+                android:background="@android:color/transparent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+            <ListView
+                android:id="@+id/search_suggestion_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:dividerHeight="1dp"
+                android:divider="@android:color/darker_gray"
+                android:background="@android:color/white"/>
+        </FrameLayout>
+    </LinearLayout>
 
 </android.support.v4.widget.DrawerLayout>
