@@ -47,6 +47,7 @@ public class SearchSuggestionAdapter extends SimpleCursorAdapter {
                 homePresenter.incrementRecordLocally(id,count);
                 homePresenter.validateAndLoad(suggestion);
                 homePresenter.hideKeyboard();
+                homePresenter.changeToolbarVisibility(View.GONE);
                 changeCursor(null);
             }
         });

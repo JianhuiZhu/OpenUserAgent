@@ -67,4 +67,7 @@ public class HomePresenter {
     public void hideKeyboard(){
         homeView.hideKeyboard();
     }
+    public void changeToolbarVisibility(int VIEW_CODE){
+        homeView.changeToolBarVisibility(VIEW_CODE);
+    }
 }
