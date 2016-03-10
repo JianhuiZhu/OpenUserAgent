@@ -1,7 +1,9 @@
 package com.jianhui_zhu.openuseragent.view;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -12,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.DownloadListener;
 import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -97,48 +100,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
     }
 
     private HomePresenter presenter;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        presenter = new HomePresenter(this, getActivity());
-        suggestionAdapter = new SearchSuggestionAdapter(getActivity(), presenter);
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.view_home, container, false);
-        ButterKnife.bind(this, view);
-        return view;
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        webHolder.setOnScollTopInterface(new OnScollTopInterface() {
-            @Override
-            public void onSChanged(int l, int t, int oldl, int oldt) {
-
-                float webcontent = webHolder.getContentHeight() * webHolder.getScale();
-                float webnow = webHolder.getHeight() + webHolder.getScrollY();
-
-                if (webHolder.getScaleY() == 0&&(l-oldl)>=0) {
-                    toolBarArea.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-        if (RemoteDatabaseSingleton.getInstance(getActivity()).isUserLoggedIn()) {
-            this.user = RemoteDatabaseSingleton.getInstance(getActivity()).getUser();
-        }
-        settingDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-        initBrowserSettings();
-        boolean hasUrl = getArguments().getBoolean("hasUrl");
-        if (hasUrl) {
-            loadTargetUrl(getArguments().getString("url"));
-        } else {
-            loadTargetUrl("");
-        }
+    public void configViews(){
         profileTitle.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
@@ -159,6 +121,8 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
         urlBar.setSubmitButtonEnabled(true);
         suggestionList.setAdapter(suggestionAdapter);
         urlBar.onActionViewExpanded();
+        urlBar.setFocusable(false);
+        urlBar.clearFocus();
         urlBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -186,6 +150,58 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
                 return true;
             }
         });
+        boolean hasUrl = getArguments().getBoolean("hasUrl");
+        if (hasUrl) {
+            loadTargetUrl(getArguments().getString("url"));
+        } else {
+            loadTargetUrl("");
+        }
+        webHolder.setOnScollTopInterface(new OnScollTopInterface() {
+            @Override
+            public void onSChanged(int l, int t, int oldl, int oldt) {
+
+                float webcontent = webHolder.getContentHeight() * webHolder.getScale();
+                float webnow = webHolder.getHeight() + webHolder.getScrollY();
+
+                if (webHolder.getScaleY() == 0&&(l-oldl)>=0) {
+                    toolBarArea.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        settingDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        webHolder.setDownloadListener(new DownloadListener() {
+            @Override
+            public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(url));
+                startActivity(intent);
+            }
+        });
+    }
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        presenter = new HomePresenter(this, getActivity());
+        suggestionAdapter = new SearchSuggestionAdapter(getActivity(), presenter);
+
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.view_home, container, false);
+        ButterKnife.bind(this, view);
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if (RemoteDatabaseSingleton.getInstance(getActivity()).isUserLoggedIn()) {
+            this.user = RemoteDatabaseSingleton.getInstance(getActivity()).getUser();
+        }
+        initBrowserSettings();
+        configViews();
 
     }
 

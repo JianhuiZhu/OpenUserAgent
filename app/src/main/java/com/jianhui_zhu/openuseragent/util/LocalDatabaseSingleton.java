@@ -48,6 +48,7 @@ public class LocalDatabaseSingleton {
                     LocalDatabaseHelper.getInstance(context).getWritableDatabase()
                             .update("Bookmarks",newValues,"id="+bookmark.getbID(),null);
                 }
+                cursor.close();
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }

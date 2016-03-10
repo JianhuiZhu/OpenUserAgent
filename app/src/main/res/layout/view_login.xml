@@ -1,12 +1,10 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    style="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
-    tools:context=".view.LoginView">
 
-    <!-- TODO: Update blank fragment layout -->
+
     <RelativeLayout
+        tools:context=".view.LoginView"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        style="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
         android:id="@+id/google_login_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -40,5 +38,3 @@
             app:cpb_max_sweep_angle="300"
             android:visibility="gone" />
     </RelativeLayout>
-
-</FrameLayout>

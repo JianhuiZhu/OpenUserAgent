@@ -26,6 +26,6 @@ public final class SharePreferenceUtil {
         PreferenceManager
                 .getDefaultSharedPreferences(context)
                 .edit()
-                .remove(key);
+                .remove(key).commit();
     }
 }

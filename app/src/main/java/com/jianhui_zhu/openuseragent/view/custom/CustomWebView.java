@@ -2,6 +2,7 @@ package com.jianhui_zhu.openuseragent.view.custom;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.webkit.DownloadListener;
 import android.webkit.WebView;
 
 import com.jianhui_zhu.openuseragent.view.interfaces.OnScollTopInterface;

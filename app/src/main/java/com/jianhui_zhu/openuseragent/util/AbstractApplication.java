@@ -1,6 +1,8 @@
 package com.jianhui_zhu.openuseragent.util;
 
 import android.app.Application;
+import android.os.Build;
+import android.os.StrictMode;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.ndk.CrashlyticsNdk;
@@ -26,6 +28,10 @@ private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 		Firebase.getDefaultConfig().setLogLevel(Logger.Level.DEBUG);
 		Firebase.getDefaultConfig().enablePersistence();
 		SettingSingleton.getInstance(getApplicationContext());
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+			StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
+			StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build());
+		}
 //		manager.registerGcm(this).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).subscribe(new Action1<Boolean>() {
 //			@Override
 //			public void call(Boolean succeed) {
