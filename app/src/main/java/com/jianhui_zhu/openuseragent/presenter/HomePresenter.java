@@ -64,4 +64,7 @@ public class HomePresenter {
         query=query.toLowerCase();
         homeModel.saveQueryText(query);
     }
+    public void hideKeyboard(){
+        homeView.hideKeyboard();
+    }
 }

@@ -5,17 +5,19 @@ import android.util.AttributeSet;
 import android.webkit.DownloadListener;
 import android.webkit.WebView;
 
+import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 import com.jianhui_zhu.openuseragent.view.interfaces.OnScollTopInterface;
 
 /**
  * Created by jianhuizhu on 2016-03-09.
  */
 public class CustomWebView extends WebView {
-    public void setOnScollTopInterface(OnScollTopInterface onScollTopInterface) {
-        this.onScollTopInterface = onScollTopInterface;
+    public void setHomeViewInterface(HomeViewInterface homeViewInterface) {
+        this.homeViewInterface = homeViewInterface;
     }
 
-    OnScollTopInterface onScollTopInterface;
+    HomeViewInterface homeViewInterface;
+
 
     public CustomWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -38,9 +40,14 @@ public class CustomWebView extends WebView {
     }
 
     @Override
-    protected void onScrollChanged(int l, int t, int oldl, int oldt) {
-        super.onScrollChanged(l, t, oldl, oldt);
-        onScollTopInterface.onSChanged(l,t,oldl,oldt);
+    protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
+        super.onOverScrolled(scrollX, scrollY, clampedX, clampedY);
+        if(homeViewInterface!=null){
+            if(scrollY==0&&clampedY){
+                homeViewInterface.changeToolBarVisibility(VISIBLE);
+            }else if(scrollY>100){
+                homeViewInterface.changeToolBarVisibility(GONE);
+            }
+        }
     }
-
 }

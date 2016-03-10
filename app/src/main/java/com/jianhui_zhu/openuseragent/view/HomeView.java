@@ -1,5 +1,6 @@
 package com.jianhui_zhu.openuseragent.view;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -14,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.DownloadListener;
 import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
@@ -29,14 +31,12 @@ import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.User;
 import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
 import com.jianhui_zhu.openuseragent.util.AbstractFragment;
-import com.jianhui_zhu.openuseragent.util.Constant;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.RemoteDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.util.SettingSingleton;
 import com.jianhui_zhu.openuseragent.view.adapter.SearchSuggestionAdapter;
 import com.jianhui_zhu.openuseragent.view.custom.CustomWebView;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
-import com.jianhui_zhu.openuseragent.view.interfaces.OnScollTopInterface;
 import com.squareup.picasso.Picasso;
 
 import butterknife.Bind;
@@ -128,15 +128,14 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
             public boolean onQueryTextSubmit(String query) {
                 if (URLUtil.isValidUrl(query)) {
                     loadTargetUrl(query);
-                    suggestionAdapter.changeCursor(null);
-                    toolBarArea.setVisibility(View.GONE);
 
                 } else {
-                    loadTargetUrl(Constant.GOOGLE_PREFIX + query);
+                    loadTargetUrl(SettingSingleton.getInstance(getActivity()).getSearchEngine() + query);
 
                 }
                 presenter.saveQuery(query);
                 suggestionAdapter.changeCursor(null);
+                changeToolBarVisibility(View.GONE);
                 return true;
             }
 
@@ -156,18 +155,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
         } else {
             loadTargetUrl("");
         }
-        webHolder.setOnScollTopInterface(new OnScollTopInterface() {
-            @Override
-            public void onSChanged(int l, int t, int oldl, int oldt) {
-
-                float webcontent = webHolder.getContentHeight() * webHolder.getScale();
-                float webnow = webHolder.getHeight() + webHolder.getScrollY();
-
-                if (webHolder.getScaleY() == 0&&(l-oldl)>=0) {
-                    toolBarArea.setVisibility(View.VISIBLE);
-                }
-            }
-        });
+        webHolder.setHomeViewInterface(this);
         settingDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         webHolder.setDownloadListener(new DownloadListener() {
             @Override
@@ -243,12 +231,21 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
     }
 
     @Override
-    public void changeToolBarVisibility() {
-        if (toolBarArea.getVisibility() == View.GONE) {
-            toolBarArea.setVisibility(View.VISIBLE);
-        } else {
-            toolBarArea.setVisibility(View.GONE);
+    public void changeToolBarVisibility(int VIEW_CODE) {
+        switch (VIEW_CODE){
+            case View.VISIBLE:
+                toolBarArea.setVisibility(View.VISIBLE);
+                break;
+            case View.GONE:
+                toolBarArea.setVisibility(View.GONE);
+                break;
         }
+    }
+
+    @Override
+    public void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(urlBar.getWindowToken(), 0);
     }
 
 

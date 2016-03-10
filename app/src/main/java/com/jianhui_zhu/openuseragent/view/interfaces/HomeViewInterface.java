@@ -11,5 +11,6 @@ public interface HomeViewInterface {
     void showTag(String info);
     void swapCursor(Cursor cursor);
     void searchTargetWord(String word);
-    void changeToolBarVisibility();
+    void changeToolBarVisibility(int VIEW_CODE);
+    void hideKeyboard();
 }

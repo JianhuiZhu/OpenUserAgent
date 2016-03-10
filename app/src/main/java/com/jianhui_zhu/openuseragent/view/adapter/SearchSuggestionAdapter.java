@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.CursorAdapter;
 import android.widget.SimpleCursorAdapter;
@@ -34,7 +35,7 @@ public class SearchSuggestionAdapter extends SimpleCursorAdapter {
     }
 
     @Override
-    public void bindView(View view, Context context, final Cursor cursor) {
+    public void bindView(View view,  Context context, final Cursor cursor) {
         TextView tv=(TextView)view.findViewById(android.R.id.text1);
         final int id=cursor.getInt(0);
         final String suggestion= cursor.getString(1);
@@ -45,6 +46,7 @@ public class SearchSuggestionAdapter extends SimpleCursorAdapter {
             public void onClick(View v) {
                 homePresenter.incrementRecordLocally(id,count);
                 homePresenter.validateAndLoad(suggestion);
+                homePresenter.hideKeyboard();
                 changeCursor(null);
             }
         });
