@@ -35,6 +35,7 @@ import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.RemoteDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.util.SettingSingleton;
 import com.jianhui_zhu.openuseragent.view.adapter.SearchSuggestionAdapter;
+import com.jianhui_zhu.openuseragent.view.custom.CustomDrawerLayout;
 import com.jianhui_zhu.openuseragent.view.custom.CustomWebView;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 import com.squareup.picasso.Picasso;
@@ -55,7 +56,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
     @Bind(R.id.web_container)
     CustomWebView webHolder;
     @Bind(R.id.setting_drawer)
-    DrawerLayout settingDrawer;
+    CustomDrawerLayout settingDrawer;
     @Bind(R.id.profile_title)
     NavigationView profileTitle;
     @Bind(R.id.home_url_bar)
@@ -232,14 +233,14 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
 
     @Override
     public void changeToolBarVisibility(int VIEW_CODE) {
-        switch (VIEW_CODE){
-            case View.VISIBLE:
-                toolBarArea.setVisibility(View.VISIBLE);
-                break;
-            case View.GONE:
-                toolBarArea.setVisibility(View.GONE);
-                break;
-        }
+//        switch (VIEW_CODE){
+//            case View.VISIBLE:
+//                toolBarArea.setVisibility(View.VISIBLE);
+//                break;
+//            case View.GONE:
+//                toolBarArea.setVisibility(View.GONE);
+//                break;
+//        }
     }
 
     @Override
