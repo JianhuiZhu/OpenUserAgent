@@ -10,4 +10,5 @@ public final class Constant {
     public static final String AVATAR_IN_GOOGLE = "profileImageURL";
     public static final String GOOGLE_PREFIX ="https://www.google.com/search?q=";
     public static final String BAIDU_PREFIX ="http://www.baidu.com/s?wd=";
+    public static final String BING_PREFIX="http://www.bing.com/search?q=";
 }

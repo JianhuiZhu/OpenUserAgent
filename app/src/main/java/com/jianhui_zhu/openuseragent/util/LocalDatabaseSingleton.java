@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
 import com.jianhui_zhu.openuseragent.model.beans.Record;
+import com.jianhui_zhu.openuseragent.util.interfaces.DatabaseInterface;
 
 import java.lang.Override;import java.lang.String;import java.util.ArrayList;
 import java.util.LinkedList;
@@ -23,7 +24,7 @@ import rx.schedulers.Schedulers;
 /**
  * Created by jianhuizhu on 2016-02-18.
  */
-public class LocalDatabaseSingleton {
+public class LocalDatabaseSingleton implements DatabaseInterface {
     private static LocalDatabaseSingleton instance = null;
     private static Context context;
 
@@ -34,10 +35,11 @@ public class LocalDatabaseSingleton {
         LocalDatabaseSingleton.context = context;
         return instance;
     }
-    public Observable<String> updateBookmark(final Bookmark bookmark){
-        return Observable.create(new Observable.OnSubscribe<String>() {
+    @Override
+    public Observable<Bookmark> updateBookmark(final Bookmark bookmark){
+        return Observable.create(new Observable.OnSubscribe<Bookmark>() {
             @Override
-            public void call(Subscriber<? super String> subscriber) {
+            public void call(Subscriber<? super Bookmark> subscriber) {
                 Cursor cursor=LocalDatabaseHelper.getInstance(context)
                         .getReadableDatabase()
                         .rawQuery("SELECT * FROM Bookmarks WHERE id=?", new String[]{bookmark.getbID()});
@@ -47,11 +49,48 @@ public class LocalDatabaseSingleton {
                     newValues.put("url",bookmark.getUrl());
                     LocalDatabaseHelper.getInstance(context).getWritableDatabase()
                             .update("Bookmarks",newValues,"id="+bookmark.getbID(),null);
+                    subscriber.onNext(bookmark);
+                    subscriber.onCompleted();
                 }
                 cursor.close();
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
+
+    @Override
+    public Observable<String> deleteHistory(Record record) {
+        return null;
+    }
+
+    @Override
+    public Observable<String> deleteAllBookmark() {
+        return Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                int result=LocalDatabaseHelper.getInstance(context)
+                        .getWritableDatabase()
+                        .delete("Bookmarks",null,null);
+                subscriber.onNext(String.valueOf(result));
+                subscriber.onCompleted();
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    @Override
+    public Observable<String> deleteAllHistories() {
+        return Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                int result=LocalDatabaseHelper.getInstance(context)
+                        .getWritableDatabase()
+                        .delete("Records",null,null);
+                subscriber.onNext(String.valueOf(result));
+                subscriber.onCompleted();
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    @Override
     public Observable<String> deleteBookmark(final Bookmark bookmark){
         return Observable.create(new Observable.OnSubscribe<String>() {
             @Override
@@ -125,6 +164,7 @@ public class LocalDatabaseSingleton {
         LocalDatabaseHelper.getInstance(context).getWritableDatabase()
                 .update("QueryRecords",newValue,"_id=?",new String[]{id+""});
     }
+    @Override
     public Observable<String> saveBookmark(final Bookmark bookmark) {
         return Observable.create(new Observable.OnSubscribe<String>() {
             @Override
@@ -141,7 +181,7 @@ public class LocalDatabaseSingleton {
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 
     }
-
+    @Override
     public List<Bookmark> getAllBookmarks() {
         String query = "SELECT * FROM Bookmarks";
         List<Bookmark> result = new LinkedList<>();
@@ -160,8 +200,8 @@ public class LocalDatabaseSingleton {
         db.close();
         return result;
     }
-
-    public List<Record> getAllRecords() {
+    @Override
+    public List<Record> getAllHistories() {
         String query = "SELECT * FROM Records";
         SQLiteDatabase db = LocalDatabaseHelper.getInstance(context).getReadableDatabase();
         long bookmarkNumber = DatabaseUtils.queryNumEntries(db, "Records");

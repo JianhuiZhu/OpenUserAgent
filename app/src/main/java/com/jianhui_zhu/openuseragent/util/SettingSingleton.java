@@ -6,7 +6,7 @@ import android.content.Context;
  * Created by jianhuizhu on 2016-03-06.
  */
 public class SettingSingleton {
-    private static SettingSingleton ourInstance;
+    private static SettingSingleton instance;
     private Context context;
 
     public String getHomePage() {
@@ -30,10 +30,10 @@ public class SettingSingleton {
     private String homePage;
     private String searchEngine;
     public static SettingSingleton getInstance(Context context){
-        if(ourInstance==null){
+        if(instance==null){
             return new SettingSingleton(context);
         }
-        return ourInstance;
+        return instance;
     }
 
     private SettingSingleton(Context context) {

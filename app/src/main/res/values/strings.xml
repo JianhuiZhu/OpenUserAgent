@@ -3,5 +3,9 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="login">Login via Google</string>
-
+    <string-array name="search_engines">
+        <item>Google</item>
+        <item>Baidu</item>
+        <item>Bing</item>
+    </string-array>
 </resources>

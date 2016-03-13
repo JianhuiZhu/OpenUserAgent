@@ -48,7 +48,7 @@ public class BookmarkModel {
 
     public Observable deleteBookmark(Bookmark bookmark){
         if(RemoteDatabaseSingleton.getInstance(context).isUserLoggedIn()&& !DataValidationUtil.isInteger(bookmark.getbID())){
-            return RemoteDatabaseSingleton.getInstance(context).removeBookmark(bookmark);
+            return RemoteDatabaseSingleton.getInstance(context).deleteBookmark(bookmark);
         }else{
             return LocalDatabaseSingleton.getInstance(context).deleteBookmark(bookmark);
         }
