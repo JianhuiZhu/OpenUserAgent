@@ -22,6 +22,7 @@
             android:id="@+id/bookmark_name"
             android:layout_width="match_parent"
             android:layout_height="20dp"
+
             android:clickable="true"
             android:layout_toRightOf="@id/bookmark_avatar"
             android:textSize="12sp"
