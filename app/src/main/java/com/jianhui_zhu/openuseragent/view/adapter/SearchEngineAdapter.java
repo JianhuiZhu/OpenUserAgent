@@ -31,6 +31,8 @@ public class SearchEngineAdapter extends ArrayAdapter<CharSequence> {
         searchEngines.add("Google");
         searchEngines.add("Baidu");
         searchEngines.add("Bing");
+        this.addAll(searchEngines);
+        notifyDataSetChanged();
     }
 
     @Override
@@ -40,15 +42,6 @@ public class SearchEngineAdapter extends ArrayAdapter<CharSequence> {
         }
         final TextView tv=(TextView)convertView.findViewById(R.id.spinner_item);
         tv.setText(searchEngines.get(position));
-        tv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(!tv.getText().equals(currentSearchEngine)){
-                    SettingSingleton.getInstance(context)
-                            .setSearchEngine(tv.getText().toString());
-                }
-            }
-        });
         return convertView;
     }
 

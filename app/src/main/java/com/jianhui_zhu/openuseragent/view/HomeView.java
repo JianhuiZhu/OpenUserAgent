@@ -19,6 +19,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.DownloadListener;
 import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
+import android.webkit.WebIconDatabase;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -34,11 +35,17 @@ import com.jianhui_zhu.openuseragent.util.AbstractFragment;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.RemoteDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.util.SettingSingleton;
+import com.jianhui_zhu.openuseragent.util.WebIconUtil;
 import com.jianhui_zhu.openuseragent.view.adapter.SearchSuggestionAdapter;
 import com.jianhui_zhu.openuseragent.view.custom.CustomDrawerLayout;
 import com.jianhui_zhu.openuseragent.view.custom.CustomWebView;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 import com.squareup.picasso.Picasso;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -170,6 +177,9 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getActivity();
+        String path=getActivity().getDir("icons", Context.MODE_PRIVATE).getPath();
+        WebIconDatabase.getInstance().open(path);
         presenter = new HomePresenter(this, getActivity());
         suggestionAdapter = new SearchSuggestionAdapter(getActivity(), presenter);
 
@@ -279,12 +289,27 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
         }
 
 
+
+
     }
 
     private class CustomWebChrome extends WebChromeClient {
         @Override
         public void onProgressChanged(WebView view, int newProgress) {
 
+        }
+
+        @Override
+        public void onReceivedIcon(WebView view, Bitmap icon) {
+            super.onReceivedIcon(view, icon);
+            try {
+                URL uri=new URL(view.getUrl()) ;
+                String host=uri.getHost();
+                WebIconUtil.getInstance().setIcon(icon,host);
+                presenter.saveHistory(uri.toString(),view.getTitle());
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
         }
     }
 

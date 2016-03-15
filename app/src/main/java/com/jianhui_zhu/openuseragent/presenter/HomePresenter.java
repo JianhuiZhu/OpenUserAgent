@@ -31,6 +31,9 @@ public class HomePresenter {
             homeView.searchTargetWord(word);
         }
     }
+    public void saveHistory(String url,String name){
+        homeModel.saveHistoryLocal(url,name);
+    }
     public void saveBookmark(String url, String name, String uID) {
         Observable<String> observable;
         if (uID != null) {

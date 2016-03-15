@@ -41,16 +41,6 @@ public class SearchSuggestionAdapter extends SimpleCursorAdapter {
         final String suggestion= cursor.getString(1);
         final int count=cursor.getInt(2);
         tv.setText(suggestion);
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                homePresenter.incrementRecordLocally(id,count);
-                homePresenter.validateAndLoad(suggestion);
-                homePresenter.hideKeyboard();
-                homePresenter.changeToolbarVisibility(View.GONE);
-                changeCursor(null);
-            }
-        });
     }
 
 

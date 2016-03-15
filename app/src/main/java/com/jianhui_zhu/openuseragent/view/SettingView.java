@@ -48,9 +48,28 @@ public class SettingView extends AbstractFragment {
         super.onViewCreated(view, savedInstanceState);
         homePage.setText(settings.getHomePage());
         String curSearchEngine=SettingSingleton.getInstance(getActivity()).getSearchEngine();
-        SearchEngineAdapter adapter=new SearchEngineAdapter(getActivity(),curSearchEngine);
-        int position=adapter.getPosition(curSearchEngine);
+        final SearchEngineAdapter adapter=new SearchEngineAdapter(getActivity(),curSearchEngine);
+        //ArrayAdapter<CharSequence> arrayAdapter=ArrayAdapter.createFromResource(getActivity(),R.array.search_engines,R.layout.item_spinner);
+        //adapter.setDropDownViewResource(R.layout.item_spinner);
+        //int position=arrayAdapter.getPosition(curSearchEngine);
+
         searchEngine.setAdapter(adapter);
+        int position=adapter.getPosition(curSearchEngine);
         searchEngine.setSelection(position);
+        searchEngine.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String engine=adapter.getItem(position).toString();
+                String defaultEngine=SettingSingleton.getInstance(getActivity()).getSearchEngine();
+                if(!engine.equals(defaultEngine)){
+                    SettingSingleton.getInstance(getActivity()).setSearchEngine(engine);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 }

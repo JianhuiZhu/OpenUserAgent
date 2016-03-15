@@ -8,6 +8,7 @@ import com.jianhui_zhu.openuseragent.model.beans.Record;
 import com.jianhui_zhu.openuseragent.model.beans.User;
 import com.jianhui_zhu.openuseragent.util.LocalDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.util.RemoteDatabaseSingleton;
+import com.jianhui_zhu.openuseragent.util.WebIconUtil;
 
 import rx.Observable;
 
@@ -32,6 +33,7 @@ public class HomeModel {
         Bookmark bookmark = new Bookmark();
         bookmark.setUrl(url);
         bookmark.setName(name);
+
         if (uID != null) {
             return RemoteDatabaseSingleton.getInstance(context).saveBookmark(bookmark);
         }
