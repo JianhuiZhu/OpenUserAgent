@@ -59,13 +59,13 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
     }
 
     @Override
-    public Observable<String> deleteHistory(History history) {
-        return null;
+    public void deleteHistory(History history) {
+
     }
 
     @Override
-    public Observable<String> deleteAllBookmark() {
-        return Observable.create(new Observable.OnSubscribe<String>() {
+    public void deleteAllBookmark() {
+        Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
                 int result=LocalDatabaseHelper.getInstance(context)
@@ -74,12 +74,12 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
                 subscriber.onNext(String.valueOf(result));
                 subscriber.onCompleted();
             }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        }).subscribeOn(Schedulers.io()).subscribe();
     }
 
     @Override
-    public Observable<String> deleteAllHistories() {
-        return Observable.create(new Observable.OnSubscribe<String>() {
+    public void deleteAllHistories() {
+        Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
                 int result=LocalDatabaseHelper.getInstance(context)
@@ -88,21 +88,21 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
                 subscriber.onNext(String.valueOf(result));
                 subscriber.onCompleted();
             }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        }).subscribeOn(Schedulers.io()).subscribe();
     }
 
     @Override
-    public Observable<String> deleteBookmark(final Bookmark bookmark){
-        return Observable.create(new Observable.OnSubscribe<String>() {
+    public void deleteBookmark(final Bookmark bookmark){
+        Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
                 LocalDatabaseHelper.getInstance(context).getWritableDatabase().delete("Bookmarks","id="+bookmark.getbID(),null);
             }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        }).subscribeOn(Schedulers.io()).subscribe();
 
     }
-    public Observable<String> saveHistory(final History history) {
-        return Observable.create(new Observable.OnSubscribe<String>() {
+    public void saveHistory(final History history) {
+        Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
                 LocalDatabaseHelper.getInstance(context)
@@ -115,7 +115,7 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
                 subscriber.onNext("DONE");
                 subscriber.onCompleted();
             }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        }).subscribeOn(Schedulers.io()).subscribe();
 
     }
     public void saveQueryRecord(final String query){
@@ -166,8 +166,8 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
                 .update("QueryRecords",newValue,"_id=?",new String[]{id+""});
     }
     @Override
-    public Observable<String> saveBookmark(final Bookmark bookmark) {
-        return Observable.create(new Observable.OnSubscribe<String>() {
+    public void saveBookmark(final Bookmark bookmark) {
+        Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
                 LocalDatabaseHelper.getInstance(context)
@@ -179,7 +179,7 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
                 subscriber.onNext("DONE");
                 subscriber.onCompleted();
             }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        }).subscribeOn(Schedulers.io()).subscribe();
 
     }
     @Override

@@ -58,6 +58,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
     private boolean drawerIsOpen = false;
     @Bind(R.id.tool_bar_area)
     PercentRelativeLayout toolBarArea;
+    boolean isHomePage=true;
     @Bind(R.id.web_container)
     CustomWebView webHolder;
     @Bind(R.id.setting_drawer)
@@ -282,7 +283,11 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
 
         @Override
         public void onPageFinished(WebView view, String url) {
-            presenter.saveRecordLocally(view.getUrl(), view.getTitle());
+            if(!isHomePage) {
+                presenter.saveRecordLocally(view.getUrl(), view.getTitle());
+            }else{
+                isHomePage=false;
+            }
 
         }
 

@@ -37,16 +37,10 @@ public class HomePresenter {
     public void saveBookmark(String url, String name, String uID) {
         Observable<String> observable;
         if (uID != null) {
-            observable = homeModel.saveBookmark(url, name, uID);
+            homeModel.saveBookmark(url, name, uID);
         } else {
-            observable = homeModel.saveBookmark(url, name, null);
+            homeModel.saveBookmark(url, name, null);
         }
-        observable.subscribe(new Action1<String>() {
-            @Override
-            public void call(String s) {
-                homeView.showTag(s);
-            }
-        });
     }
     public void saveRecordLocally(String url,String name){
         homeModel.saveHistoryLocal(url,name);

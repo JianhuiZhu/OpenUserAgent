@@ -61,9 +61,9 @@ public class RemoteDatabaseSingleton implements DatabaseInterface,GoogleApiClien
         return remoteDB;
     }
     @Override
-    public Observable<String> saveBookmark(final Bookmark bookmark) {
+    public void saveBookmark(final Bookmark bookmark) {
 
-        return Observable.create(new Observable.OnSubscribe<String>() {
+        Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
                 Firebase recordRef = new Firebase(Constant.urlRoot).child(user.getuID()).child("bookmarks").push();
@@ -71,19 +71,19 @@ public class RemoteDatabaseSingleton implements DatabaseInterface,GoogleApiClien
                 recordRef.setValue(bookmark);
                 subscriber.onCompleted();
             }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        }).subscribeOn(Schedulers.io()).subscribe();
 
     }
     @Override
-    public Observable<String> saveHistory(final History history) {
-        return Observable.create(new Observable.OnSubscribe<String>() {
+    public void saveHistory(final History history) {
+        Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
                 Firebase recordRef = new Firebase(Constant.urlRoot).child(user.getuID()).child("histories").push();
                 history.setrID(recordRef.getKey());
                 recordRef.setValue(history);
             }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        }).subscribeOn(Schedulers.io()).subscribe();
     }
     @Override
     public Observable<List<History>> getAllHistories() {
@@ -247,8 +247,8 @@ public class RemoteDatabaseSingleton implements DatabaseInterface,GoogleApiClien
     }
 
 
-    public Observable<String> deleteBookmark(final Bookmark bookmark){
-        return Observable.create(new Observable.OnSubscribe<String>() {
+    public void deleteBookmark(final Bookmark bookmark){
+        Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(final Subscriber<? super String> subscriber) {
                 Firebase ref=new Firebase(Constant.urlRoot).child(user.getuID()).child("bookmarks").child(bookmark.getbID());
@@ -260,11 +260,11 @@ public class RemoteDatabaseSingleton implements DatabaseInterface,GoogleApiClien
                     }
                 });
             }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        }).subscribeOn(Schedulers.io()).subscribe();
     }
     @Override
-    public Observable<String> deleteHistory(final History history){
-        return Observable.create(new Observable.OnSubscribe<String>() {
+    public void deleteHistory(final History history){
+        Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(final Subscriber<? super String> subscriber) {
                 Firebase ref=new Firebase(Constant.urlRoot).child(user.getuID()).child("histories").child(history.getrID());
@@ -276,17 +276,17 @@ public class RemoteDatabaseSingleton implements DatabaseInterface,GoogleApiClien
                     }
                 });
             }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        }).subscribeOn(Schedulers.io()).subscribe();
     }
 
     @Override
-    public Observable<String> deleteAllBookmark() {
-        return null;
+    public void deleteAllBookmark() {
+
     }
 
     @Override
-    public Observable<String> deleteAllHistories() {
-        return null;
+    public void deleteAllHistories() {
+
     }
 
 }

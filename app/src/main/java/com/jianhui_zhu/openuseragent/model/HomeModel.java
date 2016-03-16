@@ -30,38 +30,33 @@ public class HomeModel {
     }
 
 
-    public Observable<String> saveBookmark(String url, String name, String uID) {
+    public void saveBookmark(String url, String name, String uID) {
         Bookmark bookmark = new Bookmark();
         bookmark.setUrl(url);
         bookmark.setName(name);
 
         if (uID != null) {
-            return RemoteDatabaseSingleton.getInstance().saveBookmark(bookmark);
+            RemoteDatabaseSingleton.getInstance().saveBookmark(bookmark);
         }
-        return LocalDatabaseSingleton.getInstance().saveBookmark(bookmark);
+        LocalDatabaseSingleton.getInstance().saveBookmark(bookmark);
 
     }
 
-    public Observable<String> saveHistory(String url, String uID) {
+    public void saveHistory(String url, String uID) {
         History history = new History();
         history.setUrl(url);
         history.setTimestamp(System.currentTimeMillis());
         if (uID != null) {
-            return RemoteDatabaseSingleton.getInstance().saveHistory(history);
+            RemoteDatabaseSingleton.getInstance().saveHistory(history);
         }
-        return LocalDatabaseSingleton.getInstance().saveHistory(history);
+        LocalDatabaseSingleton.getInstance().saveHistory(history);
     }
     public void saveHistoryLocal(String url,String name){
         History history =new History();
         history.setName(name);
         history.setUrl(url);
         history.setTimestamp(System.currentTimeMillis());
-        LocalDatabaseSingleton.getInstance().saveHistory(history).subscribe(new Action1<String>() {
-            @Override
-            public void call(String s) {
-                Toast.makeText(context,s,Toast.LENGTH_SHORT).show();
-            }
-        });
+        LocalDatabaseSingleton.getInstance().saveHistory(history);
     }
     public void incrementRecordLocally(int id,int count){
         LocalDatabaseSingleton.getInstance().incrementQueryRecordCount(id,count);

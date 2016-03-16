@@ -38,11 +38,6 @@ public class BookmarkPresenter {
 
     public void deleteBookmark(Bookmark bookmark){
 
-        bookmarkModel.deleteBookmark(bookmark).subscribe(new Action1() {
-            @Override
-            public void call(Object o) {
-                view.showTag("bookmark deleted");
-            }
-        });
+        bookmarkModel.deleteBookmark(bookmark);
     }
 }

@@ -46,11 +46,11 @@ public class BookmarkModel {
         }
     }
 
-    public Observable deleteBookmark(Bookmark bookmark){
+    public void deleteBookmark(Bookmark bookmark){
         if(RemoteDatabaseSingleton.getInstance().isUserLoggedIn()&& !DataValidationUtil.isInteger(bookmark.getbID())){
-            return RemoteDatabaseSingleton.getInstance().deleteBookmark(bookmark);
+            RemoteDatabaseSingleton.getInstance().deleteBookmark(bookmark);
         }else{
-            return LocalDatabaseSingleton.getInstance().deleteBookmark(bookmark);
+            LocalDatabaseSingleton.getInstance().deleteBookmark(bookmark);
         }
     }
 }

@@ -13,11 +13,11 @@ import rx.Observable;
 public interface DatabaseInterface {
     List<Bookmark> getAllBookmarks();
     Observable<List<History>> getAllHistories();
-    Observable<String> saveBookmark(final Bookmark bookmark);
-    Observable<String> saveHistory(final History history);
-    Observable<String> deleteBookmark(final Bookmark bookmark);
+    void saveBookmark(final Bookmark bookmark);
+    void saveHistory(final History history);
+    void deleteBookmark(final Bookmark bookmark);
     Observable<Bookmark> updateBookmark(final Bookmark bookmark);
-    Observable<String> deleteHistory(final History history);
-    Observable<String> deleteAllBookmark();
-    Observable<String> deleteAllHistories();
+    void deleteHistory(final History history);
+    void deleteAllBookmark();
+    void deleteAllHistories();
 }
