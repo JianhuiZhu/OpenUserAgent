@@ -3,12 +3,10 @@ package com.jianhui_zhu.openuseragent.model.beans;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.Serializable;
-
 /**
  * Created by Jianhui Zhu on 2016-02-06.
  */
-public class Record implements Parcelable{
+public class History implements Parcelable{
     String rID;
     String name;
     String url;
@@ -24,22 +22,22 @@ public class Record implements Parcelable{
 
 
 
-    protected Record(Parcel in) {
+    protected History(Parcel in) {
         rID = in.readString();
         name=in.readString();
         url = in.readString();
         timestamp = in.readLong();
     }
 
-    public static final Creator<Record> CREATOR = new Creator<Record>() {
+    public static final Creator<History> CREATOR = new Creator<History>() {
         @Override
-        public Record createFromParcel(Parcel in) {
-            return new Record(in);
+        public History createFromParcel(Parcel in) {
+            return new History(in);
         }
 
         @Override
-        public Record[] newArray(int size) {
-            return new Record[size];
+        public History[] newArray(int size) {
+            return new History[size];
         }
     };
 
@@ -51,7 +49,7 @@ public class Record implements Parcelable{
         this.rID = rID;
     }
 
-    public Record() {
+    public History() {
 
     }
     public long getTimestamp() {

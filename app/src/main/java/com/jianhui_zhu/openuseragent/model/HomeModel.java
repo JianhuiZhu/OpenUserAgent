@@ -2,15 +2,16 @@ package com.jianhui_zhu.openuseragent.model;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.widget.Toast;
 
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
-import com.jianhui_zhu.openuseragent.model.beans.Record;
+import com.jianhui_zhu.openuseragent.model.beans.History;
 import com.jianhui_zhu.openuseragent.model.beans.User;
 import com.jianhui_zhu.openuseragent.util.LocalDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.util.RemoteDatabaseSingleton;
-import com.jianhui_zhu.openuseragent.util.WebIconUtil;
 
 import rx.Observable;
+import rx.functions.Action1;
 
 /**
  * Created by jianhuizhu on 2016-02-16.
@@ -35,36 +36,41 @@ public class HomeModel {
         bookmark.setName(name);
 
         if (uID != null) {
-            return RemoteDatabaseSingleton.getInstance(context).saveBookmark(bookmark);
+            return RemoteDatabaseSingleton.getInstance().saveBookmark(bookmark);
         }
-        return LocalDatabaseSingleton.getInstance(context).saveBookmark(bookmark);
+        return LocalDatabaseSingleton.getInstance().saveBookmark(bookmark);
 
     }
 
     public Observable<String> saveHistory(String url, String uID) {
-        Record record = new Record();
-        record.setUrl(url);
-        record.setTimestamp(System.currentTimeMillis());
+        History history = new History();
+        history.setUrl(url);
+        history.setTimestamp(System.currentTimeMillis());
         if (uID != null) {
-            return RemoteDatabaseSingleton.getInstance(context).saveHistory(record);
+            return RemoteDatabaseSingleton.getInstance().saveHistory(history);
         }
-        return LocalDatabaseSingleton.getInstance(context).saveHistory(record);
+        return LocalDatabaseSingleton.getInstance().saveHistory(history);
     }
     public void saveHistoryLocal(String url,String name){
-        Record record=new Record();
-        record.setName(name);
-        record.setUrl(url);
-        record.setTimestamp(System.currentTimeMillis());
-        LocalDatabaseSingleton.getInstance(context).saveHistory(record);
+        History history =new History();
+        history.setName(name);
+        history.setUrl(url);
+        history.setTimestamp(System.currentTimeMillis());
+        LocalDatabaseSingleton.getInstance().saveHistory(history).subscribe(new Action1<String>() {
+            @Override
+            public void call(String s) {
+                Toast.makeText(context,s,Toast.LENGTH_SHORT).show();
+            }
+        });
     }
     public void incrementRecordLocally(int id,int count){
-        LocalDatabaseSingleton.getInstance(context).incrementQueryRecordCount(id,count);
+        LocalDatabaseSingleton.getInstance().incrementQueryRecordCount(id,count);
     }
     public Observable<Cursor> queryText(String text){
-        return LocalDatabaseSingleton.getInstance(context).getQueryRecord(text);
+        return LocalDatabaseSingleton.getInstance().getQueryRecord(text);
     }
     public void saveQueryText(String text){
-        LocalDatabaseSingleton.getInstance(context)
+        LocalDatabaseSingleton.getInstance()
                 .saveQueryRecord(text);
     }
 }

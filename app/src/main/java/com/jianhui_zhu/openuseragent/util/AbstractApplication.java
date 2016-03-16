@@ -26,6 +26,8 @@ private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 		Fabric.with(this, new Crashlytics(), new CrashlyticsNdk());
 		Firebase.setAndroidContext(this);
 		WebIconUtil.instantiate(this);
+		LocalDatabaseSingleton.instantiate(this);
+		RemoteDatabaseSingleton.instantiate(this);
 		Firebase.getDefaultConfig().setLogLevel(Logger.Level.DEBUG);
 		Firebase.getDefaultConfig().enablePersistence();
 		SettingSingleton.getInstance(getApplicationContext());

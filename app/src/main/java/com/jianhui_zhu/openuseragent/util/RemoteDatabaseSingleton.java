@@ -17,7 +17,7 @@ import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
-import com.jianhui_zhu.openuseragent.model.beans.Record;
+import com.jianhui_zhu.openuseragent.model.beans.History;
 import com.jianhui_zhu.openuseragent.model.beans.User;
 import com.jianhui_zhu.openuseragent.util.interfaces.DatabaseInterface;
 
@@ -36,9 +36,10 @@ import rx.schedulers.Schedulers;
  * Created by jianhuizhu on 2016-02-19.
  */
 public class RemoteDatabaseSingleton implements DatabaseInterface,GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener{
-    private static List<Record> records;
+    private static List<History> histories;
     private static List<Bookmark> bookmarks;
     private static User user;
+    private static RemoteDatabaseSingleton remoteDB = null;
     private Context context;
     private static GoogleApiClient googleApiClient;
     private RemoteDatabaseSingleton(Context context) {
@@ -52,12 +53,11 @@ public class RemoteDatabaseSingleton implements DatabaseInterface,GoogleApiClien
         this.googleApiClient.connect();
     }
 
-    private static RemoteDatabaseSingleton remoteDB = null;
 
-    public static RemoteDatabaseSingleton getInstance(Context context) {
-        if (remoteDB == null) {
-            RemoteDatabaseSingleton.remoteDB = new RemoteDatabaseSingleton(context);
-        }
+    public static void instantiate(Context context){
+        remoteDB=new RemoteDatabaseSingleton(context);
+    }
+    public static RemoteDatabaseSingleton getInstance() {
         return remoteDB;
     }
     @Override
@@ -75,35 +75,42 @@ public class RemoteDatabaseSingleton implements DatabaseInterface,GoogleApiClien
 
     }
     @Override
-    public Observable<String> saveHistory(final Record record) {
+    public Observable<String> saveHistory(final History history) {
         return Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
                 Firebase recordRef = new Firebase(Constant.urlRoot).child(user.getuID()).child("histories").push();
-                record.setrID(recordRef.getKey());
-                recordRef.setValue(record);
+                history.setrID(recordRef.getKey());
+                recordRef.setValue(history);
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
     @Override
-    public List<Record> getAllHistories() {
-        Firebase recordRef = new Firebase(Constant.urlRoot).child(user.getuID()).child("histories");
-        recordRef.addValueEventListener(new ValueEventListener() {
+    public Observable<List<History>> getAllHistories() {
+        return Observable.create(new Observable.OnSubscribe<List<History>>() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                records = new ArrayList<>((int) dataSnapshot.getChildrenCount());
-                for (DataSnapshot child : dataSnapshot.getChildren()) {
-                    Record record = child.getValue(Record.class);
-                    records.add(record);
-                }
-            }
+            public void call(final Subscriber<? super List<History>> subscriber) {
+                Firebase recordRef = new Firebase(Constant.urlRoot).child(user.getuID()).child("histories");
+                recordRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        histories = new ArrayList<>((int) dataSnapshot.getChildrenCount());
+                        for (DataSnapshot child : dataSnapshot.getChildren()) {
+                            History history = child.getValue(History.class);
+                            histories.add(history);
+                        }
+                        subscriber.onNext(histories);
+                        subscriber.onCompleted();
+                    }
 
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
+                    @Override
+                    public void onCancelled(FirebaseError firebaseError) {
 
+                    }
+                });
             }
-        });
-        return records;
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+
     }
     @Override
     public List<Bookmark> getAllBookmarks() {
@@ -256,11 +263,11 @@ public class RemoteDatabaseSingleton implements DatabaseInterface,GoogleApiClien
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
     @Override
-    public Observable<String> deleteHistory(final Record record){
+    public Observable<String> deleteHistory(final History history){
         return Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(final Subscriber<? super String> subscriber) {
-                Firebase ref=new Firebase(Constant.urlRoot).child(user.getuID()).child("histories").child(record.getrID());
+                Firebase ref=new Firebase(Constant.urlRoot).child(user.getuID()).child("histories").child(history.getrID());
                 ref.removeValue(new Firebase.CompletionListener() {
                     @Override
                     public void onComplete(FirebaseError firebaseError, Firebase firebase) {

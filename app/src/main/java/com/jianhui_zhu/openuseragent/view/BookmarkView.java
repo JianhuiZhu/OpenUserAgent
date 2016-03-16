@@ -50,10 +50,10 @@ public class BookmarkView extends AbstractFragment implements BookmarkViewInterf
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         List<Bookmark> bookmarks=new ArrayList<>();
-        if(RemoteDatabaseSingleton.getInstance(getActivity()).isUserLoggedIn()) {
-            bookmarks.addAll(RemoteDatabaseSingleton.getInstance(getActivity()).getAllBookmarks());
+        if(RemoteDatabaseSingleton.getInstance().isUserLoggedIn()) {
+            bookmarks.addAll(RemoteDatabaseSingleton.getInstance().getAllBookmarks());
         }
-        bookmarks.addAll(LocalDatabaseSingleton.getInstance(getActivity()).getAllBookmarks());
+        bookmarks.addAll(LocalDatabaseSingleton.getInstance().getAllBookmarks());
 
         bookmarkList.setLayoutManager(new LinearLayoutManager(getActivity()));
         bookmarkList.setItemAnimator(new DefaultItemAnimator());

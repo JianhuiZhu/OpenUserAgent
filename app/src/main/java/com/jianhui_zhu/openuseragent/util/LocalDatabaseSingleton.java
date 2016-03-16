@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
-import com.jianhui_zhu.openuseragent.model.beans.Record;
+import com.jianhui_zhu.openuseragent.model.beans.History;
 import com.jianhui_zhu.openuseragent.util.interfaces.DatabaseInterface;
 
 import java.lang.Override;import java.lang.String;import java.util.ArrayList;
@@ -27,12 +27,13 @@ import rx.schedulers.Schedulers;
 public class LocalDatabaseSingleton implements DatabaseInterface {
     private static LocalDatabaseSingleton instance = null;
     private static Context context;
-
-    public static synchronized LocalDatabaseSingleton getInstance(Context context) {
-        if (instance == null) {
-            instance = new LocalDatabaseSingleton();
-        }
-        LocalDatabaseSingleton.context = context;
+    public static void instantiate(Context context){
+        instance=new LocalDatabaseSingleton(context);
+    }
+    private LocalDatabaseSingleton(Context context){
+        LocalDatabaseSingleton.context=context;
+    }
+    public static synchronized LocalDatabaseSingleton getInstance() {
         return instance;
     }
     @Override
@@ -58,7 +59,7 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
     }
 
     @Override
-    public Observable<String> deleteHistory(Record record) {
+    public Observable<String> deleteHistory(History history) {
         return null;
     }
 
@@ -83,7 +84,7 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
             public void call(Subscriber<? super String> subscriber) {
                 int result=LocalDatabaseHelper.getInstance(context)
                         .getWritableDatabase()
-                        .delete("Records",null,null);
+                        .delete("Histories",null,null);
                 subscriber.onNext(String.valueOf(result));
                 subscriber.onCompleted();
             }
@@ -100,17 +101,17 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 
     }
-    public Observable<String> saveHistory(final Record record) {
+    public Observable<String> saveHistory(final History history) {
         return Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
                 LocalDatabaseHelper.getInstance(context)
                         .getWritableDatabase()
-                        .execSQL("INSERT INTO Records (name,url,timestamp) " +
+                        .execSQL("INSERT INTO Histories (name,url,timestamp) " +
                                 "VALUES("
-                                +"\""+record.getName()+"\",\""
-                                + record.getUrl() + "\","
-                                + record.getTimestamp() + ")");
+                                +"\""+ history.getName()+"\",\""
+                                + history.getUrl() + "\","
+                                + history.getTimestamp() + ")");
                 subscriber.onNext("DONE");
                 subscriber.onCompleted();
             }
@@ -137,7 +138,7 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
             public void call(Subscriber<? super Cursor> subscriber) {
                 LocalDatabaseHelper.getInstance(context)
                         .getReadableDatabase()
-                        .query("Records",null,"name=?",new String[]{"%"+query+"%"},null,null,"timestamp DESC","3");
+                        .query("Histories",null,"name=?",new String[]{"%"+query+"%"},null,null,"timestamp DESC","3");
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
@@ -201,24 +202,32 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
         return result;
     }
     @Override
-    public List<Record> getAllHistories() {
-        String query = "SELECT * FROM Records";
-        SQLiteDatabase db = LocalDatabaseHelper.getInstance(context).getReadableDatabase();
-        long bookmarkNumber = DatabaseUtils.queryNumEntries(db, "Records");
-        List<Record> result = new ArrayList<>((int) bookmarkNumber);
-        Cursor cursor = db.rawQuery(query, null);
-        if (cursor.moveToFirst()) {
-            do {
-                Record record = new Record();
-                record.setrID(cursor.getColumnName(0));
-                record.setTimestamp(cursor.getLong(3));
-                record.setUrl(cursor.getString(2));
-                result.add(record);
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
-        db.close();
-        return result;
+    public Observable<List<History>> getAllHistories() {
+
+
+        return Observable.create(new Observable.OnSubscribe<List<History>>() {
+            @Override
+            public void call(Subscriber<? super List<History>> subscriber) {
+                String query = "SELECT * FROM Histories";
+                SQLiteDatabase db = LocalDatabaseHelper.getInstance(context).getReadableDatabase();
+                long bookmarkNumber = DatabaseUtils.queryNumEntries(db, "Histories");
+                List<History> result = new ArrayList<>((int) bookmarkNumber);
+                Cursor cursor = db.rawQuery(query, null);
+                if (cursor.moveToFirst()) {
+                    do {
+                        History history = new History();
+                        history.setrID(cursor.getColumnName(0));
+                        history.setTimestamp(cursor.getLong(3));
+                        history.setUrl(cursor.getString(2));
+                        result.add(history);
+                    } while (cursor.moveToNext());
+                }
+                cursor.close();
+                db.close();
+                subscriber.onNext(result);
+                subscriber.onCompleted();
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 
     }
 
@@ -245,7 +254,7 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
                     "id INTEGER NOT NULL PRIMARY KEY," +
                     "name VARCHAR(50) NOT NULL," +
                     "url VARCHAR(300) NOT NULL)";
-            String createRecordsTable = "CREATE TABLE IF NOT EXISTS Records(" +
+            String createRecordsTable = "CREATE TABLE IF NOT EXISTS Histories(" +
                     "_id INTEGER NOT NULL PRIMARY KEY,"+
                     "name VARCHAR(50) NOT NULL,"+
                     "url VARCHAR(300) NOT NULL," +

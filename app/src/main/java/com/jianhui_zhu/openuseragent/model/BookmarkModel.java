@@ -20,7 +20,7 @@ public class BookmarkModel {
         this.context=context;
     }
     private boolean isUserLoggedIn(){
-        if(RemoteDatabaseSingleton.getInstance(context).isUserLoggedIn()){
+        if(RemoteDatabaseSingleton.getInstance().isUserLoggedIn()){
             return true;
         }
         return false;
@@ -28,29 +28,29 @@ public class BookmarkModel {
     public List<Bookmark> getAllBookmarks(){
         List<Bookmark> bookmarks;
         if(isUserLoggedIn()){
-           bookmarks=RemoteDatabaseSingleton.getInstance(context).getAllBookmarks();
-            for(Bookmark bookmark: LocalDatabaseSingleton.getInstance(context).getAllBookmarks()){
+           bookmarks=RemoteDatabaseSingleton.getInstance().getAllBookmarks();
+            for(Bookmark bookmark: LocalDatabaseSingleton.getInstance().getAllBookmarks()){
                 bookmarks.add(bookmark);
             }
         }else{
-            bookmarks=LocalDatabaseSingleton.getInstance(context).getAllBookmarks();
+            bookmarks=LocalDatabaseSingleton.getInstance().getAllBookmarks();
         }
         return bookmarks;
     }
 
     public Observable updateBookmark(Bookmark bookmark){
-        if(RemoteDatabaseSingleton.getInstance(context).isUserLoggedIn()&& !DataValidationUtil.isInteger(bookmark.getbID())){
-            return RemoteDatabaseSingleton.getInstance(context).updateBookmark(bookmark);
+        if(RemoteDatabaseSingleton.getInstance().isUserLoggedIn()&& !DataValidationUtil.isInteger(bookmark.getbID())){
+            return RemoteDatabaseSingleton.getInstance().updateBookmark(bookmark);
         }else{
-            return LocalDatabaseSingleton.getInstance(context).updateBookmark(bookmark);
+            return LocalDatabaseSingleton.getInstance().updateBookmark(bookmark);
         }
     }
 
     public Observable deleteBookmark(Bookmark bookmark){
-        if(RemoteDatabaseSingleton.getInstance(context).isUserLoggedIn()&& !DataValidationUtil.isInteger(bookmark.getbID())){
-            return RemoteDatabaseSingleton.getInstance(context).deleteBookmark(bookmark);
+        if(RemoteDatabaseSingleton.getInstance().isUserLoggedIn()&& !DataValidationUtil.isInteger(bookmark.getbID())){
+            return RemoteDatabaseSingleton.getInstance().deleteBookmark(bookmark);
         }else{
-            return LocalDatabaseSingleton.getInstance(context).deleteBookmark(bookmark);
+            return LocalDatabaseSingleton.getInstance().deleteBookmark(bookmark);
         }
     }
 }

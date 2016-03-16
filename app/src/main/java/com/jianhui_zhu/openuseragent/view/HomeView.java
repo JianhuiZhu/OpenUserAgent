@@ -42,9 +42,7 @@ import com.jianhui_zhu.openuseragent.view.custom.CustomWebView;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 
 import butterknife.Bind;
@@ -79,8 +77,8 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
                 webHolder.reload();
                 break;
             case R.id.add_bookmark_icon:
-                if (RemoteDatabaseSingleton.getInstance(getActivity()).isUserLoggedIn()) {
-                    this.user = RemoteDatabaseSingleton.getInstance(getActivity()).getUser();
+                if (RemoteDatabaseSingleton.getInstance().isUserLoggedIn()) {
+                    this.user = RemoteDatabaseSingleton.getInstance().getUser();
                 }
                 String url = webHolder.getUrl();
                 String urlTitle = webHolder.getTitle();
@@ -92,8 +90,8 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
 
                 break;
             case R.id.home_menu_icon:
-                if (RemoteDatabaseSingleton.getInstance(getActivity()).isUserLoggedIn()) {
-                    this.user = RemoteDatabaseSingleton.getInstance(getActivity()).getUser();
+                if (RemoteDatabaseSingleton.getInstance().isUserLoggedIn()) {
+                    this.user = RemoteDatabaseSingleton.getInstance().getUser();
                 }
                 if (user != null) {
                     CircleImageView avatar = (CircleImageView) getActivity().findViewById(R.id.home_avatar);
@@ -196,8 +194,8 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (RemoteDatabaseSingleton.getInstance(getActivity()).isUserLoggedIn()) {
-            this.user = RemoteDatabaseSingleton.getInstance(getActivity()).getUser();
+        if (RemoteDatabaseSingleton.getInstance().isUserLoggedIn()) {
+            this.user = RemoteDatabaseSingleton.getInstance().getUser();
         }
         initBrowserSettings();
         configViews();
@@ -305,8 +303,8 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
             try {
                 URL uri=new URL(view.getUrl()) ;
                 String host=uri.getHost();
-                WebIconUtil.getInstance().setIcon(icon,host);
-                presenter.saveHistory(uri.toString(),view.getTitle());
+                WebIconUtil webIconUtil= WebIconUtil.getInstance();
+                webIconUtil.setIcon(icon,host);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }

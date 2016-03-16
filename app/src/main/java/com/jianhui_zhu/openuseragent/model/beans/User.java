@@ -6,7 +6,6 @@ import android.os.Parcelable;
 
 import com.jianhui_zhu.openuseragent.util.MapUtil;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,7 +17,7 @@ public class User implements Parcelable {
     String avatarUrl;
     String homepage;
     Map<String, Bookmark> bookmarks;
-    Map<String, Record> records;
+    Map<String, History> histories;
 
     public User() {
 
@@ -39,7 +38,7 @@ public class User implements Parcelable {
         homepage=in.readString();
         Bundle bundle = in.readBundle();
         bookmarks = MapUtil.fromBundle(bundle.getBundle("bookmarks"), Bookmark.class);
-        records = MapUtil.fromBundle(bundle.getBundle("records"), Record.class);
+        histories = MapUtil.fromBundle(bundle.getBundle("histories"), History.class);
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -54,12 +53,12 @@ public class User implements Parcelable {
         }
     };
 
-    public Map<String, Record> getRecords() {
-        return records;
+    public Map<String, History> getHistories() {
+        return histories;
     }
 
-    public void setRecords(Map<String, Record> records) {
-        this.records = records;
+    public void setHistories(Map<String, History> histories) {
+        this.histories = histories;
     }
 
     public Map<String, Bookmark> getBookmarks() {
@@ -109,7 +108,7 @@ public class User implements Parcelable {
         dest.writeString(homepage);
         Bundle bundle = new Bundle();
         bundle.putBundle("bookmarks", MapUtil.toBundle(bookmarks));
-        bundle.putBundle("records", MapUtil.toBundle(records));
+        bundle.putBundle("histories", MapUtil.toBundle(histories));
         dest.writeBundle(bundle);
 
     }

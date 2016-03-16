@@ -5,6 +5,9 @@ import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.squareup.otto.Subscribe;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,8 +16,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import rx.Observable;
+import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.observables.AsyncOnSubscribe;
 import rx.schedulers.Schedulers;
 
 /**
@@ -31,8 +37,11 @@ public class WebIconUtil {
         this.cw=new ContextWrapper(context);
     }
     private boolean isIconExist(String name){
-        File file=cw.getDir(DEFAULT_ICON_FOLDER+File.separator+name+DEFAULT_IMAGE_SUFFIX,Context.MODE_PRIVATE);
-        return file.exists();
+
+            String path = context.getDir("icons",Context.MODE_PRIVATE).getAbsolutePath()+File.separator;
+            File icon=new File(path+name+DEFAULT_IMAGE_SUFFIX);
+            boolean isExist=icon.exists();
+            return isExist;
     }
 
     public static void instantiate(Context context){
@@ -48,7 +57,7 @@ public class WebIconUtil {
         return Observable.create(new Observable.OnSubscribe<Bitmap>() {
             @Override
             public void call(Subscriber<? super Bitmap> subscriber) {
-                String path=cw.getDir(DEFAULT_ICON_FOLDER, Context.MODE_PRIVATE).getPath()+ File.separator+name+DEFAULT_IMAGE_SUFFIX;
+                String path = context.getDir("icons",Context.MODE_PRIVATE).getAbsolutePath()+File.separator+name+DEFAULT_IMAGE_SUFFIX;
                 try {
                     Bitmap bitmap= BitmapFactory.decodeStream(new FileInputStream(new File(path)));
                     if(bitmap!=null){
@@ -66,14 +75,15 @@ public class WebIconUtil {
             Observable.create(new Observable.OnSubscribe<String>() {
                 @Override
                 public void call(Subscriber<? super String> subscriber) {
-                    File directory = cw.getDir(DEFAULT_ICON_FOLDER, Context.MODE_PRIVATE);
+                    File directory = context.getDir("icons",Context.MODE_PRIVATE);
 
-                    File mypath = new File(directory, name + DEFAULT_IMAGE_SUFFIX);
+                    File path = new File(directory, name + DEFAULT_IMAGE_SUFFIX);
                     FileOutputStream fout = null;
                     try {
-                        fout = new FileOutputStream(mypath);
-                        // Use the compress method on the BitMap object to write image to the OutputStream
+                        fout = new FileOutputStream(path);
                         bitmap.compress(Bitmap.CompressFormat.PNG, 100, fout);
+                        subscriber.onNext("done");
+                        subscriber.onCompleted();
                     } catch (Exception e) {
                         e.printStackTrace();
                     } finally {
@@ -81,13 +91,19 @@ public class WebIconUtil {
                             if (fout != null) {
                                 fout.flush();
                                 fout.close();
+                                subscriber.onNext("done");
+                                subscriber.onCompleted();
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
                 }
-            }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+            }).subscribeOn(Schedulers.io()).subscribe();
         }
+    }
+    public File getIconByNameAsFile(final String name) {
+        String path=cw.getDir(DEFAULT_ICON_FOLDER, Context.MODE_PRIVATE).getPath()+ File.separator+name+DEFAULT_IMAGE_SUFFIX;
+        return new File(path);
     }
 }
