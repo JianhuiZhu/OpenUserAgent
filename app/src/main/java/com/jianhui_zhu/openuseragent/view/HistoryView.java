@@ -79,11 +79,7 @@ public class HistoryView extends AbstractFragment implements DatePickerDialog.On
 
     @Override
     public void onDateSet(DatePickerDialog view, int year, int month, int day) {
-        Date date = new Date(System.currentTimeMillis());
-        date.setYear(year);
-        date.setMonth(month);
-        date.setDate(day);
-        presenter.getHistoryByDate(date);
+        presenter.getHistoryByDate(year, month, day);
     }
 
     @Override

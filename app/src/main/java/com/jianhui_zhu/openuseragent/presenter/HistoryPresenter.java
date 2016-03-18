@@ -26,8 +26,8 @@ public class HistoryPresenter {
     public Observable<List<History>> getAllHistory(){
         return model.getAllHistory();
     }
-    public void getHistoryByDate(Date date){
-        model.getHistoryByDate(date).subscribe(new Action1<List<History>>() {
+    public void getHistoryByDate(int year, int month, int day){
+        model.getHistoryByDate(year,month, day).subscribe(new Action1<List<History>>() {
             @Override
             public void call(List<History> histories) {
                 view.refreshList(histories);

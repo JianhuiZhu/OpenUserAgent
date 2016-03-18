@@ -21,5 +21,5 @@ public interface DatabaseInterface {
     void deleteHistory(final History history);
     void deleteAllBookmark();
     void deleteAllHistories();
-    Observable<List<History>> getHistoryByDate(Date date);
+    Observable<List<History>> getHistoryByDate(int year, int month, int day);
 }

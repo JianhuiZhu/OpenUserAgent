@@ -291,8 +291,9 @@ public class RemoteDatabaseSingleton implements DatabaseInterface,GoogleApiClien
     }
 
     @Override
-    public Observable<List<History>> getHistoryByDate(Date date) {
+    public Observable<List<History>> getHistoryByDate(int year, int month, int day) {
         return null;
     }
+
 
 }

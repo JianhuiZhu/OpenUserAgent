@@ -23,7 +23,7 @@ public class HistoryModel {
     public Observable<List<History>> getAllHistory(){
         return LocalDatabaseSingleton.getInstance().getAllHistories();
     }
-    public Observable<List<History>> getHistoryByDate(Date date){
-        return LocalDatabaseSingleton.getInstance().getHistoryByDate(date);
+    public Observable<List<History>> getHistoryByDate(int year, int month, int day){
+        return LocalDatabaseSingleton.getInstance().getHistoryByDate(year,month,day);
     }
 }

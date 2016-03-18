@@ -13,7 +13,9 @@ import com.jianhui_zhu.openuseragent.model.beans.History;
 import com.jianhui_zhu.openuseragent.util.interfaces.DatabaseInterface;
 
 import java.lang.Override;import java.lang.String;import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -93,15 +95,23 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
     }
 
     @Override
-    public Observable<List<History>> getHistoryByDate(final Date date) {
+    public Observable<List<History>> getHistoryByDate(final int year, final int month, final int day) {
         return Observable.create(new Observable.OnSubscribe<List<History>>() {
             @Override
             public void call(Subscriber<? super List<History>> subscriber) {
-                long day=date.getTime()/(1000*60*60*24);
+                GregorianCalendar cal = new GregorianCalendar();
                 SQLiteDatabase db=LocalDatabaseHelper.getInstance(context)
                         .getReadableDatabase();
+                Date date=new Date();
+                cal.setTime(date);
+                cal.set(year,month,day);
+                cal.set(Calendar.HOUR_OF_DAY, 0);
+                cal.set(Calendar.MINUTE, 0);
+                cal.set(Calendar.SECOND, 0);
+                long startTime=cal.getTimeInMillis();
+                long endTime = startTime + 24 * 3600 * 1000;
                 Cursor cursor=db
-                        .query("Histories",null,"timestamp / (1000*60*60*24)=?",new String[]{String.valueOf(day)},null,null,"timestamp DESC");
+                        .query("Histories",null,"timestamp >=? AND timestamp < ?",new String[]{String.valueOf(startTime), String.valueOf(endTime)},null,null,"timestamp DESC");
                 ArrayList<History> result=new ArrayList<History>(cursor.getCount());
                 if (cursor.moveToFirst()) {
                     do {
@@ -287,7 +297,7 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
                     "_id INTEGER NOT NULL PRIMARY KEY,"+
                     "name VARCHAR(50) NOT NULL,"+
                     "url VARCHAR(300) NOT NULL," +
-                    "timestamp INT NOT NULL)";
+                    "timestamp INTEGER NOT NULL)";
             String createQueryTable="CREATE TABLE IF NOT EXISTS QueryRecords(" +
                     "_id INTEGER NOT NULL PRIMARY KEY,"+
                     "query VARCHAR(400) NOT NULL," +

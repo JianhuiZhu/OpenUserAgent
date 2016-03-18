@@ -72,7 +72,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         History history=histories.get(position);
         try {
             URI uri=new URI(history.getUrl());
-            String time=history.getTimestamp();
+            Date date=new Date(history.getTimestamp());
             WebIconUtil.getInstance().getIconByName(uri.getHost()).subscribe(new Action1<Bitmap>() {
                 @Override
                 public void call(Bitmap result) {
@@ -80,7 +80,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
                 }
             });
             holder.title.setText(history.getName());
-            holder.time.setText(time);
+            holder.time.setText(date.getHours()+":"+date.getMinutes());
             setAnimation(holder.container,position);
         } catch (URISyntaxException e) {
             e.printStackTrace();
