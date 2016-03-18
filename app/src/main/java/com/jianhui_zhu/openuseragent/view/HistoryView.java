@@ -15,24 +15,39 @@ import com.jianhui_zhu.openuseragent.model.beans.History;
 import com.jianhui_zhu.openuseragent.presenter.HistoryPresenter;
 import com.jianhui_zhu.openuseragent.util.AbstractFragment;
 import com.jianhui_zhu.openuseragent.view.adapter.HistoryAdapter;
+import com.jianhui_zhu.openuseragent.view.interfaces.HistoryViewInterface;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import rx.functions.Action1;
 
 /**
  * Created by jianhuizhu on 2016-02-16.
  */
-public class HistoryView extends AbstractFragment implements DatePickerDialog.OnDateSetListener{
+public class HistoryView extends AbstractFragment implements DatePickerDialog.OnDateSetListener,HistoryViewInterface{
     @Bind(R.id.general_tool_bar_title)
     TextView toolbarTitle;
     @Bind(R.id.history_list)
     RecyclerView list;
+    @OnClick(R.id.date_picker_btn)
+    public void click(View view){
+        Calendar now = Calendar.getInstance();
+        DatePickerDialog dpd = DatePickerDialog.newInstance(
+                this,
+                now.get(Calendar.YEAR),
+                now.get(Calendar.MONTH),
+                now.get(Calendar.DAY_OF_MONTH)
+        );
+        dpd.show(getFragmentManager(), "Datepickerdialog");
+    }
     HistoryAdapter adapter;
-    HistoryPresenter presenter=new HistoryPresenter(getActivity());
+    HistoryPresenter presenter=new HistoryPresenter(getActivity(),this);
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,14 +72,22 @@ public class HistoryView extends AbstractFragment implements DatePickerDialog.On
             @Override
             public void call(List<History> histories) {
                 adapter=new HistoryAdapter(getActivity(),presenter,histories);
-
                 list.setAdapter(adapter);
             }
         });
     }
 
     @Override
-    public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-        
+    public void onDateSet(DatePickerDialog view, int year, int month, int day) {
+        Date date = new Date(System.currentTimeMillis());
+        date.setYear(year);
+        date.setMonth(month);
+        date.setDate(day);
+        presenter.getHistoryByDate(date);
+    }
+
+    @Override
+    public void refreshList(List<History> histories) {
+        adapter.changeHistoriesDataSet(histories);
     }
 }

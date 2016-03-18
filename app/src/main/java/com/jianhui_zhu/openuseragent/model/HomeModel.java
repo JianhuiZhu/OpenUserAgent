@@ -45,6 +45,7 @@ public class HomeModel {
     public void saveHistory(String url, String uID) {
         History history = new History();
         history.setUrl(url);
+
         history.setTimestamp(System.currentTimeMillis());
         if (uID != null) {
             RemoteDatabaseSingleton.getInstance().saveHistory(history);

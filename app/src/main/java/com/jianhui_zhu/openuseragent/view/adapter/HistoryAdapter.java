@@ -43,8 +43,13 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     public void setHistories(List<History> histories) {
         this.histories = histories;
+        notifyDataSetChanged();
     }
-
+    public void changeHistoriesDataSet(List<History> histories){
+        this.histories.clear();
+        this.histories.addAll(histories);
+        notifyDataSetChanged();
+    }
     List<History> histories;
     public HistoryAdapter(Context context,HistoryPresenter presenter,List<History> histories){
         this.context=context;
@@ -67,8 +72,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         History history=histories.get(position);
         try {
             URI uri=new URI(history.getUrl());
-            Date date=new Date(history.getTimestamp());
-            String time=date.getHours()+" : "+date.getMinutes();
+            String time=history.getTimestamp();
             WebIconUtil.getInstance().getIconByName(uri.getHost()).subscribe(new Action1<Bitmap>() {
                 @Override
                 public void call(Bitmap result) {
