@@ -23,6 +23,7 @@ import com.jianhui_zhu.openuseragent.util.interfaces.DatabaseInterface;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -287,6 +288,11 @@ public class RemoteDatabaseSingleton implements DatabaseInterface,GoogleApiClien
     @Override
     public void deleteAllHistories() {
 
+    }
+
+    @Override
+    public Observable<List<History>> getHistoryByDate(Date date) {
+        return null;
     }
 
 }

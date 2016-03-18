@@ -23,7 +23,7 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-        <activity android:name=".util.activity.SplashScreenActivity"></activity>
+        <activity android:name=".util.activity.SplashScreenActivity"/>
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="d0ff74dbd8150cdda8a7bef23291e659035e5322" />

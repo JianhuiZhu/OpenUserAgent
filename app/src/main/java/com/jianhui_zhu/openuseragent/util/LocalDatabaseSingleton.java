@@ -13,6 +13,7 @@ import com.jianhui_zhu.openuseragent.model.beans.History;
 import com.jianhui_zhu.openuseragent.util.interfaces.DatabaseInterface;
 
 import java.lang.Override;import java.lang.String;import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -89,6 +90,34 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
                 subscriber.onCompleted();
             }
         }).subscribeOn(Schedulers.io()).subscribe();
+    }
+
+    @Override
+    public Observable<List<History>> getHistoryByDate(final Date date) {
+        return Observable.create(new Observable.OnSubscribe<List<History>>() {
+            @Override
+            public void call(Subscriber<? super List<History>> subscriber) {
+                long day=date.getTime()/(1000*60*60*24);
+                SQLiteDatabase db=LocalDatabaseHelper.getInstance(context)
+                        .getReadableDatabase();
+                Cursor cursor=db
+                        .query("Histories",null,"timestamp / (1000*60*60*24)=?",new String[]{String.valueOf(day)},null,null,"timestamp DESC");
+                ArrayList<History> result=new ArrayList<History>(cursor.getCount());
+                if (cursor.moveToFirst()) {
+                    do {
+                        History history = new History();
+                        history.setrID(cursor.getColumnName(0));
+                        history.setTimestamp(cursor.getLong(3));
+                        history.setUrl(cursor.getString(2));
+                        result.add(history);
+                    } while (cursor.moveToNext());
+                }
+                cursor.close();
+                db.close();
+                subscriber.onNext(result);
+                subscriber.onCompleted();
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
 
     @Override

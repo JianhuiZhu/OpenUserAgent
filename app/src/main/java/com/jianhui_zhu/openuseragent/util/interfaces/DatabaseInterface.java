@@ -3,6 +3,7 @@ package com.jianhui_zhu.openuseragent.util.interfaces;
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
 import com.jianhui_zhu.openuseragent.model.beans.History;
 
+import java.util.Date;
 import java.util.List;
 
 import rx.Observable;
@@ -20,4 +21,5 @@ public interface DatabaseInterface {
     void deleteHistory(final History history);
     void deleteAllBookmark();
     void deleteAllHistories();
+    Observable<List<History>> getHistoryByDate(Date date);
 }

@@ -15,6 +15,7 @@ import com.jianhui_zhu.openuseragent.model.beans.History;
 import com.jianhui_zhu.openuseragent.presenter.HistoryPresenter;
 import com.jianhui_zhu.openuseragent.util.AbstractFragment;
 import com.jianhui_zhu.openuseragent.view.adapter.HistoryAdapter;
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ import rx.functions.Action1;
 /**
  * Created by jianhuizhu on 2016-02-16.
  */
-public class HistoryView extends AbstractFragment{
+public class HistoryView extends AbstractFragment implements DatePickerDialog.OnDateSetListener{
     @Bind(R.id.general_tool_bar_title)
     TextView toolbarTitle;
     @Bind(R.id.history_list)
@@ -60,5 +61,10 @@ public class HistoryView extends AbstractFragment{
                 list.setAdapter(adapter);
             }
         });
+    }
+
+    @Override
+    public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+        
     }
 }
