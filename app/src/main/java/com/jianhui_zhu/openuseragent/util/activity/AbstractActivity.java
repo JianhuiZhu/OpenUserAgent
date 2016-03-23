@@ -2,6 +2,8 @@ package com.jianhui_zhu.openuseragent.util.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 
 import com.squareup.otto.Bus;import java.lang.Override;
 
@@ -9,7 +11,7 @@ import com.squareup.otto.Bus;import java.lang.Override;
 /**
  * Created by jianhuizhu on 2016-01-27
  */
-public abstract class AbstractActivity extends Activity {
+public abstract class AbstractActivity extends AppCompatActivity {
 //	private ObjectGraph mObjectGraph;
 
 //	@Inject

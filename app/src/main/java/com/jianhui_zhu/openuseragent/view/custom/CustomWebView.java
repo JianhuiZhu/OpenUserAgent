@@ -2,6 +2,8 @@ package com.jianhui_zhu.openuseragent.view.custom;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.webkit.DownloadListener;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
@@ -10,13 +12,23 @@ import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
  * Created by jianhuizhu on 2016-03-09.
  */
 public class CustomWebView extends WebView {
+    private void initSettings(){
+
+    }
+
     public void setHomeViewInterface(HomeViewInterface homeViewInterface) {
         this.homeViewInterface = homeViewInterface;
     }
 
     HomeViewInterface homeViewInterface;
 
-
+    public CustomWebView(Context context){
+        super(context);
+        WebSettings settings=this.getSettings();
+        settings.setDefaultTextEncodingName("UTF-8");
+        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        settings.setJavaScriptEnabled(true);
+    }
     public CustomWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
@@ -48,4 +60,6 @@ public class CustomWebView extends WebView {
             }
         }
     }
+
+
 }

@@ -22,7 +22,6 @@ public class MainActivity extends AbstractActivity {
 
 		setContentView(R.layout.activity_main);
 		FragmenUtil.switchToFragment(this, new TestView());
-
 	}
 
 	@Override

@@ -6,7 +6,6 @@ import android.database.Cursor;
  * Created by jianhuizhu on 2016-02-09.
  */
 public interface HomeViewInterface {
-    void initBrowserSettings();
     void loadTargetUrl(String url);
     void showTag(String info);
     void swapCursor(Cursor cursor);
