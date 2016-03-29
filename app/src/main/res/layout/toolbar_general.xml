@@ -10,7 +10,7 @@
     android:layout_marginLeft="16dp"
     android:layout_width="24dp"
     android:background="@android:color/transparent"
-    android:src="@drawable/ic_keyboard_backspace_white_18dp"
+    android:src="@drawable/ic_back"
     android:layout_height="24dp" />
     <TextView
         android:id="@+id/general_tool_bar_title"

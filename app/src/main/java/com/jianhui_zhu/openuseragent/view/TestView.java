@@ -22,7 +22,7 @@ import butterknife.OnClick;
  */
 public class TestView extends AbstractFragment {
     @OnClick({R.id.go_to_home_fragment, R.id.go_to_setting_fragment, R.id.go_to_profile_fragment,
-            R.id.go_to_login_fragment, R.id.go_to_download_fragment, R.id.go_to_bookmark_fragment,R.id.go_to_history_fragment})
+            R.id.go_to_download_fragment, R.id.go_to_bookmark_fragment,R.id.go_to_history_fragment})
     public void changeFragment(Button btn){
         switch(btn.getId()){
             case R.id.go_to_home_fragment:
@@ -33,9 +33,6 @@ public class TestView extends AbstractFragment {
                 break;
             case R.id.go_to_download_fragment:
                 FragmenUtil.switchToFragment(getActivity(),new DownloadView());
-                break;
-            case R.id.go_to_login_fragment:
-                FragmenUtil.switchToFragment(getActivity(),new LoginView());
                 break;
             case R.id.go_to_profile_fragment:
                 FragmenUtil.switchToFragment(getActivity(),new ProfileView());

@@ -5,11 +5,9 @@ import android.database.Cursor;
 import android.webkit.URLUtil;
 
 import com.jianhui_zhu.openuseragent.model.HomeModel;
-import com.jianhui_zhu.openuseragent.model.LoginModel;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 
 import rx.Observable;
-import rx.Observer;
 import rx.functions.Action1;
 
 /**

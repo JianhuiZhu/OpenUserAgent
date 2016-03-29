@@ -13,11 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <Button
-        android:id="@+id/go_to_login_fragment"
-        android:text="Login Fragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <Button
         android:id="@+id/go_to_profile_fragment"
         android:text="Profile Fragment"
         android:layout_width="match_parent"

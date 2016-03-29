@@ -13,16 +13,22 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.WebViewInfoHolder;
+import com.jianhui_zhu.openuseragent.view.TabView;
 import com.jianhui_zhu.openuseragent.view.custom.CustomWebView;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Stack;
+import java.util.Vector;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -33,12 +39,22 @@ import rx.schedulers.Schedulers;
 /**
  * Created by jianhuizhu on 2016-03-23.
  */
-public class WebviewAdapter extends FragmentPagerAdapter {
-    List<WebViewInfoHolder> webViews=new ArrayList<>();
+public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
+    private static WebViewAdapter instance;
 
-    public WebviewAdapter(FragmentManager fm) {
-        super(fm);
+    private WebViewAdapter(Context context, int resource) {
+        super(context, resource);
     }
+
+    public static WebViewAdapter getInstance(Context context){
+        if(instance==null){
+            instance = new WebViewAdapter(context,R.layout.item_webview);
+        }
+        return instance;
+    }
+    ArrayList<WebViewInfoHolder> webViews=new ArrayList<>();
+
+
     private WebViewInfoHolder getByWebView(final CustomWebView webView){
         for(WebViewInfoHolder holder : webViews){
             if(holder.getWebView()==webView)
@@ -58,6 +74,7 @@ public class WebviewAdapter extends FragmentPagerAdapter {
                 picture.draw(canvas);
                 WebViewInfoHolder holder =new WebViewInfoHolder();
                 holder.setWebView(webView);
+                holder.setTitle(webView.getTitle());
                 holder.setBitmap(bitmap);
                 subscriber.onNext(holder);
                 subscriber.onCompleted();
@@ -66,32 +83,37 @@ public class WebviewAdapter extends FragmentPagerAdapter {
             @Override
             public void call(WebViewInfoHolder webViewInfoHolder) {
                 webViews.add(webViewInfoHolder);
+                notifyDataSetChanged();
             }
         });
     }
 
-    @Override
-    public Fragment getItem(int position) {
-        return null;
-    }
 
     @Override
     public int getCount() {
         return webViews == null ? 0 : webViews.size();
     }
 
-    @Override
-    public Object instantiateItem(ViewGroup container, final int position) {
-        LayoutInflater inflater = (LayoutInflater) container.getContext()
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View page = inflater.inflate(R.layout.item_webview, null);
+    private void swapWebViews(int position){
+        WebViewInfoHolder temp = webViews.get(position);
+        webViews.remove(position);
+        webViews.add(temp);
+        notifyDataSetChanged();
+    }
 
-        page.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-                Log.i("TAG", "This page was clicked: " + position);
-            }
-        });
-        ((ViewPager) container).addView(page, 0);
-        return page;
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        WebViewInfoHolder holder = webViews.get(position);
+        String title = holder.getTitle();
+        Bitmap snapshot = holder.getBitmap();
+        if(convertView==null){
+            LayoutInflater vi = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView=vi.inflate(R.layout.item_webview, null);
+        }
+        TextView titleView = (TextView)convertView.findViewById(R.id.title);
+        ImageView snapshotView = (ImageView)convertView.findViewById(R.id.snapshot);
+        titleView.setText(title);
+        snapshotView.setImageBitmap(snapshot);
+        return convertView;
     }
 }

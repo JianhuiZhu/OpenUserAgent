@@ -14,7 +14,7 @@
         <ImageView
             android:layout_margin="5dp"
             android:id="@+id/bookmark_avatar"
-            android:src="@drawable/globe"
+            android:src="@drawable/ic_globe"
             android:layout_width="30dp"
             android:layout_height="30dp" />
 

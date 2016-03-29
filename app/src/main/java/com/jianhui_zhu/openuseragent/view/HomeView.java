@@ -21,7 +21,6 @@ import android.webkit.DownloadListener;
 import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
 import android.webkit.WebIconDatabase;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
@@ -40,9 +39,10 @@ import com.jianhui_zhu.openuseragent.util.SettingSingleton;
 import com.jianhui_zhu.openuseragent.util.WebIconUtil;
 import com.jianhui_zhu.openuseragent.util.activity.MainActivity;
 import com.jianhui_zhu.openuseragent.view.adapter.SearchSuggestionAdapter;
-import com.jianhui_zhu.openuseragent.view.adapter.WebviewAdapter;
+import com.jianhui_zhu.openuseragent.view.adapter.WebViewAdapter;
 import com.jianhui_zhu.openuseragent.view.custom.CustomDrawerLayout;
 import com.jianhui_zhu.openuseragent.view.custom.CustomWebView;
+import com.jianhui_zhu.openuseragent.view.dialogs.TabStackDialog;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 import com.squareup.picasso.Picasso;
 
@@ -75,12 +75,11 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
     @Bind(R.id.search_suggestion_list)
     ListView suggestionList;
     SearchSuggestionAdapter suggestionAdapter;
-    WebviewAdapter webviewAdapter;
+    WebViewAdapter webViewAdapter;
     @OnClick({R.id.home_refresh_icon, R.id.add_bookmark_icon, R.id.home_menu_icon})
     public void click(View view) {
         switch (view.getId()) {
             case R.id.home_refresh_icon:
-                //webHolder.reload();
                 swapWebView();
                 break;
             case R.id.add_bookmark_icon:
@@ -97,17 +96,18 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
 
                 break;
             case R.id.home_menu_icon:
-                if (RemoteDatabaseSingleton.getInstance().isUserLoggedIn()) {
-                    this.user = RemoteDatabaseSingleton.getInstance().getUser();
-                }
-                if (user != null) {
-                    CircleImageView avatar = (CircleImageView) getActivity().findViewById(R.id.home_avatar);
-                    TextView username = (TextView) getActivity().findViewById(R.id.home_name);
-                    Picasso.with(getActivity()).load(user.getAvatarUrl()).fit().into(avatar);
-                    username.setText(user.getUsername());
-                }
-                settingDrawer.openDrawer(Gravity.RIGHT);
-                drawerIsOpen = true;
+//                if (RemoteDatabaseSingleton.getInstance().isUserLoggedIn()) {
+//                    this.user = RemoteDatabaseSingleton.getInstance().getUser();
+//                }
+//                if (user != null) {
+//                    CircleImageView avatar = (CircleImageView) getActivity().findViewById(R.id.home_avatar);
+//                    TextView username = (TextView) getActivity().findViewById(R.id.home_name);
+//                    Picasso.with(getActivity()).load(user.getAvatarUrl()).fit().into(avatar);
+//                    username.setText(user.getUsername());
+//                }
+//                settingDrawer.openDrawer(Gravity.RIGHT);
+//                drawerIsOpen = true;
+                FragmenUtil.switchToFragment(getActivity(),new TabStackDialog());
                 break;
         }
     }
@@ -192,7 +192,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        webviewAdapter=new WebviewAdapter(((MainActivity)getActivity()).getSupportFragmentManager());
+        webViewAdapter =WebViewAdapter.getInstance(getActivity());
         if (RemoteDatabaseSingleton.getInstance().isUserLoggedIn()) {
             this.user = RemoteDatabaseSingleton.getInstance().getUser();
         }
@@ -338,7 +338,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
             webviewContainer.removeAllViewsInLayout();
             webviewContainer.addView(web, 0);
             if(webHolder!=null&&webHolder.getHeight()>0&&webHolder.getWidth()>0){
-                webviewAdapter.addWebView(webHolder);
+                webViewAdapter.addWebView(webHolder);
             }
             webHolder=web;
     }
