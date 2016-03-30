@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:background="@color/mdtp_accent_color"
+    android:layout_height="36dp">
+<android.support.percent.PercentRelativeLayout
+    android:layout_marginLeft="16dp"
+    android:layout_marginTop="8dp"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:layout_marginBottom="8dp"
+    android:layout_marginRight="16dp">
+<ImageView
+    android:id="@+id/backward"
+    android:src="@drawable/ic_back"
+    app:layout_widthPercent="16%"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" />
+<ImageView
+    android:layout_toRightOf="@+id/backward"
+    android:id="@+id/forward"
+    android:src="@drawable/ic_forward"
+    app:layout_widthPercent="16%"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content" />
+<ImageView
+    android:layout_toRightOf="@+id/forward"
+    android:id="@+id/home"
+    android:src="@drawable/ic_home"
+    app:layout_widthPercent="16%"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content" />
+    <ImageView
+        android:layout_toRightOf="@+id/home"
+        android:id="@+id/refresh"
+        android:src="@drawable/ic_refresh"
+        app:layout_widthPercent="16%"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" />
+    <ImageView
+        android:layout_toRightOf="@+id/refresh"
+        android:id="@+id/history"
+        android:src="@drawable/ic_history"
+        app:layout_widthPercent="16%"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" />
+    <ImageView
+        android:layout_toRightOf="@+id/history"
+        android:id="@+id/add_bookmark"
+        android:src="@drawable/ic_add_bookmark"
+        app:layout_widthPercent="16%"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" />
+</android.support.percent.PercentRelativeLayout>
+</LinearLayout>

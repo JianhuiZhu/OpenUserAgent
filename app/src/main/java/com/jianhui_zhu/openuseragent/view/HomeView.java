@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.percent.PercentRelativeLayout;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -57,7 +58,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * Created by Jianhui Zhu on 2016-01-27.
  */
-public class HomeView extends AbstractFragment implements HomeViewInterface {
+public class HomeView extends AbstractFragment implements HomeViewInterface,SwipeRefreshLayout.OnRefreshListener {
     @Bind(R.id.webview_holder)
     FrameLayout webviewContainer;
     User user;
@@ -74,28 +75,12 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
     SearchView urlBar;
     @Bind(R.id.search_suggestion_list)
     ListView suggestionList;
+    @Bind(R.id.swipe_refresh)
+    SwipeRefreshLayout swipeRefreshLayout;
     SearchSuggestionAdapter suggestionAdapter;
     WebViewAdapter webViewAdapter;
-    @OnClick({R.id.home_refresh_icon, R.id.add_bookmark_icon, R.id.home_menu_icon})
+    @OnClick({R.id.home_menu_icon})
     public void click(View view) {
-        switch (view.getId()) {
-            case R.id.home_refresh_icon:
-                swapWebView();
-                break;
-            case R.id.add_bookmark_icon:
-                if (RemoteDatabaseSingleton.getInstance().isUserLoggedIn()) {
-                    this.user = RemoteDatabaseSingleton.getInstance().getUser();
-                }
-                String url = webHolder.getUrl();
-                String urlTitle = webHolder.getTitle();
-                if (user == null) {
-                    presenter.saveBookmark(url, urlTitle, null);
-                } else {
-                    presenter.saveBookmark(url, urlTitle, user.getuID());
-                }
-
-                break;
-            case R.id.home_menu_icon:
 //                if (RemoteDatabaseSingleton.getInstance().isUserLoggedIn()) {
 //                    this.user = RemoteDatabaseSingleton.getInstance().getUser();
 //                }
@@ -108,8 +93,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
 //                settingDrawer.openDrawer(Gravity.RIGHT);
 //                drawerIsOpen = true;
                 FragmenUtil.switchToFragment(getActivity(),new TabStackDialog());
-                break;
-        }
+
     }
 
     private HomePresenter presenter;
@@ -130,6 +114,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
                 return true;
             }
         });
+        swipeRefreshLayout.setOnRefreshListener(this);
         urlBar.setIconifiedByDefault(true);
         urlBar.setSubmitButtonEnabled(true);
         suggestionList.setAdapter(suggestionAdapter);
@@ -246,6 +231,11 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
         imm.hideSoftInputFromWindow(urlBar.getWindowToken(), 0);
     }
 
+    @Override
+    public void onRefresh() {
+        webHolder.reload();
+    }
+
 
 //    @Override
 //    public void onClick(View v) {
@@ -266,15 +256,17 @@ public class HomeView extends AbstractFragment implements HomeViewInterface {
 
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
+
         }
 
 
         @Override
         public void onPageFinished(WebView view, String url) {
             Log.d("webview","Page loaded");
+            if(swipeRefreshLayout.isRefreshing()){
+                swipeRefreshLayout.setRefreshing(false);
+            }
         }
-
-
 
 
     }
