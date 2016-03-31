@@ -1,21 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="56dp">
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
+    android:layout_height="36dp">
     <ImageView
+        android:layout_marginLeft="16dp"
         android:id="@+id/bookmark_avatar"
-        android:paddingLeft="16dp"
-        android:layout_centerVertical="true"
-        android:src="@android:drawable/ic_menu_recent_history"
-        android:layout_width="48dp"
-        android:layout_height="48dp" />
+        android:src="@drawable/ic_globe"
+        android:layout_width="24dp"
+        android:layout_height="24dp" />
+
     <TextView
-        android:fontFamily="sans-serif"
-        android:layout_centerVertical="true"
-        android:paddingLeft="72dp"
-        android:text="To be filled"
+        android:layout_marginLeft="5dp"
+        android:textColor="@color/mdtp_date_picker_text_normal"
+        android:text="to be filled"
         android:id="@+id/bookmark_name"
-        android:textSize="16sp"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:layout_toRightOf="@id/bookmark_avatar"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        />
+    <TextView
+        android:id="@+id/bookmark_url"
+        android:text="url to be filled"
+        android:layout_toRightOf="@+id/bookmark_avatar"
+        android:layout_below="@+id/bookmark_name"
+        android:layout_width="match_parent"
+        android:maxLines="1"
+        android:textStyle="italic"
+        android:textSize="12sp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="16dp"
+        android:textColor="@color/mdtp_dark_gray"
         android:layout_height="wrap_content" />
 </RelativeLayout>

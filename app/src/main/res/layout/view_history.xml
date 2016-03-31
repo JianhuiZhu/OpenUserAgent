@@ -4,36 +4,35 @@
     android:layout_height="match_parent">
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:background="@android:color/holo_blue_dark"
-        android:layout_height="56dp">
-        <ImageButton
+        android:background="@color/mdtp_accent_color"
+        android:layout_height="36dp">
+        <ImageView
             android:id="@+id/general_tool_bar_go_back"
             android:layout_marginTop="8dp"
             android:layout_marginLeft="16dp"
-            android:layout_width="36dp"
+            android:layout_width="24dp"
             android:background="@android:color/transparent"
             android:src="@drawable/ic_back"
-            android:layout_height="36dp" />
+            android:layout_height="24dp" />
         <TextView
             android:id="@+id/general_tool_bar_title"
             android:layout_toRightOf="@+id/general_tool_bar_go_back"
             android:text="History"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textColor="@android:color/white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="20dp"
             android:textStyle="bold"
-            android:layout_alignParentBottom="true"
-            android:paddingBottom="20dp"/>
+            android:layout_marginLeft="16dp"
+            android:layout_centerVertical="true"/>
         <ImageView
             android:id="@+id/date_picker_btn"
             android:layout_alignParentRight="true"
             android:layout_marginTop="8dp"
             android:layout_marginRight="16dp"
             android:src="@drawable/ic_date"
-            android:layout_width="36dp"
-            android:layout_height="36dp" />
+            android:layout_width="24dp"
+            android:layout_height="24dp" />
     </RelativeLayout>
 <android.support.v7.widget.RecyclerView
     android:id="@+id/history_list"
