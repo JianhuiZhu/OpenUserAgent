@@ -4,35 +4,32 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.Log;
-import android.widget.Toast;
-
-import com.squareup.otto.Subscribe;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import rx.Observable;
-import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.observables.AsyncOnSubscribe;
 import rx.schedulers.Schedulers;
 
 /**
  * Created by jianhuizhu on 2016-03-13.
  */
-public class WebIconUtil {
+public class WebUtil {
     private String DEFAULT_IMAGE_SUFFIX=".png";
     private String DEFAULT_ICON_FOLDER="icons";
     ContextWrapper cw;
     Context context;
-    private static WebIconUtil instance;
-    private WebIconUtil(Context context){
+    private static WebUtil instance;
+    private WebUtil(Context context){
         this.context=context;
         this.cw=new ContextWrapper(context);
     }
@@ -45,11 +42,11 @@ public class WebIconUtil {
     }
 
     public static void instantiate(Context context){
-        WebIconUtil.instance=new WebIconUtil(context);
+        WebUtil.instance=new WebUtil(context);
     }
-    public static WebIconUtil getInstance(){
+    public static WebUtil getInstance(){
         if(instance==null){
-            Log.e(WebIconUtil.class.getSimpleName(),"Web Icon manager have not been instantiated");
+            Log.e(WebUtil.class.getSimpleName(),"Web Icon manager have not been instantiated");
         }
         return instance;
     }
@@ -105,5 +102,10 @@ public class WebIconUtil {
     public File getIconByNameAsFile(final String name) {
         String path=cw.getDir(DEFAULT_ICON_FOLDER, Context.MODE_PRIVATE).getPath()+ File.separator+name+DEFAULT_IMAGE_SUFFIX;
         return new File(path);
+    }
+    public static String getDomainbyUrl(final String url) throws URISyntaxException {
+
+            URI uri = new URI(url);
+            return uri.getHost();
     }
 }

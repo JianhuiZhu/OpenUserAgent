@@ -47,7 +47,7 @@ public class BookmarkModel {
     }
 
     public void deleteBookmark(Bookmark bookmark){
-        if(RemoteDatabaseSingleton.getInstance().isUserLoggedIn()&& !DataValidationUtil.isInteger(bookmark.getbID())){
+        if(RemoteDatabaseSingleton.getInstance().isUserLoggedIn() && !DataValidationUtil.isInteger(bookmark.getbID())){
             RemoteDatabaseSingleton.getInstance().deleteBookmark(bookmark);
         }else{
             LocalDatabaseSingleton.getInstance().deleteBookmark(bookmark);

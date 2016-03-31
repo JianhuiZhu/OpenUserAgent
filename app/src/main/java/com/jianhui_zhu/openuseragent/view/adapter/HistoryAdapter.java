@@ -3,6 +3,7 @@ package com.jianhui_zhu.openuseragent.view.adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,13 +16,10 @@ import android.widget.TextView;
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.History;
 import com.jianhui_zhu.openuseragent.presenter.HistoryPresenter;
-import com.jianhui_zhu.openuseragent.util.WebIconUtil;
-import com.squareup.picasso.Picasso;
+import com.jianhui_zhu.openuseragent.util.WebUtil;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -71,9 +69,9 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     public void onBindViewHolder(final ViewHolder holder, int position) {
         History history=histories.get(position);
         try {
-            URI uri=new URI(history.getUrl());
+            String host = WebUtil.getDomainbyUrl(history.getUrl());
             Date date=new Date(history.getTimestamp());
-            WebIconUtil.getInstance().getIconByName(uri.getHost()).subscribe(new Action1<Bitmap>() {
+            WebUtil.getInstance().getIconByName(host).subscribe(new Action1<Bitmap>() {
                 @Override
                 public void call(Bitmap result) {
                     holder.avatar.setImageBitmap(result);
@@ -83,7 +81,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
             holder.time.setText(date.getHours()+":"+date.getMinutes());
             setAnimation(holder.container,position);
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            Log.e(this.getClass().getSimpleName(),e.getMessage());
         }
 
     }

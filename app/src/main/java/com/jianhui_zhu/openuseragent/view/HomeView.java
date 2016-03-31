@@ -12,7 +12,6 @@ import android.support.percent.PercentRelativeLayout;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,7 +26,6 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jianhui_zhu.openuseragent.R;
@@ -37,15 +35,13 @@ import com.jianhui_zhu.openuseragent.util.AbstractFragment;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.RemoteDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.util.SettingSingleton;
-import com.jianhui_zhu.openuseragent.util.WebIconUtil;
-import com.jianhui_zhu.openuseragent.util.activity.MainActivity;
+import com.jianhui_zhu.openuseragent.util.WebUtil;
 import com.jianhui_zhu.openuseragent.view.adapter.SearchSuggestionAdapter;
 import com.jianhui_zhu.openuseragent.view.adapter.WebViewAdapter;
 import com.jianhui_zhu.openuseragent.view.custom.CustomDrawerLayout;
 import com.jianhui_zhu.openuseragent.view.custom.CustomWebView;
 import com.jianhui_zhu.openuseragent.view.dialogs.TabStackDialog;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
-import com.squareup.picasso.Picasso;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -53,7 +49,6 @@ import java.net.URL;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by Jianhui Zhu on 2016-01-27.
@@ -283,8 +278,8 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
             try {
                 URL uri=new URL(view.getUrl()) ;
                 String host=uri.getHost();
-                WebIconUtil webIconUtil= WebIconUtil.getInstance();
-                webIconUtil.setIcon(icon,host);
+                WebUtil webUtil = WebUtil.getInstance();
+                webUtil.setIcon(icon,host);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }

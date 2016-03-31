@@ -2,8 +2,8 @@ package com.jianhui_zhu.openuseragent.view.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,11 +14,10 @@ import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
 import com.jianhui_zhu.openuseragent.presenter.BookmarkPresenter;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
-import com.jianhui_zhu.openuseragent.util.WebIconUtil;
+import com.jianhui_zhu.openuseragent.util.WebUtil;
 import com.jianhui_zhu.openuseragent.view.HomeView;
 import com.jianhui_zhu.openuseragent.view.dialogs.BookmarkDialog;
 import com.jianhui_zhu.openuseragent.view.interfaces.BookmarkAdapterInterface;
-import com.squareup.picasso.Picasso;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -62,15 +61,15 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
         holder.name.setText(bookmark.getName());
         holder.location=position;
         try {
-            URI uri=new URI(bookmark.getUrl());
-            WebIconUtil.getInstance().getIconByName(uri.getHost()).subscribe(new Action1<Bitmap>() {
+            String host = WebUtil.getDomainbyUrl(bookmark.getUrl());
+            WebUtil.getInstance().getIconByName(host).subscribe(new Action1<Bitmap>() {
                 @Override
                 public void call(Bitmap bitmap) {
                     holder.avatar.setImageBitmap(bitmap);
                 }
             });
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            Log.e(this.getClass().getSimpleName(),e.getMessage());
         }
     }
 

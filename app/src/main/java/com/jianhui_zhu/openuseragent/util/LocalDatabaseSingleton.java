@@ -111,8 +111,10 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
                 long startTime=cal.getTimeInMillis();
                 long endTime = startTime + 24 * 3600 * 1000;
                 Cursor cursor=db
-                        .query("Histories",null,"timestamp >=? AND timestamp < ?",new String[]{String.valueOf(startTime), String.valueOf(endTime)},null,null,"timestamp DESC");
-                ArrayList<History> result=new ArrayList<History>(cursor.getCount());
+                        .query("Histories",null,"timestamp >=? AND timestamp < ?"
+                                ,new String[]{String.valueOf(startTime), String.valueOf(endTime)}
+                                ,null,null,"timestamp DESC");
+                ArrayList<History> result=new ArrayList<>(cursor.getCount());
                 if (cursor.moveToFirst()) {
                     do {
                         History history = new History();
