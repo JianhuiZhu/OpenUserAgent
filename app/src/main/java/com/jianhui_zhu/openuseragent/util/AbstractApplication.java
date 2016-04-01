@@ -16,10 +16,6 @@ import java.lang.Override;import io.fabric.sdk.android.Fabric;
  * Created by jianhuizhu on 2016-01-27
  */
 public class AbstractApplication extends Application {
-//	protected ObjectGraph mApplicationGraph;
-private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-
-
 	@Override
 	public void onCreate() {
 		super.onCreate();

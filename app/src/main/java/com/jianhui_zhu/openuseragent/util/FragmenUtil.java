@@ -22,6 +22,7 @@ public class FragmenUtil {
 				((AbstractDialogFragment) fragment).show(((Activity) context).getFragmentManager(), DIALOG_FRAGMENT_TAG);
 			} else{
 				FragmentTransaction transaction = ((Activity) context).getFragmentManager().beginTransaction();
+				transaction.setCustomAnimations(R.animator.fragment_slide_right_enter,R.animator.fragment_slide_left_exit);
 				transaction.addToBackStack(fragment.getClass().getSimpleName());
 				transaction.replace(R.id.container, fragment, fragment.getClass().getSimpleName());
 				transaction.commit();

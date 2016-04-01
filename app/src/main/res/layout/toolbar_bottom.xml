@@ -39,15 +39,16 @@
         app:layout_widthPercent="16%"
         android:layout_width="0dp"
         android:layout_height="wrap_content" />
+
     <ImageView
         android:layout_toRightOf="@+id/refresh"
-        android:id="@+id/history"
-        android:src="@drawable/ic_history"
+        android:id="@+id/tab"
+        android:src="@drawable/ic_tab_1"
         app:layout_widthPercent="16%"
         android:layout_width="0dp"
         android:layout_height="wrap_content" />
     <ImageView
-        android:layout_toRightOf="@+id/history"
+        android:layout_toRightOf="@+id/tab"
         android:id="@+id/add_bookmark"
         android:src="@drawable/ic_add_bookmark"
         app:layout_widthPercent="16%"

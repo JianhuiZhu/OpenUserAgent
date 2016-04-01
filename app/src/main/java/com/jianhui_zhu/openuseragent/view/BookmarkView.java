@@ -31,11 +31,11 @@ import butterknife.ButterKnife;
 public class BookmarkView extends AbstractFragment implements BookmarkViewInterface{
     @Bind(R.id.list)
     RecyclerView bookmarkList;
-    BookmarkPresenter bookmarkPresenter;
+    BookmarkPresenter presenter;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        bookmarkPresenter=new BookmarkPresenter(getActivity(),this);
+        presenter =new BookmarkPresenter(getActivity(),this);
     }
 
     @Nullable
@@ -50,15 +50,11 @@ public class BookmarkView extends AbstractFragment implements BookmarkViewInterf
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         List<Bookmark> bookmarks=new ArrayList<>();
-        if(RemoteDatabaseSingleton.getInstance().isUserLoggedIn()) {
-            bookmarks.addAll(RemoteDatabaseSingleton.getInstance().getAllBookmarks());
-        }
-        bookmarks.addAll(LocalDatabaseSingleton.getInstance().getAllBookmarks());
-
+        bookmarks.addAll(presenter.getAllBookmarks());
         bookmarkList.setLayoutManager(new LinearLayoutManager(getActivity()));
         bookmarkList.setItemAnimator(new DefaultItemAnimator());
         bookmarkList.setHasFixedSize(true);
-        BookmarkAdapter bookmarkAdapter=new BookmarkAdapter(bookmarks,getActivity(),bookmarkList,bookmarkPresenter);
+        BookmarkAdapter bookmarkAdapter=new BookmarkAdapter(bookmarks,getActivity(),bookmarkList, presenter);
         bookmarkList.setAdapter(bookmarkAdapter);
     }
 

@@ -55,7 +55,7 @@ public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
     ArrayList<WebViewInfoHolder> webViews=new ArrayList<>();
 
 
-    private WebViewInfoHolder getByWebView(final CustomWebView webView){
+    private WebViewInfoHolder getWebViewInfoHolderByWebView(final CustomWebView webView){
         for(WebViewInfoHolder holder : webViews){
             if(holder.getWebView()==webView)
                 return holder;
@@ -112,8 +112,17 @@ public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
         }
         TextView titleView = (TextView)convertView.findViewById(R.id.title);
         ImageView snapshotView = (ImageView)convertView.findViewById(R.id.snapshot);
+
         titleView.setText(title);
         snapshotView.setImageBitmap(snapshot);
         return convertView;
+    }
+
+    private boolean isWebViewExists(final CustomWebView webView){
+        for(WebViewInfoHolder holder : webViews){
+            if(holder.getWebView().equals(webView))
+                return true;
+        }
+        return false;
     }
 }
