@@ -234,6 +234,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
         } else {
             this.webHolder.loadUrl(SettingSingleton.getInstance(getActivity()).getHomePage());
         }
+        swipeRefreshLayout.setRefreshing(true);
 
     }
 
@@ -287,7 +288,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
 
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
-
+            Log.d(this.getClass().getSimpleName(),url+"    is loaded");
         }
 
 

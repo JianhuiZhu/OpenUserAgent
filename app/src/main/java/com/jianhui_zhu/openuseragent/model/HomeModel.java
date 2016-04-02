@@ -42,8 +42,9 @@ public class HomeModel {
 
     }
 
-    public void saveHistory(String url, String uID) {
+    public void saveHistory(String url, String uID, String name) {
         History history = new History();
+        history.setName(name);
         history.setUrl(url);
 
         history.setTimestamp(System.currentTimeMillis());
