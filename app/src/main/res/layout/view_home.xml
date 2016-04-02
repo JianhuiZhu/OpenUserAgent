@@ -14,16 +14,7 @@
     android:background="@android:color/transparent"
     android:layout_gravity="end"
     android:fitsSystemWindows="true">
-    <android.support.design.widget.NavigationView
-        android:id="@+id/profile_title"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="end"
-        android:layout_marginBottom="5dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="5dp"
-        app:headerLayout="@layout/profile_header"
-        app:menu="@menu/menu_settings" />
+
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -53,6 +44,15 @@
             android:layout_width="match_parent"
             android:layout_height="48dp" />
     </RelativeLayout>
-
+    <android.support.design.widget.NavigationView
+        android:id="@+id/profile_title"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="5dp"
+        app:headerLayout="@layout/profile_header"
+        app:menu="@menu/menu_settings" />
 </com.jianhui_zhu.openuseragent.view.custom.CustomDrawerLayout>
 </LinearLayout>

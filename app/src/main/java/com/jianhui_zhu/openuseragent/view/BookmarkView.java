@@ -2,18 +2,21 @@ package com.jianhui_zhu.openuseragent.view;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
 import com.jianhui_zhu.openuseragent.presenter.BookmarkPresenter;
 import com.jianhui_zhu.openuseragent.util.AbstractFragment;
+import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.LocalDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.util.RemoteDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.view.adapter.BookmarkAdapter;
@@ -24,6 +27,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by Jianhui Zhu on 2016-02-06.
@@ -31,6 +35,10 @@ import butterknife.ButterKnife;
 public class BookmarkView extends AbstractFragment implements BookmarkViewInterface{
     @Bind(R.id.list)
     RecyclerView bookmarkList;
+    @OnClick(R.id.general_tool_bar_go_back)
+    public void click(){
+        FragmenUtil.backToPreviousFragment(getActivity(),this);
+    }
     BookmarkPresenter presenter;
     @Override
     public void onCreate(Bundle savedInstanceState) {

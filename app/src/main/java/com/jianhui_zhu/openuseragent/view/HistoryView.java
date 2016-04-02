@@ -14,6 +14,7 @@ import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.History;
 import com.jianhui_zhu.openuseragent.presenter.HistoryPresenter;
 import com.jianhui_zhu.openuseragent.util.AbstractFragment;
+import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.view.adapter.HistoryAdapter;
 import com.jianhui_zhu.openuseragent.view.interfaces.HistoryViewInterface;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
@@ -35,16 +36,24 @@ public class HistoryView extends AbstractFragment implements DatePickerDialog.On
     TextView toolbarTitle;
     @Bind(R.id.history_list)
     RecyclerView list;
-    @OnClick(R.id.date_picker_btn)
+
+    @OnClick({R.id.date_picker_btn,R.id.general_tool_bar_go_back})
     public void click(View view){
-        Calendar now = Calendar.getInstance();
-        DatePickerDialog dpd = DatePickerDialog.newInstance(
-                this,
-                now.get(Calendar.YEAR),
-                now.get(Calendar.MONTH),
-                now.get(Calendar.DAY_OF_MONTH)
-        );
-        dpd.show(getFragmentManager(), "Datepickerdialog");
+        switch (view.getId()) {
+            case R.id.date_picker_btn:
+            Calendar now = Calendar.getInstance();
+            DatePickerDialog dpd = DatePickerDialog.newInstance(
+                    this,
+                    now.get(Calendar.YEAR),
+                    now.get(Calendar.MONTH),
+                    now.get(Calendar.DAY_OF_MONTH)
+            );
+            dpd.show(getFragmentManager(), "Datepickerdialog");
+                break;
+            case R.id.general_tool_bar_go_back:
+                FragmenUtil.backToPreviousFragment(getActivity(),this);
+                break;
+        }
     }
     HistoryAdapter adapter;
     HistoryPresenter presenter=new HistoryPresenter(getActivity(),this);

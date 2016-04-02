@@ -12,12 +12,14 @@ import android.widget.Spinner;
 
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.util.AbstractFragment;
+import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.SettingSingleton;
 import com.jianhui_zhu.openuseragent.util.SharePreferenceUtil;
 import com.jianhui_zhu.openuseragent.view.adapter.SearchEngineAdapter;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by Jianhui Zhu on 2016-02-05.
@@ -28,7 +30,10 @@ public class SettingView extends AbstractFragment {
     @Bind(R.id.search_engine_spinner)
     Spinner searchEngine;
     SettingSingleton settings;
-
+    @OnClick(R.id.general_tool_bar_go_back)
+    public void click(){
+        FragmenUtil.backToPreviousFragment(getActivity(),this);
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

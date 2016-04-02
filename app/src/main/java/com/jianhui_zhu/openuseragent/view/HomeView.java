@@ -12,6 +12,7 @@ import android.support.percent.PercentRelativeLayout;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,8 +25,10 @@ import android.webkit.WebIconDatabase;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jianhui_zhu.openuseragent.R;
@@ -42,6 +45,7 @@ import com.jianhui_zhu.openuseragent.view.custom.CustomDrawerLayout;
 import com.jianhui_zhu.openuseragent.view.custom.CustomWebView;
 import com.jianhui_zhu.openuseragent.view.dialogs.TabStackDialog;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
+import com.squareup.picasso.Picasso;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -54,6 +58,7 @@ import butterknife.OnClick;
  * Created by Jianhui Zhu on 2016-01-27.
  */
 public class HomeView extends AbstractFragment implements HomeViewInterface,SwipeRefreshLayout.OnRefreshListener {
+    private Bundle webViewBundle;
     @Bind(R.id.webview_holder)
     FrameLayout webviewContainer;
     User user;
@@ -72,23 +77,52 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     ListView suggestionList;
     @Bind(R.id.swipe_refresh)
     SwipeRefreshLayout swipeRefreshLayout;
+    @Bind(R.id.backward)
+    ImageView backward;
+    @Bind(R.id.forward)
+            ImageView forward;
+    @Bind(R.id.refresh)
+            ImageView refresh;
+    @Bind(R.id.tab)
+            ImageView tab;
+    @Bind(R.id.add_bookmark)
+            ImageView addBookmark;
+    @Bind(R.id.home)
+            ImageView home;
     SearchSuggestionAdapter suggestionAdapter;
     WebViewAdapter webViewAdapter;
-    @OnClick({R.id.home_menu_icon})
+    @OnClick({R.id.home_menu_icon,R.id.refresh,R.id.tab,R.id.add_bookmark})
     public void click(View view) {
-//                if (RemoteDatabaseSingleton.getInstance().isUserLoggedIn()) {
-//                    this.user = RemoteDatabaseSingleton.getInstance().getUser();
-//                }
-//                if (user != null) {
-//                    CircleImageView avatar = (CircleImageView) getActivity().findViewById(R.id.home_avatar);
-//                    TextView username = (TextView) getActivity().findViewById(R.id.home_name);
-//                    Picasso.with(getActivity()).load(user.getAvatarUrl()).fit().into(avatar);
-//                    username.setText(user.getUsername());
-//                }
-//                settingDrawer.openDrawer(Gravity.RIGHT);
-//                drawerIsOpen = true;
+        switch (view.getId()) {
+            case R.id.home_menu_icon:
+            if (RemoteDatabaseSingleton.getInstance().isUserLoggedIn()) {
+                this.user = RemoteDatabaseSingleton.getInstance().getUser();
+            }
+            if (user != null) {
+                ImageView avatar = (ImageView) getActivity().findViewById(R.id.home_avatar);
+                TextView username = (TextView) getActivity().findViewById(R.id.home_name);
+                Picasso.with(getActivity()).load(user.getAvatarUrl()).fit().into(avatar);
+                username.setText(user.getUsername());
+            }
+            settingDrawer.openDrawer(Gravity.RIGHT);
+            drawerIsOpen = true;
+                break;
+            case R.id.refresh:
+                onRefresh();
+                break;
+            case R.id.tab:
                 FragmenUtil.switchToFragment(getActivity(),new TabStackDialog());
+                break;
+            case R.id.add_bookmark:
 
+                presenter.saveBookmark(webHolder.getUrl(),webHolder.getTitle(),user == null ? null : user.getuID());
+                break;
+            case R.id.home:
+                String homePageUrl = SettingSingleton.getInstance(getActivity()).getHomePage();
+                if(homePageUrl!=null)
+                    loadTargetUrl(homePageUrl);
+                break;
+        }
     }
 
     private HomePresenter presenter;
@@ -98,6 +132,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
             public boolean onNavigationItemSelected(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.setting_option:
+                        FragmenUtil.switchToFragment(getActivity(),new SettingView());
                         break;
                     case R.id.bookmark_option:
                         FragmenUtil.switchToFragment(getActivity(), new BookmarkView());
@@ -106,6 +141,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                         FragmenUtil.switchToFragment(getActivity(), new HistoryView());
                         break;
                 }
+                settingDrawer.closeDrawers();
                 return true;
             }
         });
@@ -149,6 +185,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
             loadTargetUrl("");
         }
         settingDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -158,14 +195,17 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
         WebIconDatabase.getInstance().open(path);
         presenter = new HomePresenter(this, getActivity());
         suggestionAdapter = new SearchSuggestionAdapter(getActivity(), presenter);
-
+        if(savedInstanceState!=null) {
+            webHolder.restoreState(savedInstanceState);
+        }
     }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.view_home, container, false);
+
         ButterKnife.bind(this, view);
+
         return view;
     }
 
@@ -176,8 +216,13 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
         if (RemoteDatabaseSingleton.getInstance().isUserLoggedIn()) {
             this.user = RemoteDatabaseSingleton.getInstance().getUser();
         }
-        swapWebView();
-        configViews();
+        if(webHolder==null) {
+            webHolder = initWebView();
+            webHolder.setDrawingCacheEnabled(true);
+            configViews();
+        }else if(webViewBundle!=null){
+            webHolder.restoreState(webViewBundle);
+        }
 
     }
 
@@ -232,15 +277,6 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     }
 
 
-//    @Override
-//    public void onClick(View v) {
-//
-//        if (drawerIsOpen) {
-//            settingDrawer.closeDrawer(Gravity.LEFT);
-//            drawerIsOpen = false;
-//        }
-//    }
-
     private class CustomWebViewClient extends WebViewClient {
 
         @Override
@@ -260,6 +296,11 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
             Log.d("webview","Page loaded");
             if(swipeRefreshLayout.isRefreshing()){
                 swipeRefreshLayout.setRefreshing(false);
+            }
+
+            if(url!=null&&!url.equals("about:blank")) {
+                webViewAdapter.addWebView(webHolder);
+                presenter.saveHistory(url,view.getTitle());
             }
         }
 
@@ -304,30 +345,70 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     }
 
     private void swapWebView(){
-            CustomWebView web = new CustomWebView(getActivity());
-            WebViewClient client = new CustomWebViewClient();
-            WebChromeClient chromeClient = new CustomWebChrome();
-            web.setWebViewClient(client);
-            web.setWebChromeClient(chromeClient);
-            web.setDownloadListener(new DownloadListener() {
-                @Override
-                public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse(url));
-                    startActivity(intent);
-                }
-            });
-            FrameLayout.LayoutParams para = new FrameLayout
-                    .LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            para.setMargins(0, 0, 0, 0);
-            web.setLayoutParams(para);
-            web.setHomeViewInterface(this);
-            webviewContainer.removeAllViewsInLayout();
-            webviewContainer.addView(web, 0);
+            CustomWebView web = initWebView();
             if(webHolder!=null&&webHolder.getHeight()>0&&webHolder.getWidth()>0){
                 webViewAdapter.addWebView(webHolder);
             }
             webHolder=web;
     }
 
+    private CustomWebView initWebView(){
+        CustomWebView web = new CustomWebView(getActivity());
+        WebViewClient client = new CustomWebViewClient();
+
+        WebChromeClient chromeClient = new CustomWebChrome();
+        web.setWebViewClient(client);
+        web.setSaveEnabled(true);
+        web.setWebChromeClient(chromeClient);
+        web.setDownloadListener(new DownloadListener() {
+            @Override
+            public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(url));
+                startActivity(intent);
+            }
+        });
+        FrameLayout.LayoutParams para = new FrameLayout
+                .LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        para.setMargins(0, 0, 0, 0);
+        web.setLayoutParams(para);
+        web.setHomeViewInterface(this);
+        webviewContainer.removeAllViewsInLayout();
+        webviewContainer.addView(web, 0);
+        return web;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        webViewBundle = new Bundle();
+        webHolder.saveState(webViewBundle);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        webHolder.saveState(outState);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        webHolder.destroy();
+    }
 }

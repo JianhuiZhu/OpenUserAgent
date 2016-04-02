@@ -64,28 +64,12 @@ public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
         return null;
     }
     public void addWebView(final CustomWebView webView){
-        Observable.create(new Observable.OnSubscribe<WebViewInfoHolder>() {
-            @Override
-            public void call(Subscriber<? super WebViewInfoHolder> subscriber) {
-                Picture picture = webView.capturePicture();
-                Bitmap bitmap = Bitmap.createBitmap( picture.getWidth(),
-                        picture.getHeight(), Bitmap.Config.ARGB_8888);
-                Canvas canvas = new Canvas(bitmap);
-                picture.draw(canvas);
-                WebViewInfoHolder holder =new WebViewInfoHolder();
-                holder.setWebView(webView);
-                holder.setTitle(webView.getTitle());
-                holder.setBitmap(bitmap);
-                subscriber.onNext(holder);
-                subscriber.onCompleted();
-            }
-        }).subscribeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<WebViewInfoHolder>() {
-            @Override
-            public void call(WebViewInfoHolder webViewInfoHolder) {
-                webViews.add(webViewInfoHolder);
-                notifyDataSetChanged();
-            }
-        });
+        if(isWebViewExists(webView)==false) {
+            WebViewInfoHolder holder = new WebViewInfoHolder();
+            holder.setWebView(webView);
+            holder.setTitle(webView.getTitle());
+            webViews.add(0,holder);
+        }
     }
 
 
@@ -103,7 +87,7 @@ public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        WebViewInfoHolder holder = webViews.get(position);
+        final WebViewInfoHolder holder = webViews.get(position);
         String title = holder.getTitle();
         Bitmap snapshot = holder.getBitmap();
         if(convertView==null){
@@ -111,10 +95,32 @@ public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
             convertView=vi.inflate(R.layout.item_webview, null);
         }
         TextView titleView = (TextView)convertView.findViewById(R.id.title);
-        ImageView snapshotView = (ImageView)convertView.findViewById(R.id.snapshot);
+        final ImageView snapshotView = (ImageView)convertView.findViewById(R.id.snapshot);
 
         titleView.setText(title);
-        snapshotView.setImageBitmap(snapshot);
+        if(holder.getBitmap()==null) {
+            Observable.create(new Observable.OnSubscribe<WebViewInfoHolder>() {
+                @Override
+                public void call(Subscriber<? super WebViewInfoHolder> subscriber) {
+                    Picture picture = holder.getWebView().capturePicture();
+                    Bitmap bitmap = Bitmap.createBitmap(picture.getWidth(),
+                            picture.getHeight(), Bitmap.Config.ARGB_8888);
+                    Canvas canvas = new Canvas(bitmap);
+                    picture.draw(canvas);
+                    holder.setBitmap(bitmap);
+                    subscriber.onNext(holder);
+                    subscriber.onCompleted();
+                }
+            }).subscribeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<WebViewInfoHolder>() {
+                @Override
+                public void call(WebViewInfoHolder webViewInfoHolder) {
+                    snapshotView.setImageBitmap(webViewInfoHolder.getBitmap());
+                    notifyDataSetChanged();
+                }
+            });
+        }else{
+            snapshotView.setImageBitmap(holder.getBitmap());
+        }
         return convertView;
     }
 
