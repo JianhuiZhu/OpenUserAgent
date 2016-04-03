@@ -7,53 +7,106 @@
     android:background="@color/mdtp_accent_color"
     android:layout_height="36dp">
 <android.support.percent.PercentRelativeLayout
-    android:layout_marginLeft="16dp"
-    android:layout_marginTop="8dp"
-    android:layout_width="match_parent"
-    android:layout_height="48dp"
     android:layout_marginBottom="8dp"
-    android:layout_marginRight="16dp">
+    android:layout_marginTop="8dp"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <com.andexert.library.RippleView
+        android:id="@+id/backward_area"
+        app:rv_rippleDuration="150"
+        app:layout_widthPercent="16%"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        rv_centered="true">
 <ImageView
+    android:layout_centerInParent="true"
     android:id="@+id/backward"
     android:src="@drawable/ic_back"
-    app:layout_widthPercent="16%"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content" />
+    android:layout_width="24dp"
+    android:layout_height="24dp"
+    />
+    </com.andexert.library.RippleView>
+    <com.andexert.library.RippleView
+        android:layout_toRightOf="@+id/backward_area"
+        android:id="@+id/forward_area"
+        app:rv_rippleDuration="150"
+        app:layout_widthPercent="16%"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        rv_centered="true">
 <ImageView
-    android:layout_toRightOf="@+id/backward"
+    android:layout_centerInParent="true"
     android:id="@+id/forward"
     android:src="@drawable/ic_forward"
-    app:layout_widthPercent="16%"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content" />
+    android:clickable="true"
+    android:layout_width="24dp"
+    android:layout_height="24dp"
+    />
+    </com.andexert.library.RippleView>
+    <com.andexert.library.RippleView
+        android:layout_toRightOf="@+id/forward_area"
+        android:id="@+id/home_area"
+        app:rv_rippleDuration="150"
+        app:layout_widthPercent="16%"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        rv_centered="true">
 <ImageView
-    android:layout_toRightOf="@+id/forward"
+    android:layout_centerInParent="true"
     android:id="@+id/home"
     android:src="@drawable/ic_home"
-    app:layout_widthPercent="16%"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content" />
+    android:layout_width="24dp"
+    android:layout_height="24dp"
+    />
+    </com.andexert.library.RippleView>
+    <com.andexert.library.RippleView
+        android:layout_toRightOf="@+id/home_area"
+        android:id="@+id/refresh_area"
+        app:rv_rippleDuration="150"
+        app:layout_widthPercent="16%"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        rv_centered="true">
     <ImageView
-        android:layout_toRightOf="@+id/home"
+        android:layout_centerInParent="true"
         android:id="@+id/refresh"
         android:src="@drawable/ic_refresh"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        />
+</com.andexert.library.RippleView>
+    <com.andexert.library.RippleView
+        android:layout_toRightOf="@+id/refresh_area"
+        android:id="@+id/tab_area"
+        app:rv_rippleDuration="150"
         app:layout_widthPercent="16%"
         android:layout_width="0dp"
-        android:layout_height="wrap_content" />
-
+        android:layout_height="wrap_content"
+        rv_centered="true">
     <ImageView
-        android:layout_toRightOf="@+id/refresh"
+        android:layout_centerInParent="true"
         android:id="@+id/tab"
         android:src="@drawable/ic_tab_1"
+        android:layout_width="24dp"
+        android:layout_height="24dp"/>
+    </com.andexert.library.RippleView>
+    <com.andexert.library.RippleView
+        android:layout_toRightOf="@+id/tab_area"
+        android:id="@+id/add_bookmark_area"
+        app:rv_rippleDuration="150"
         app:layout_widthPercent="16%"
         android:layout_width="0dp"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        rv_centered="true">
     <ImageView
-        android:layout_toRightOf="@+id/tab"
+        android:layout_centerInParent="true"
         android:id="@+id/add_bookmark"
         android:src="@drawable/ic_add_bookmark"
-        app:layout_widthPercent="16%"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+    </com.andexert.library.RippleView>
 </android.support.percent.PercentRelativeLayout>
 </LinearLayout>

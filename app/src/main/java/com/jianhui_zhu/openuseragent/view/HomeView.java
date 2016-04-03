@@ -92,7 +92,8 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     SearchSuggestionAdapter suggestionAdapter;
     WebViewAdapter webViewAdapter;
     @OnClick({R.id.home_menu_icon,R.id.refresh,R.id.tab,R.id.add_bookmark})
-    public void click(View view) {
+    public void click(ImageView view) {
+
         switch (view.getId()) {
             case R.id.home_menu_icon:
             if (RemoteDatabaseSingleton.getInstance().isUserLoggedIn()) {
@@ -220,8 +221,6 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
             webHolder = initWebView();
             webHolder.setDrawingCacheEnabled(true);
             configViews();
-        }else if(webViewBundle!=null){
-            webHolder.restoreState(webViewBundle);
         }
 
     }
@@ -283,6 +282,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             view.loadUrl(url);
+
             return true;
         }
 
@@ -382,8 +382,6 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     @Override
     public void onPause() {
         super.onPause();
-        webViewBundle = new Bundle();
-        webHolder.saveState(webViewBundle);
     }
 
     @Override
@@ -396,11 +394,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
         super.onStop();
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        webHolder.saveState(outState);
-    }
+
 
     @Override
     public void onDestroy() {

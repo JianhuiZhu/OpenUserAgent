@@ -22,16 +22,22 @@
         android:layout_height="0dp" />
 
 
-
+    <com.andexert.library.RippleView
+        android:id="@+id/backward_area"
+        app:rv_rippleDuration="150"
+        app:layout_widthPercent="15%"
+        app:layout_heightPercent="100%"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_toRightOf="@+id/home_url_bar"
+        rv_centered="true">
     <ImageView
         android:id="@+id/home_menu_icon"
         android:layout_gravity="center"
-        app:layout_widthPercent="15%"
-        app:layout_heightPercent="100%"
-        android:layout_toRightOf="@+id/home_url_bar"
+        android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:background="@android:color/transparent"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="wrap_content"
         android:src="@drawable/ic_menu" />
+    </com.andexert.library.RippleView>
 </android.support.percent.PercentRelativeLayout>
