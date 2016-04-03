@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:clickable="true"
         android:layout_toRightOf="@id/bookmark_avatar"
-        android:textSize="14sp"
+        android:textSize="12sp"
         android:textStyle="bold"
         />
     <TextView
@@ -31,9 +31,16 @@
         android:layout_width="match_parent"
         android:maxLines="1"
         android:textStyle="italic"
-        android:textSize="12sp"
+        android:textSize="10sp"
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="16dp"
         android:textColor="@color/mdtp_dark_gray"
         android:layout_height="wrap_content" />
+    <View
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_height="2dp"
+        android:background="@android:color/darker_gray" />
 </RelativeLayout>
