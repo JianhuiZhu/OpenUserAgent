@@ -99,25 +99,15 @@ public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
 
         titleView.setText(title);
         if(holder.getBitmap()==null) {
-            Observable.create(new Observable.OnSubscribe<WebViewInfoHolder>() {
-                @Override
-                public void call(Subscriber<? super WebViewInfoHolder> subscriber) {
                     Picture picture = holder.getWebView().capturePicture();
                     Bitmap bitmap = Bitmap.createBitmap(picture.getWidth(),
                             picture.getHeight(), Bitmap.Config.ARGB_8888);
                     Canvas canvas = new Canvas(bitmap);
                     picture.draw(canvas);
                     holder.setBitmap(bitmap);
-                    subscriber.onNext(holder);
-                    subscriber.onCompleted();
-                }
-            }).subscribeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<WebViewInfoHolder>() {
-                @Override
-                public void call(WebViewInfoHolder webViewInfoHolder) {
-                    snapshotView.setImageBitmap(webViewInfoHolder.getBitmap());
+                    snapshotView.setImageBitmap(holder.getBitmap());
                     notifyDataSetChanged();
-                }
-            });
+
         }else{
             snapshotView.setImageBitmap(holder.getBitmap());
         }

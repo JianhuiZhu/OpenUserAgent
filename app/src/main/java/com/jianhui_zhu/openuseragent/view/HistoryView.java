@@ -8,7 +8,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.History;
@@ -36,8 +38,7 @@ public class HistoryView extends AbstractFragment implements DatePickerDialog.On
     TextView toolbarTitle;
     @Bind(R.id.history_list)
     RecyclerView list;
-
-    @OnClick({R.id.date_picker_btn,R.id.general_tool_bar_go_back})
+    @OnClick({R.id.date_picker_btn,R.id.history_go_back})
     public void click(View view){
         switch (view.getId()) {
             case R.id.date_picker_btn:
@@ -46,11 +47,10 @@ public class HistoryView extends AbstractFragment implements DatePickerDialog.On
                     this,
                     now.get(Calendar.YEAR),
                     now.get(Calendar.MONTH),
-                    now.get(Calendar.DAY_OF_MONTH)
-            );
+                    now.get(Calendar.DAY_OF_MONTH));
             dpd.show(getFragmentManager(), "Datepickerdialog");
                 break;
-            case R.id.general_tool_bar_go_back:
+            case R.id.history_go_back:
                 FragmenUtil.backToPreviousFragment(getActivity(),this);
                 break;
         }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -31,6 +32,7 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.andexert.library.RippleView;
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.User;
 import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
@@ -78,24 +80,28 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     @Bind(R.id.swipe_refresh)
     SwipeRefreshLayout swipeRefreshLayout;
     @Bind(R.id.backward)
-    ImageView backward;
+    ImageView backwardIcon;
     @Bind(R.id.forward)
-            ImageView forward;
-    @Bind(R.id.refresh)
-            ImageView refresh;
-    @Bind(R.id.tab)
-            ImageView tab;
-    @Bind(R.id.add_bookmark)
-            ImageView addBookmark;
-    @Bind(R.id.home)
-            ImageView home;
+    ImageView forwardIcon;
+    @Bind(R.id.backward_area)
+    RippleView backward;
+    @Bind(R.id.forward_area)
+    RippleView forward;
+    @Bind(R.id.refresh_area)
+    RippleView refresh;
+    @Bind(R.id.tab_area)
+    RippleView tab;
+    @Bind(R.id.add_bookmark_area)
+    RippleView addBookmark;
+    @Bind(R.id.home_area)
+    RippleView home;
     SearchSuggestionAdapter suggestionAdapter;
     WebViewAdapter webViewAdapter;
-    @OnClick({R.id.home_menu_icon,R.id.refresh,R.id.tab,R.id.add_bookmark})
-    public void click(ImageView view) {
+    @OnClick({R.id.menu_area,R.id.refresh_area,R.id.tab_area,R.id.add_bookmark_area,R.id.backward_area,R.id.forward_area})
+    public void click(RippleView view) {
 
         switch (view.getId()) {
-            case R.id.home_menu_icon:
+            case R.id.menu_area:
             if (RemoteDatabaseSingleton.getInstance().isUserLoggedIn()) {
                 this.user = RemoteDatabaseSingleton.getInstance().getUser();
             }
@@ -108,21 +114,33 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
             settingDrawer.openDrawer(Gravity.RIGHT);
             drawerIsOpen = true;
                 break;
-            case R.id.refresh:
+            case R.id.refresh_area:
                 onRefresh();
                 break;
-            case R.id.tab:
+            case R.id.tab_area:
                 FragmenUtil.switchToFragment(getActivity(),new TabStackDialog());
                 break;
-            case R.id.add_bookmark:
+            case R.id.add_bookmark_area:
 
                 presenter.saveBookmark(webHolder.getUrl(),webHolder.getTitle(),user == null ? null : user.getuID());
                 break;
-            case R.id.home:
+            case R.id.home_area:
                 String homePageUrl = SettingSingleton.getInstance(getActivity()).getHomePage();
                 if(homePageUrl!=null)
                     loadTargetUrl(homePageUrl);
                 break;
+            case R.id.backward_area:
+                if(webHolder!=null&&webHolder.canGoBack()){
+                    webHolder.goBack();
+                }
+                break;
+            case R.id.forward_area:
+                if(webHolder!=null&&webHolder.canGoForward()){
+                    webHolder.goForward();
+                }
+                break;
+            default:
+                Log.d("id",view.getId()+"");
         }
     }
 
@@ -196,15 +214,11 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
         WebIconDatabase.getInstance().open(path);
         presenter = new HomePresenter(this, getActivity());
         suggestionAdapter = new SearchSuggestionAdapter(getActivity(), presenter);
-        if(savedInstanceState!=null) {
-            webHolder.restoreState(savedInstanceState);
-        }
     }
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.view_home, container, false);
-
         ButterKnife.bind(this, view);
 
         return view;
@@ -303,6 +317,16 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                 webViewAdapter.addWebView(webHolder);
                 presenter.saveHistory(url,view.getTitle());
             }
+            if(webHolder!=null&&webHolder.canGoBack()==false){
+                backwardIcon.setColorFilter(R.color.cardview_shadow_end_color, PorterDuff.Mode.MULTIPLY);
+            }else{
+                backwardIcon.clearColorFilter();
+            }
+            if(webHolder!=null&&webHolder.canGoForward()==false){
+                forwardIcon.setColorFilter(R.color.cardview_shadow_end_color,PorterDuff.Mode.MULTIPLY);
+            }else{
+                forwardIcon.clearColorFilter();
+            }
         }
 
 
@@ -376,6 +400,8 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
         web.setHomeViewInterface(this);
         webviewContainer.removeAllViewsInLayout();
         webviewContainer.addView(web, 0);
+        backwardIcon.setColorFilter(R.color.cardview_shadow_end_color,PorterDuff.Mode.MULTIPLY);
+        forwardIcon.setColorFilter(R.color.cardview_shadow_end_color,PorterDuff.Mode.MULTIPLY);
         return web;
     }
 

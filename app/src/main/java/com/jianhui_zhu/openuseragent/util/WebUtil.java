@@ -64,6 +64,8 @@ public class WebUtil {
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
+
+
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }

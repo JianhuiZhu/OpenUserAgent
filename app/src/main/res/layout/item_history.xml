@@ -51,10 +51,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <View
+        android:layout_toRightOf="@+id/history_avatar"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
-        android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:layout_height="2dp"
+        android:layout_height="1dp"
         android:background="@android:color/darker_gray" />
 </RelativeLayout>

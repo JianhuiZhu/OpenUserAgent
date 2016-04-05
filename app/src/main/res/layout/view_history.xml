@@ -16,7 +16,8 @@
             android:layout_height="wrap_content"
             rv_centered="true">
         <ImageView
-            android:id="@+id/general_tool_bar_go_back"
+            android:clickable="true"
+            android:id="@+id/history_go_back"
             android:layout_marginTop="8dp"
             android:layout_marginLeft="16dp"
             android:layout_width="24dp"
@@ -34,12 +35,7 @@
             android:layout_height="wrap_content"
             android:textStyle="bold"
             android:layout_marginLeft="16dp"
-            android:layout_centerVertical="true"/>
-        <com.andexert.library.RippleView
-            app:rv_rippleDuration="150"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            rv_centered="true">
+            android:layout_marginTop="12dp"/>
         <ImageView
             android:id="@+id/date_picker_btn"
             android:layout_alignParentRight="true"
@@ -48,7 +44,6 @@
             android:src="@drawable/ic_date"
             android:layout_width="24dp"
             android:layout_height="24dp" />
-        </com.andexert.library.RippleView>
     </RelativeLayout>
 <android.support.v7.widget.RecyclerView
     android:id="@+id/history_list"
