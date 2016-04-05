@@ -63,6 +63,11 @@ public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
         this.homePresenter = homePresenter;
         return this;
     }
+
+    public HomePresenter getHomePresenter() {
+        return homePresenter;
+    }
+
     public WebViewAdapter setTabStackDialog(TabStackDialog tabStackDialog){
         this.tabStackDialog = tabStackDialog;
         return this;
@@ -104,6 +109,7 @@ public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
+
         final WebViewInfoHolder holder = webViews.get(position);
         String title = webViews.get(position).getTitle();
         Bitmap snapshot = holder.getBitmap();
@@ -136,6 +142,7 @@ public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
                 if(webViews.isEmpty()){
                     if(homePresenter!=null&&tabStackDialog!=null){
                         homePresenter.clearWebHolder();
+                        tabStackDialog.dismiss();
                     }
                 }
                 notifyDataSetChanged();

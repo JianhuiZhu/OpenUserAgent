@@ -207,8 +207,8 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
                 .update("QueryRecords",newValue,"_id=?",new String[]{id+""});
     }
     @Override
-    public void saveBookmark(final Bookmark bookmark) {
-        Observable.create(new Observable.OnSubscribe<String>() {
+    public Observable<String> saveBookmark(final Bookmark bookmark) {
+        return Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
                 LocalDatabaseHelper.getInstance(context)
@@ -217,10 +217,10 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
                                 "VALUES(\""
                                 + bookmark.getUrl() + "\",\""
                                 + bookmark.getName() + "\")");
-                subscriber.onNext("DONE");
+                subscriber.onNext(bookmark.getName()+" saved as bookmark");
                 subscriber.onCompleted();
             }
-        }).subscribeOn(Schedulers.io()).subscribe();
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 
     }
     @Override

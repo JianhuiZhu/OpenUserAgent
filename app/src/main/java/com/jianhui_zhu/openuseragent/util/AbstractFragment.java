@@ -4,7 +4,6 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;import java.lang.Override;
 
-//import de.greenrobot.event.EventBus;
 
 
 /**
@@ -24,14 +23,10 @@ public class AbstractFragment extends Fragment {
 	@Override
 	public void onResume() {
 		super.onResume();
-		Log.d(this.getClass().getName(), "registered bus");
-	//	mEventBus.register(this);
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		Log.d(this.getClass().getName(), "unregistered bus");
-	//	mEventBus.unregister(this);
 	}
 }

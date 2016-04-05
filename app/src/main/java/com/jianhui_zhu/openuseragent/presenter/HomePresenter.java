@@ -25,6 +25,7 @@ public class HomePresenter {
         if(instance==null) {
             this.homeView = homeView;
             this.homeModel = new HomeModel(context);
+            instance = this;
         }
     }
     public static HomePresenter getInstance() throws Exception {
@@ -44,12 +45,18 @@ public class HomePresenter {
         homeModel.saveHistoryLocal(url,name);
     }
     public void saveBookmark(String url, String name, String uID) {
-        Observable<String> observable;
+        Observable<String>  observable;
         if (uID != null) {
-            homeModel.saveBookmark(url, name, uID);
+            observable=homeModel.saveBookmark(url, name, uID);
         } else {
-            homeModel.saveBookmark(url, name, null);
+            observable=homeModel.saveBookmark(url, name, null);
         }
+        observable.subscribe(new Action1<String>() {
+            @Override
+            public void call(String s) {
+                homeView.showTag(s);
+            }
+        });
     }
     public void saveRecordLocally(String url,String name){
         homeModel.saveHistoryLocal(url,name);

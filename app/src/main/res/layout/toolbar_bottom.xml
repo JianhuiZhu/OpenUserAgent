@@ -23,7 +23,7 @@
 <ImageView
     android:layout_centerInParent="true"
     android:id="@+id/backward"
-    android:src="@drawable/ic_back"
+    android:src="@drawable/ic_home_backward"
     android:layout_width="24dp"
     android:layout_height="24dp"
     />
@@ -39,7 +39,7 @@
 <ImageView
     android:layout_centerInParent="true"
     android:id="@+id/forward"
-    android:src="@drawable/ic_forward"
+    android:src="@drawable/ic_home_forward"
     android:clickable="true"
     android:layout_width="24dp"
     android:layout_height="24dp"

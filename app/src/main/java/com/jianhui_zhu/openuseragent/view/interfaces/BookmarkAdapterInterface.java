@@ -8,4 +8,5 @@ import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
 public interface BookmarkAdapterInterface {
     void updatedBookmark(int position,Bookmark bookmark);
     void deletedBookmark(int position);
+    void addNewBookmark(Bookmark bookmark);
 }

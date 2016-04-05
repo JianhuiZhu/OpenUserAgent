@@ -123,7 +123,11 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                 onRefresh();
                 break;
             case R.id.tab_area:
-                FragmenUtil.switchToFragment(getActivity(),new TabStackDialog());
+                if(webViewAdapter.isEmpty()){
+                    Toast.makeText(getActivity(),"No tab exists.",Toast.LENGTH_SHORT).show();
+                }else {
+                    FragmenUtil.switchToFragment(getActivity(), new TabStackDialog());
+                }
                 break;
             case R.id.add_bookmark_area:
 

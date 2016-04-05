@@ -62,17 +62,18 @@ public class RemoteDatabaseSingleton implements DatabaseInterface,GoogleApiClien
         return remoteDB;
     }
     @Override
-    public void saveBookmark(final Bookmark bookmark) {
+    public Observable<String> saveBookmark(final Bookmark bookmark) {
 
-        Observable.create(new Observable.OnSubscribe<String>() {
+        return Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
                 Firebase recordRef = new Firebase(Constant.urlRoot).child(user.getuID()).child("bookmarks").push();
                 bookmark.setbID(recordRef.getKey());
                 recordRef.setValue(bookmark);
+                subscriber.onNext(bookmark.getName()+" saved as bookmark");
                 subscriber.onCompleted();
             }
-        }).subscribeOn(Schedulers.io()).subscribe();
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 
     }
     @Override

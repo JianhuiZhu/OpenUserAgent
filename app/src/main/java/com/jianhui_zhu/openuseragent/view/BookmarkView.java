@@ -41,10 +41,11 @@ public class BookmarkView extends AbstractFragment implements BookmarkViewInterf
         FragmenUtil.backToPreviousFragment(getActivity(),this);
     }
     BookmarkPresenter presenter;
+    BookmarkAdapter bookmarkAdapter;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        presenter =new BookmarkPresenter(getActivity(),this);
+
     }
 
     @Nullable
@@ -58,19 +59,22 @@ public class BookmarkView extends AbstractFragment implements BookmarkViewInterf
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        List<Bookmark> bookmarks=new ArrayList<>();
-        bookmarks.addAll(presenter.getAllBookmarks());
+
         bookmarkList.setLayoutManager(new LinearLayoutManager(getActivity()));
         bookmarkList.setItemAnimator(new DefaultItemAnimator());
         bookmarkList.setHasFixedSize(true);
+        List<Bookmark> bookmarks=new ArrayList<>();
         HomePresenter homePresenter= null;
         try {
             homePresenter = HomePresenter.getInstance();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        BookmarkAdapter bookmarkAdapter=new BookmarkAdapter(bookmarks,getActivity(),bookmarkList, presenter,homePresenter,this);
+        presenter =new BookmarkPresenter(getActivity(),this,null);
+        this.bookmarkAdapter=new BookmarkAdapter(bookmarks,getActivity(),presenter,homePresenter,this);
+        presenter.setAdapterInterface(this.bookmarkAdapter);
         bookmarkList.setAdapter(bookmarkAdapter);
+        bookmarks.addAll(presenter.getAllBookmarks());
     }
 
 

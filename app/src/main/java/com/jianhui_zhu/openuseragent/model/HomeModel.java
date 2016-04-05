@@ -30,15 +30,15 @@ public class HomeModel {
     }
 
 
-    public void saveBookmark(String url, String name, String uID) {
+    public Observable<String> saveBookmark(String url, String name, String uID) {
         Bookmark bookmark = new Bookmark();
         bookmark.setUrl(url);
         bookmark.setName(name);
 
         if (uID != null) {
-            RemoteDatabaseSingleton.getInstance().saveBookmark(bookmark);
+            return RemoteDatabaseSingleton.getInstance().saveBookmark(bookmark);
         }
-        LocalDatabaseSingleton.getInstance().saveBookmark(bookmark);
+        return LocalDatabaseSingleton.getInstance().saveBookmark(bookmark);
 
     }
 

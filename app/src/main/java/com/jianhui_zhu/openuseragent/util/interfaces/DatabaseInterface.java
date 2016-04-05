@@ -14,7 +14,7 @@ import rx.Observable;
 public interface DatabaseInterface {
     List<Bookmark> getAllBookmarks();
     Observable<List<History>> getAllHistories();
-    void saveBookmark(final Bookmark bookmark);
+    Observable<String> saveBookmark(final Bookmark bookmark);
     void saveHistory(final History history);
     void deleteBookmark(final Bookmark bookmark);
     Observable<Bookmark> updateBookmark(final Bookmark bookmark);

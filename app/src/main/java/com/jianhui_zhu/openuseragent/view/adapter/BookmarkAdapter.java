@@ -21,10 +21,9 @@ import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.WebUtil;
 import com.jianhui_zhu.openuseragent.view.BookmarkView;
 import com.jianhui_zhu.openuseragent.view.HomeView;
-import com.jianhui_zhu.openuseragent.view.dialogs.BookmarkDialog;
+import com.jianhui_zhu.openuseragent.view.dialogs.EditBookmarkDialog;
 import com.jianhui_zhu.openuseragent.view.interfaces.BookmarkAdapterInterface;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
@@ -38,16 +37,17 @@ import rx.functions.Action1;
 public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHolder> implements BookmarkAdapterInterface{
     List<Bookmark> bookmarks;
     Context context;
-    RecyclerView recyclerView;
     private BookmarkView bookmarkView;
     private BookmarkAdapter adapterInterface;
     private BookmarkPresenter bookmarkPresenter;
     private int lastPosition = -1;
     private HomePresenter homePresenter;
-    public  BookmarkAdapter(List<Bookmark> bookmarks,Context context,RecyclerView recyclerView,BookmarkPresenter bookmarkPresenter,HomePresenter homePresenter,BookmarkView bookmarkView){
+    public  BookmarkAdapter(List<Bookmark> bookmarks
+            ,Context context
+            ,BookmarkPresenter bookmarkPresenter
+            ,HomePresenter homePresenter,BookmarkView bookmarkView){
         this.bookmarks=bookmarks;
         this.context=context;
-        this.recyclerView=recyclerView;
         this.bookmarkPresenter=bookmarkPresenter;
         this.homePresenter=homePresenter;
         this.bookmarkView=bookmarkView;
@@ -70,6 +70,7 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
         Bookmark bookmark=bookmarks.get(position);
         holder.name.setText(bookmark.getName());
         holder.location=position;
+        holder.url.setText(bookmark.getUrl());
         try {
             String host = WebUtil.getDomainbyUrl(bookmark.getUrl());
             WebUtil.getInstance().getIconByName(host).subscribe(new Action1<Bitmap>() {
@@ -102,12 +103,17 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
     public void deletedBookmark(int position) {
         Bookmark bookmark=bookmarks.get(position);
         bookmarkPresenter.deleteBookmark(bookmark);
-
         bookmarks.remove(position);
-        recyclerView.removeViewAt(position);
+        //recyclerView.removeViewAt(position);
         this.notifyItemRemoved(position);
         this.notifyItemRangeChanged(position,bookmarks.size());
 
+    }
+
+    @Override
+    public void addNewBookmark(Bookmark bookmark) {
+        bookmarks.add(bookmark);
+        notifyDataSetChanged();
     }
 
 
@@ -119,6 +125,8 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
         ImageView avatar;
         @Bind(R.id.bookmark_name)
         TextView name;
+        @Bind(R.id.bookmark_url)
+        TextView url;
         public ViewHolder(View itemView) {
             super(itemView);
             itemView.setOnLongClickListener(this);
@@ -129,7 +137,7 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
 
         @Override
         public boolean onLongClick(View v) {
-           FragmenUtil.switchToFragment(context,BookmarkDialog.newInstance(bookmarks.get(location),location,adapterInterface));
+           FragmenUtil.switchToFragment(context, EditBookmarkDialog.newInstance(bookmarks.get(location),location,adapterInterface));
             return true;
         }
 

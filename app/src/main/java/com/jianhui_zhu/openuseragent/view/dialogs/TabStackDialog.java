@@ -40,6 +40,7 @@ public class TabStackDialog extends AbstractDialogFragment {
         adapter = WebViewAdapter.getInstance(getActivity());
         adapter.setTabStackDialog(this);
         stackView.setAdapter(adapter);
+        homePresenter = adapter.getHomePresenter();
     }
 
     @Override

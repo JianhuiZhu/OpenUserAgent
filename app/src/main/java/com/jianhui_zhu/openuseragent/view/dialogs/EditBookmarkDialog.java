@@ -2,12 +2,9 @@ package com.jianhui_zhu.openuseragent.view.dialogs;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 
 import com.jianhui_zhu.openuseragent.R;
@@ -22,7 +19,7 @@ import butterknife.OnClick;
 /**
  * Created by jianhuizhu on 2016-03-04.
  */
-public class BookmarkDialog extends AbstractDialogFragment {
+public class EditBookmarkDialog extends AbstractDialogFragment {
     BookmarkAdapterInterface adapterInterface;
     int position;
     Bookmark bookmark;
@@ -52,7 +49,7 @@ public class BookmarkDialog extends AbstractDialogFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view=inflater.inflate(R.layout.dialog_bookmark,container,false);
+        View view=inflater.inflate(R.layout.dialog_edit_bookmark,container,false);
         ButterKnife.bind(this,view);
         return view;
     }
@@ -64,12 +61,12 @@ public class BookmarkDialog extends AbstractDialogFragment {
         url.setText(bookmark.getUrl());
     }
 
-    public static BookmarkDialog newInstance(Bookmark bookmark, int position, BookmarkAdapterInterface adapterInterface) {
+    public static EditBookmarkDialog newInstance(Bookmark bookmark, int position, BookmarkAdapterInterface adapterInterface) {
 
         Bundle args = new Bundle();
         args.putParcelable("bookmark",bookmark);
         args.putInt("position",position);
-        BookmarkDialog fragment = new BookmarkDialog();
+        EditBookmarkDialog fragment = new EditBookmarkDialog();
         fragment.adapterInterface=adapterInterface;
         fragment.setArguments(args);
         return fragment;

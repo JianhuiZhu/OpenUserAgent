@@ -53,4 +53,11 @@ public class BookmarkModel {
             LocalDatabaseSingleton.getInstance().deleteBookmark(bookmark);
         }
     }
+    public Observable<String> addBookmark(Bookmark bookmark){
+        if(RemoteDatabaseSingleton.getInstance().isUserLoggedIn()){
+            return RemoteDatabaseSingleton.getInstance().saveBookmark(bookmark);
+        }else{
+            return LocalDatabaseSingleton.getInstance().saveBookmark(bookmark);
+        }
+    }
 }
