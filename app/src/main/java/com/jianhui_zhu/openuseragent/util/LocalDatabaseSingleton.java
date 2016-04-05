@@ -257,7 +257,8 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
                 if (cursor.moveToFirst()) {
                     do {
                         History history = new History();
-                        history.setrID(cursor.getColumnName(0));
+                        history.setrID(cursor.getString(0));
+                        history.setName(cursor.getString(1));
                         history.setTimestamp(cursor.getLong(3));
                         history.setUrl(cursor.getString(2));
                         result.add(history);

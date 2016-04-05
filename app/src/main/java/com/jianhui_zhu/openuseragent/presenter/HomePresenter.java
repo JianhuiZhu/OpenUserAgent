@@ -3,8 +3,10 @@ package com.jianhui_zhu.openuseragent.presenter;
 import android.content.Context;
 import android.database.Cursor;
 import android.webkit.URLUtil;
+import android.webkit.WebView;
 
 import com.jianhui_zhu.openuseragent.model.HomeModel;
+import com.jianhui_zhu.openuseragent.view.custom.CustomWebView;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 
 import rx.Observable;
@@ -14,13 +16,22 @@ import rx.functions.Action1;
  * Created by Jianhui Zhu on 2016-02-06.
  */
 public class HomePresenter {
+    private static HomePresenter instance;
     private HomeViewInterface homeView;
 
     private HomeModel homeModel;
 
     public HomePresenter(HomeViewInterface homeView, Context context) {
-        this.homeView=homeView;
-        this.homeModel = new HomeModel(context);
+        if(instance==null) {
+            this.homeView = homeView;
+            this.homeModel = new HomeModel(context);
+        }
+    }
+    public static HomePresenter getInstance() throws Exception {
+        if(instance==null){
+            throw new Exception("home presenter not instantiated");
+        }
+        return instance;
     }
     public void validateAndLoad(String word){
         if(URLUtil.isValidUrl(word)){
@@ -64,5 +75,17 @@ public class HomePresenter {
     }
     public void changeToolbarVisibility(int VIEW_CODE){
         homeView.changeToolBarVisibility(VIEW_CODE);
+    }
+    public void swapUrl(String url){
+        homeView.loadTargetUrl(url);
+    }
+    public void changeNumTabsIcon(int num){
+        homeView.changeNumTabsIcon(num);
+    }
+    public void changeWebView(CustomWebView webView){
+        homeView.changeWebView(webView);
+    }
+    public void clearWebHolder(){
+        homeView.clearWebHolder();
     }
 }

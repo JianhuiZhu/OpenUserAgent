@@ -12,11 +12,16 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.History;
 import com.jianhui_zhu.openuseragent.presenter.HistoryPresenter;
+import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
+import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.WebUtil;
+import com.jianhui_zhu.openuseragent.view.HistoryView;
+import com.jianhui_zhu.openuseragent.view.HomeView;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -31,6 +36,8 @@ import rx.functions.Action1;
  * Created by jianhuizhu on 2016-02-16.
  */
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder>{
+    private HomePresenter homePresenter;
+    private HistoryView historyView;
     private Context context;
     private HistoryPresenter presenter;
     private int lastPosition = -1;
@@ -49,10 +56,12 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         notifyDataSetChanged();
     }
     List<History> histories;
-    public HistoryAdapter(Context context,HistoryPresenter presenter,List<History> histories){
+    public HistoryAdapter(Context context,HistoryPresenter presenter,List<History> histories,HomePresenter homePresenter, HistoryView historyView){
         this.context=context;
         this.presenter=presenter;
         this.histories=histories;
+        this.homePresenter=homePresenter;
+        this.historyView=historyView;
 
     }
     @Override
@@ -71,14 +80,19 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         try {
             String host = WebUtil.getDomainbyUrl(history.getUrl());
             Date date=new Date(history.getTimestamp());
+            holder.position=position;
             WebUtil.getInstance().getIconByName(host).subscribe(new Action1<Bitmap>() {
                 @Override
                 public void call(Bitmap result) {
                     holder.avatar.setImageBitmap(result);
                 }
             });
+            int hour = date.getHours();
+            String  min = date.getMinutes()<10 ? "0"+date.getMinutes() : String.valueOf(date.getMinutes());
+            String time = hour+":"+min;
             holder.title.setText(history.getName());
-            holder.time.setText(date.getHours()+":"+date.getMinutes());
+            holder.time.setText(time);
+            holder.url.setText(history.getUrl());
             setAnimation(holder.container,position);
         } catch (URISyntaxException e) {
             Log.e(this.getClass().getSimpleName(),e.getMessage());
@@ -91,18 +105,32 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         return histories == null ? 0 : histories.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         @Bind(R.id.item_history_container)
         RelativeLayout container;
         @Bind(R.id.history_avatar)
         ImageView avatar;
+        int position;
         @Bind(R.id.history_title)
         TextView title;
         @Bind(R.id.history_time)
         TextView time;
+        @Bind(R.id.history_url)
+        TextView url;
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if(homePresenter==null)
+                FragmenUtil.switchToFragment(context, HomeView.newInstanceWithUrl(histories.get(position).getUrl()));
+            else{
+                homePresenter.swapUrl(histories.get(position).getUrl());
+                FragmenUtil.backToPreviousFragment(context,historyView);
+            }
         }
     }
     private void setAnimation(View viewToAnimate, int position)

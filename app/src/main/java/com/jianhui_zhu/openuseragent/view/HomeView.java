@@ -55,6 +55,9 @@ import java.net.URL;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Observable;
+import rx.Subscriber;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by Jianhui Zhu on 2016-01-27.
@@ -95,6 +98,8 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     RippleView addBookmark;
     @Bind(R.id.home_area)
     RippleView home;
+    @Bind(R.id.tab)
+    ImageView tabIcon;
     SearchSuggestionAdapter suggestionAdapter;
     WebViewAdapter webViewAdapter;
     @OnClick({R.id.menu_area,R.id.refresh_area,R.id.tab_area,R.id.add_bookmark_area,R.id.backward_area,R.id.forward_area})
@@ -210,10 +215,21 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActivity();
-        String path=getActivity().getDir("icons", Context.MODE_PRIVATE).getPath();
-        WebIconDatabase.getInstance().open(path);
         presenter = new HomePresenter(this, getActivity());
-        suggestionAdapter = new SearchSuggestionAdapter(getActivity(), presenter);
+        Observable.create(new Observable.OnSubscribe<Object>() {
+            @Override
+            public void call(Subscriber<? super Object> subscriber) {
+                String path=getActivity().getDir("icons", Context.MODE_PRIVATE).getPath();
+                WebIconDatabase.getInstance().open(path);
+                suggestionAdapter = new SearchSuggestionAdapter(getActivity(), presenter);
+                webViewAdapter =WebViewAdapter.getInstance(getActivity());
+                webViewAdapter.setHomePresenter(presenter);
+                if (RemoteDatabaseSingleton.getInstance().isUserLoggedIn()) {
+                    user = RemoteDatabaseSingleton.getInstance().getUser();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).subscribe();
+
     }
     @Nullable
     @Override
@@ -227,10 +243,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        webViewAdapter =WebViewAdapter.getInstance(getActivity());
-        if (RemoteDatabaseSingleton.getInstance().isUserLoggedIn()) {
-            this.user = RemoteDatabaseSingleton.getInstance().getUser();
-        }
+
         if(webHolder==null) {
             webHolder = initWebView();
             webHolder.setDrawingCacheEnabled(true);
@@ -242,12 +255,13 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
 
     @Override
     public void loadTargetUrl(String url) {
+        swipeRefreshLayout.setRefreshing(true);
         if (url != null && !url.equals("")) {
             this.webHolder.loadUrl(url);
         } else {
             this.webHolder.loadUrl(SettingSingleton.getInstance(getActivity()).getHomePage());
         }
-        swipeRefreshLayout.setRefreshing(true);
+
 
     }
 
@@ -286,46 +300,99 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     }
 
     @Override
+    public void changeNumTabsIcon(int num) {
+        switch(num){
+            case 0:
+                tabIcon.setImageResource(R.drawable.ic_tab);
+                break;
+            case 1:
+                tabIcon.setImageResource(R.drawable.ic_tab_1);
+                break;
+            case 2:
+                tabIcon.setImageResource(R.drawable.ic_tab_2);
+                break;
+            case 3:
+                tabIcon.setImageResource(R.drawable.ic_tab_3);
+                break;
+            case 4:
+                tabIcon.setImageResource(R.drawable.ic_tab_4);
+                break;
+            case 5:
+                tabIcon.setImageResource(R.drawable.ic_tab_5);
+                break;
+            case 6:
+                tabIcon.setImageResource(R.drawable.ic_tab_6);
+                break;
+            case 7:
+                tabIcon.setImageResource(R.drawable.ic_tab_7);
+                break;
+            case 8:
+                tabIcon.setImageResource(R.drawable.ic_tab_8);
+                break;
+            case 9:
+                tabIcon.setImageResource(R.drawable.ic_tab_9);
+                break;
+            default:
+                tabIcon.setImageResource(R.drawable.ic_tab_more);
+                break;
+        }
+    }
+
+    @Override
+    public void changeWebView(CustomWebView webView) {
+        webHolder = webView;
+    }
+
+    @Override
+    public void clearWebHolder() {
+
+        webviewContainer.removeAllViews();
+        webHolder = null;
+    }
+
+    @Override
     public void onRefresh() {
         webHolder.reload();
     }
 
 
     private class CustomWebViewClient extends WebViewClient {
-
+        private boolean isRedirect =false;
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             view.loadUrl(url);
-
+            isRedirect = true;
             return true;
         }
 
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
-            Log.d(this.getClass().getSimpleName(),url+"    is loaded");
+            swipeRefreshLayout.setRefreshing(true);
+            isRedirect = false;
         }
 
 
         @Override
         public void onPageFinished(WebView view, String url) {
-            Log.d("webview","Page loaded");
-            if(swipeRefreshLayout.isRefreshing()){
-                swipeRefreshLayout.setRefreshing(false);
-            }
+            if(isRedirect==false) {
+                if (swipeRefreshLayout.isRefreshing()) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
 
-            if(url!=null&&!url.equals("about:blank")) {
-                webViewAdapter.addWebView(webHolder);
-                presenter.saveHistory(url,view.getTitle());
-            }
-            if(webHolder!=null&&webHolder.canGoBack()==false){
-                backwardIcon.setColorFilter(R.color.cardview_shadow_end_color, PorterDuff.Mode.MULTIPLY);
-            }else{
-                backwardIcon.clearColorFilter();
-            }
-            if(webHolder!=null&&webHolder.canGoForward()==false){
-                forwardIcon.setColorFilter(R.color.cardview_shadow_end_color,PorterDuff.Mode.MULTIPLY);
-            }else{
-                forwardIcon.clearColorFilter();
+                if (url != null && !url.equals("about:blank")) {
+                    webViewAdapter.addWebView(webHolder);
+                    presenter.saveHistory(url, view.getTitle());
+                }
+                if (webHolder != null && webHolder.canGoBack() == false) {
+                    backwardIcon.setColorFilter(R.color.cardview_shadow_end_color, PorterDuff.Mode.MULTIPLY);
+                } else {
+                    backwardIcon.clearColorFilter();
+                }
+                if (webHolder != null && webHolder.canGoForward() == false) {
+                    forwardIcon.setColorFilter(R.color.cardview_shadow_end_color, PorterDuff.Mode.MULTIPLY);
+                } else {
+                    forwardIcon.clearColorFilter();
+                }
             }
         }
 
@@ -333,10 +400,6 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     }
 
     private class CustomWebChrome extends WebChromeClient {
-        @Override
-        public void onProgressChanged(WebView view, int newProgress) {
-
-        }
 
         @Override
         public void onReceivedIcon(WebView view, Bitmap icon) {

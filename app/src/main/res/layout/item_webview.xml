@@ -10,15 +10,21 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-<TextView
+    <TextView
+    android:background="@color/mdtp_accent_color"
+    android:textColor="@color/mdtp_white"
     android:gravity="center"
     android:id="@+id/title"
+    android:textSize="12sp"
     android:layout_width="match_parent"
     android:layout_height="36dp" />
         <ImageView
+            android:id="@+id/close_btn"
+            android:src="@drawable/ic_clear"
+            android:foregroundGravity="center"
             android:layout_alignParentRight="true"
-            android:layout_width="24dp"
-            android:layout_height="24dp" />
+            android:layout_width="36dp"
+            android:layout_height="36dp" />
     </RelativeLayout>
     <ImageView
         android:id="@+id/snapshot"

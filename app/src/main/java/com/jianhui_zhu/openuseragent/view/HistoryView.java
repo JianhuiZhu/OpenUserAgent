@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.History;
 import com.jianhui_zhu.openuseragent.presenter.HistoryPresenter;
+import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
 import com.jianhui_zhu.openuseragent.util.AbstractFragment;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.view.adapter.HistoryAdapter;
@@ -34,6 +35,7 @@ import rx.functions.Action1;
  * Created by jianhuizhu on 2016-02-16.
  */
 public class HistoryView extends AbstractFragment implements DatePickerDialog.OnDateSetListener,HistoryViewInterface{
+    HistoryView historyView;
     @Bind(R.id.general_tool_bar_title)
     TextView toolbarTitle;
     @Bind(R.id.history_list)
@@ -60,6 +62,7 @@ public class HistoryView extends AbstractFragment implements DatePickerDialog.On
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        historyView=this;
     }
 
     @Nullable
@@ -80,7 +83,13 @@ public class HistoryView extends AbstractFragment implements DatePickerDialog.On
         presenter.getAllHistory().subscribe(new Action1<List<History>>() {
             @Override
             public void call(List<History> histories) {
-                adapter=new HistoryAdapter(getActivity(),presenter,histories);
+                HomePresenter homePresenter=null;
+                try {
+                    homePresenter = HomePresenter.getInstance();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                adapter=new HistoryAdapter(getActivity(),presenter,histories, homePresenter,historyView);
                 list.setAdapter(adapter);
             }
         });

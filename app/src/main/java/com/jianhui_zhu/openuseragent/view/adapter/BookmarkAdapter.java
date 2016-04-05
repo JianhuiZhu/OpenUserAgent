@@ -7,14 +7,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
 import com.jianhui_zhu.openuseragent.presenter.BookmarkPresenter;
+import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.WebUtil;
+import com.jianhui_zhu.openuseragent.view.BookmarkView;
 import com.jianhui_zhu.openuseragent.view.HomeView;
 import com.jianhui_zhu.openuseragent.view.dialogs.BookmarkDialog;
 import com.jianhui_zhu.openuseragent.view.interfaces.BookmarkAdapterInterface;
@@ -34,13 +39,18 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
     List<Bookmark> bookmarks;
     Context context;
     RecyclerView recyclerView;
+    private BookmarkView bookmarkView;
     private BookmarkAdapter adapterInterface;
     private BookmarkPresenter bookmarkPresenter;
-    public  BookmarkAdapter(List<Bookmark> bookmarks,Context context,RecyclerView recyclerView,BookmarkPresenter bookmarkPresenter){
+    private int lastPosition = -1;
+    private HomePresenter homePresenter;
+    public  BookmarkAdapter(List<Bookmark> bookmarks,Context context,RecyclerView recyclerView,BookmarkPresenter bookmarkPresenter,HomePresenter homePresenter,BookmarkView bookmarkView){
         this.bookmarks=bookmarks;
         this.context=context;
         this.recyclerView=recyclerView;
         this.bookmarkPresenter=bookmarkPresenter;
+        this.homePresenter=homePresenter;
+        this.bookmarkView=bookmarkView;
         adapterInterface=this;
     }
 
@@ -68,6 +78,7 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
                     holder.avatar.setImageBitmap(bitmap);
                 }
             });
+            setAnimation(holder.container,position);
         } catch (URISyntaxException e) {
             Log.e(this.getClass().getSimpleName(),e.getMessage());
         }
@@ -101,6 +112,8 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
 
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener,View.OnClickListener{
+        @Bind(R.id.bookmark_container)
+        RelativeLayout container;
         int location;
         @Bind(R.id.bookmark_avatar)
         ImageView avatar;
@@ -122,8 +135,23 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
 
         @Override
         public void onClick(View v) {
-            FragmenUtil.switchToFragment(context,HomeView.newInstanceWithUrl(bookmarks.get(location).getUrl()));
+            if(homePresenter==null)
+                FragmenUtil.switchToFragment(context,HomeView.newInstanceWithUrl(bookmarks.get(location).getUrl()));
+            else{
+                homePresenter.swapUrl(bookmarks.get(location).getUrl());
+                FragmenUtil.backToPreviousFragment(context,bookmarkView);
+            }
+
         }
     }
-
+    private void setAnimation(View viewToAnimate, int position)
+    {
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > lastPosition)
+        {
+            Animation animation = AnimationUtils.loadAnimation(context, android.R.anim.slide_in_left);
+            viewToAnimate.startAnimation(animation);
+            lastPosition = position;
+        }
+    }
 }

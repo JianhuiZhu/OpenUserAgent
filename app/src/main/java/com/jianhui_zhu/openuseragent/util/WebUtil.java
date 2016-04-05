@@ -54,14 +54,18 @@ public class WebUtil {
         return Observable.create(new Observable.OnSubscribe<Bitmap>() {
             @Override
             public void call(Subscriber<? super Bitmap> subscriber) {
-                String path = context.getDir("icons",Context.MODE_PRIVATE).getAbsolutePath()+File.separator+name+DEFAULT_IMAGE_SUFFIX;
+
+
                 try {
-                    Bitmap bitmap= BitmapFactory.decodeStream(new FileInputStream(new File(path)));
+                    String path = context.getDir("icons",Context.MODE_PRIVATE).getAbsolutePath()+File.separator+name+DEFAULT_IMAGE_SUFFIX;
+                    FileInputStream stream = new FileInputStream(new File(path));
+                    Bitmap bitmap= BitmapFactory.decodeStream(stream);
                     if(bitmap!=null){
                         subscriber.onNext(bitmap);
                         subscriber.onCompleted();
                     }
-                } catch (FileNotFoundException e) {
+                    stream.close();
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
 

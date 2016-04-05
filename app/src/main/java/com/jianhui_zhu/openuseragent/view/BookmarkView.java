@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
 import com.jianhui_zhu.openuseragent.presenter.BookmarkPresenter;
+import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
 import com.jianhui_zhu.openuseragent.util.AbstractFragment;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.LocalDatabaseSingleton;
@@ -62,7 +63,13 @@ public class BookmarkView extends AbstractFragment implements BookmarkViewInterf
         bookmarkList.setLayoutManager(new LinearLayoutManager(getActivity()));
         bookmarkList.setItemAnimator(new DefaultItemAnimator());
         bookmarkList.setHasFixedSize(true);
-        BookmarkAdapter bookmarkAdapter=new BookmarkAdapter(bookmarks,getActivity(),bookmarkList, presenter);
+        HomePresenter homePresenter= null;
+        try {
+            homePresenter = HomePresenter.getInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        BookmarkAdapter bookmarkAdapter=new BookmarkAdapter(bookmarks,getActivity(),bookmarkList, presenter,homePresenter,this);
         bookmarkList.setAdapter(bookmarkAdapter);
     }
 

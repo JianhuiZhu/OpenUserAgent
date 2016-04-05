@@ -19,8 +19,12 @@ import android.widget.TextView;
 
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.WebViewInfoHolder;
+import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
+import com.jianhui_zhu.openuseragent.util.FragmenUtil;
+import com.jianhui_zhu.openuseragent.view.HomeView;
 import com.jianhui_zhu.openuseragent.view.TabView;
 import com.jianhui_zhu.openuseragent.view.custom.CustomWebView;
+import com.jianhui_zhu.openuseragent.view.dialogs.TabStackDialog;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -41,11 +45,13 @@ import rx.schedulers.Schedulers;
  */
 public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
     private static WebViewAdapter instance;
-
+    private Context context;
     private WebViewAdapter(Context context, int resource) {
         super(context, resource);
+        this.context = context;
     }
-
+    private HomePresenter homePresenter = null;
+    private TabStackDialog tabStackDialog = null;
     public static WebViewAdapter getInstance(Context context){
         if(instance==null){
             instance = new WebViewAdapter(context,R.layout.item_webview);
@@ -53,8 +59,14 @@ public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
         return instance;
     }
     ArrayList<WebViewInfoHolder> webViews=new ArrayList<>();
-
-
+    public WebViewAdapter setHomePresenter(HomePresenter homePresenter){
+        this.homePresenter = homePresenter;
+        return this;
+    }
+    public WebViewAdapter setTabStackDialog(TabStackDialog tabStackDialog){
+        this.tabStackDialog = tabStackDialog;
+        return this;
+    }
     private WebViewInfoHolder getWebViewInfoHolderByWebView(final CustomWebView webView){
         for(WebViewInfoHolder holder : webViews){
             if(holder.getWebView()==webView)
@@ -69,6 +81,9 @@ public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
             holder.setWebView(webView);
             holder.setTitle(webView.getTitle());
             webViews.add(0,holder);
+//            clear();
+//            addAll(webViews);
+            notifyDataSetChanged();
         }
     }
 
@@ -82,18 +97,21 @@ public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
         WebViewInfoHolder temp = webViews.get(position);
         webViews.remove(position);
         webViews.add(temp);
+//        clear();
+//        addAll(webViews);
         notifyDataSetChanged();
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         final WebViewInfoHolder holder = webViews.get(position);
-        String title = holder.getTitle();
+        String title = webViews.get(position).getTitle();
         Bitmap snapshot = holder.getBitmap();
         if(convertView==null){
             LayoutInflater vi = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView=vi.inflate(R.layout.item_webview, null);
         }
+        ImageView closeIcon = (ImageView)convertView.findViewById(R.id.close_btn);
         TextView titleView = (TextView)convertView.findViewById(R.id.title);
         final ImageView snapshotView = (ImageView)convertView.findViewById(R.id.snapshot);
 
@@ -111,6 +129,40 @@ public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
         }else{
             snapshotView.setImageBitmap(holder.getBitmap());
         }
+        closeIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                webViews.remove(position);
+                if(webViews.isEmpty()){
+                    if(homePresenter!=null&&tabStackDialog!=null){
+                        homePresenter.clearWebHolder();
+                    }
+                }
+                notifyDataSetChanged();
+            }
+        });
+        titleView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(homePresenter!=null&&tabStackDialog!=null){
+                    homePresenter.changeWebView(holder.getWebView());
+                    tabStackDialog.dismiss();
+                }else{
+                    FragmenUtil.switchToFragment(context,HomeView.newInstanceWithUrl(holder.getWebView().getUrl()));
+                }
+            }
+        });
+        snapshotView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(homePresenter!=null&&tabStackDialog!=null){
+                    homePresenter.changeWebView(holder.getWebView());
+                    tabStackDialog.dismiss();
+                }else{
+                    FragmenUtil.switchToFragment(context,HomeView.newInstanceWithUrl(holder.getWebView().getUrl()));
+                }
+            }
+        });
         return convertView;
     }
 
