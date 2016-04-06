@@ -2,6 +2,7 @@ package com.jianhui_zhu.openuseragent.view;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,6 +22,7 @@ import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.LocalDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.util.RemoteDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.view.adapter.BookmarkAdapter;
+import com.jianhui_zhu.openuseragent.view.dialogs.NewBookmarkDialog;
 import com.jianhui_zhu.openuseragent.view.interfaces.BookmarkViewInterface;
 
 import java.util.ArrayList;
@@ -36,9 +38,12 @@ import butterknife.OnClick;
 public class BookmarkView extends AbstractFragment implements BookmarkViewInterface{
     @Bind(R.id.list)
     RecyclerView bookmarkList;
-    @OnClick(R.id.general_tool_bar_go_back)
-    public void click(){
-        FragmenUtil.backToPreviousFragment(getActivity(),this);
+    @OnClick({R.id.general_tool_bar_go_back,R.id.add_bookmark_manual_btn})
+    public void click(View view){
+        if(view.getId()==R.id.general_tool_bar_go_back)
+            FragmenUtil.backToPreviousFragment(getActivity(),this);
+        else
+            FragmenUtil.switchToFragment(getActivity(),new NewBookmarkDialog());
     }
     BookmarkPresenter presenter;
     BookmarkAdapter bookmarkAdapter;

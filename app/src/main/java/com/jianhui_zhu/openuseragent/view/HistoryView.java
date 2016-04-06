@@ -1,5 +1,6 @@
 package com.jianhui_zhu.openuseragent.view;
 
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -40,7 +41,9 @@ public class HistoryView extends AbstractFragment implements DatePickerDialog.On
     TextView toolbarTitle;
     @Bind(R.id.history_list)
     RecyclerView list;
-    @OnClick({R.id.date_picker_btn,R.id.history_go_back})
+    @Bind(R.id.delete_btn)
+    ImageView delete;
+    @OnClick({R.id.date_picker_btn,R.id.history_go_back,R.id.delete_btn})
     public void click(View view){
         switch (view.getId()) {
             case R.id.date_picker_btn:
@@ -55,6 +58,18 @@ public class HistoryView extends AbstractFragment implements DatePickerDialog.On
             case R.id.history_go_back:
                 FragmenUtil.backToPreviousFragment(getActivity(),this);
                 break;
+            case R.id.delete_btn:
+                adapter =(HistoryAdapter)list.getAdapter();
+                boolean isEmpty = adapter.getSelected().isEmpty();
+                if(isEmpty==false){
+                    presenter.deleteSelectedHistories(adapter.getSelected()).subscribe(new Action1<String>() {
+                        @Override
+                        public void call(String s) {
+                            adapter.deleteSelected();
+                            Toast.makeText(getActivity(),s,Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
         }
     }
     HistoryAdapter adapter;
@@ -77,6 +92,7 @@ public class HistoryView extends AbstractFragment implements DatePickerDialog.On
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         toolbarTitle.setText("History");
+        delete.setColorFilter(R.color.mdtp_light_gray, PorterDuff.Mode.MULTIPLY);
         list.setLayoutManager(new LinearLayoutManager(getActivity()));
         list.setItemAnimator(new DefaultItemAnimator());
         list.setHasFixedSize(true);
@@ -103,5 +119,14 @@ public class HistoryView extends AbstractFragment implements DatePickerDialog.On
     @Override
     public void refreshList(List<History> histories) {
         adapter.changeHistoriesDataSet(histories);
+    }
+
+    @Override
+    public void setGarbageIconStatus(boolean status) {
+        if(status){
+            delete.clearColorFilter();
+        }else {
+            delete.setColorFilter(R.color.mdtp_light_gray, PorterDuff.Mode.MULTIPLY);
+        }
     }
 }

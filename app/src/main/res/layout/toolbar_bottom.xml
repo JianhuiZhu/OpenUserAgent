@@ -88,7 +88,7 @@
     <ImageView
         android:layout_centerInParent="true"
         android:id="@+id/tab"
-        android:src="@drawable/ic_tab_1"
+        android:src="@drawable/ic_tab"
         android:layout_width="24dp"
         android:layout_height="24dp"/>
     </com.andexert.library.RippleView>

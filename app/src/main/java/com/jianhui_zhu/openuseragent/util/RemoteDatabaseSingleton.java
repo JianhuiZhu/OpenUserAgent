@@ -296,5 +296,10 @@ public class RemoteDatabaseSingleton implements DatabaseInterface,GoogleApiClien
         return null;
     }
 
+    @Override
+    public Observable<String> deleteSelectedHistory(List<History> histories) {
+        return null;
+    }
+
 
 }

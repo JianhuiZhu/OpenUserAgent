@@ -21,11 +21,13 @@ import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.WebViewInfoHolder;
 import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
+import com.jianhui_zhu.openuseragent.util.WebUtil;
 import com.jianhui_zhu.openuseragent.view.HomeView;
 import com.jianhui_zhu.openuseragent.view.TabView;
 import com.jianhui_zhu.openuseragent.view.custom.CustomWebView;
 import com.jianhui_zhu.openuseragent.view.dialogs.TabStackDialog;
 
+import java.net.URISyntaxException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -84,10 +86,15 @@ public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
         if(isWebViewExists(webView)==false) {
             WebViewInfoHolder holder = new WebViewInfoHolder();
             holder.setWebView(webView);
-            holder.setTitle(webView.getTitle());
+            String title = webView.getTitle();
+            String domain ="";
+            try {
+                domain = WebUtil.getDomainbyUrl(webView.getUrl());
+            } catch (URISyntaxException e) {
+                Log.d(this.getClass().getSimpleName(),e.toString());
+            }
+            holder.setTitle(title.equals("") ? domain : title);
             webViews.add(0,holder);
-//            clear();
-//            addAll(webViews);
             notifyDataSetChanged();
         }
     }

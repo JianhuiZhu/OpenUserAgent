@@ -31,6 +31,8 @@
         android:layout_toRightOf="@+id/history_avatar"
         android:layout_below="@+id/history_title"
         android:layout_width="match_parent"
+        android:layout_toLeftOf="@+id/history_item_checkbox"
+        android:maxLength="20"
         android:maxLines="1"
         android:textStyle="italic"
         android:layout_marginTop="5dp"
@@ -39,16 +41,11 @@
         android:layout_marginLeft="16dp"
         android:textColor="@color/mdtp_transparent_black"
         android:layout_height="wrap_content" />
-    <TextView
-        android:id="@+id/history_time"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
+    <CheckBox
         android:layout_marginTop="8dp"
+        android:id="@+id/history_item_checkbox"
+        android:layout_alignParentRight="true"
         android:layout_marginRight="16dp"
-        android:text="12:00"
-        android:textSize="12sp"
-        android:textColor="@color/mdtp_dark_gray"
-        android:typeface="monospace"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <View

@@ -10,6 +10,8 @@ import com.jianhui_zhu.openuseragent.model.beans.User;
 import com.jianhui_zhu.openuseragent.util.LocalDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.util.RemoteDatabaseSingleton;
 
+import java.util.List;
+
 import rx.Observable;
 import rx.functions.Action1;
 
@@ -28,7 +30,9 @@ public class HomeModel {
     public void setUserLoggedIn(boolean isLoggedIn) {
         this.userLoggedIn = isLoggedIn;
     }
-
+    public Observable<List<Bookmark>> getNavigationBookmark(){
+        return LocalDatabaseSingleton.getInstance().getNavigationBookmark();
+    }
 
     public Observable<String> saveBookmark(String url, String name, String uID) {
         Bookmark bookmark = new Bookmark();

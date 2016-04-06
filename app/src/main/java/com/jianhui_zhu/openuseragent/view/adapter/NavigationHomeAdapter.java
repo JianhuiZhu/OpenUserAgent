@@ -18,6 +18,7 @@ import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -29,11 +30,19 @@ import rx.functions.Action1;
 public class NavigationHomeAdapter extends RecyclerView.Adapter<NavigationHomeAdapter.ViewHolder> {
     HomePresenter presenter;
     Context context;
-    private ArrayList<Bookmark> bookmarks = new ArrayList<>();
+    private List<Bookmark> bookmarks = new ArrayList<>();
+
+    public List<Bookmark> getBookmarks() {
+        return bookmarks;
+    }
+
+    public void setBookmarks(List<Bookmark> bookmarks) {
+        this.bookmarks = bookmarks;
+    }
+
     public NavigationHomeAdapter(HomePresenter presenter){
         //super();
         this.presenter = presenter;
-
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -41,7 +50,7 @@ public class NavigationHomeAdapter extends RecyclerView.Adapter<NavigationHomeAd
 
         View view = LayoutInflater
                 .from(context)
-                .inflate(R.layout.item_web_shortcut, parent, false);
+                .inflate(R.layout.item_bookmark, parent, false);
         return new ViewHolder(view);
 
     }
@@ -50,6 +59,7 @@ public class NavigationHomeAdapter extends RecyclerView.Adapter<NavigationHomeAd
     public void onBindViewHolder(final ViewHolder holder, int position) {
         Bookmark bookmark = bookmarks.get(position);
         holder.position = position;
+        holder.url.setText(bookmark.getUrl());
         String host = null;
         try {
             host = WebUtil.getDomainbyUrl(bookmark.getUrl());
@@ -72,10 +82,12 @@ public class NavigationHomeAdapter extends RecyclerView.Adapter<NavigationHomeAd
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         int position;
-        @Bind(R.id.web_icon_title)
+        @Bind(R.id.bookmark_name)
         TextView title;
-        @Bind(R.id.web_icon_imageview)
+        @Bind(R.id.bookmark_avatar)
         ImageView icon;
+        @Bind(R.id.bookmark_url)
+        TextView url;
         public ViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);

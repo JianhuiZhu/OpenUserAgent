@@ -9,4 +9,7 @@ import java.util.List;
  */
 public interface HistoryViewInterface {
     void refreshList(List<History> histories);
+    void setGarbageIconStatus(boolean status);
+
+
 }

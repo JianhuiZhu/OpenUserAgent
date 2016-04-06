@@ -12,7 +12,9 @@ import android.support.design.widget.NavigationView;
 import android.support.percent.PercentRelativeLayout;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
@@ -30,6 +32,7 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -37,6 +40,7 @@ import android.widget.Toast;
 
 import com.andexert.library.RippleView;
 import com.jianhui_zhu.openuseragent.R;
+import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
 import com.jianhui_zhu.openuseragent.model.beans.User;
 import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
 import com.jianhui_zhu.openuseragent.util.AbstractFragment;
@@ -55,12 +59,14 @@ import com.squareup.picasso.Picasso;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observable;
 import rx.Subscriber;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -122,8 +128,9 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                 }
                 break;
             case R.id.add_bookmark_area:
-
-                presenter.saveBookmark(webHolder.getUrl(),webHolder.getTitle(),user == null ? null : user.getuID());
+                if(webHolder!=null) {
+                    presenter.saveBookmark(webHolder.getUrl(), webHolder.getTitle(), user == null ? null : user.getuID());
+                }
                 break;
             case R.id.home_area:
                 String homePageUrl = SettingSingleton.getInstance(getActivity()).getHomePage();
@@ -198,12 +205,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                 return true;
             }
         });
-        boolean hasUrl = getArguments().getBoolean("hasUrl");
-        if (hasUrl) {
-            loadTargetUrl(getArguments().getString("url"));
-        } else {
-            loadTargetUrl("");
-        }
+
         settingDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
     }
@@ -248,6 +250,11 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     @Override
     public void loadTargetUrl(String url) {
         swipeRefreshLayout.setRefreshing(true);
+        if(webHolder == null){
+            webHolder = initWebView();
+            //webViewAdapter.addWebView(webHolder);
+            //presenter.changeNumTabsIcon(webViewAdapter.getCount());
+        }
         if (url != null && !url.equals("")) {
             this.webHolder.loadUrl(url);
         } else {
@@ -374,6 +381,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                 webviewContainer.addView(webHolder, 0);
                 if (url != null && !url.equals("about:blank")) {
                     webViewAdapter.addWebView(webHolder);
+                    presenter.changeNumTabsIcon(webViewAdapter.getCount());
                     presenter.saveHistory(url, view.getTitle());
                 }
                 if (webHolder != null && webHolder.canGoBack() == false) {
@@ -433,13 +441,30 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
             webHolder=web;
     }
 
-    private RecyclerView initGridView(){
-        RecyclerView gridBookmark = new RecyclerView(getActivity());
-        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
-        gridBookmark.setLayoutManager(layoutManager);
+    private LinearLayout initGridView(){
+        LinearLayout layout = new LinearLayout(getActivity());
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setLayoutParams(params);
+        TextView title = new TextView(getActivity());
+        title.setText("Visit Often visited website");
+        title.setGravity(Gravity.CENTER);
+        layout.addView(title);
+        final RecyclerView gridBookmark = new RecyclerView(getActivity());
+        gridBookmark.setLayoutManager(new LinearLayoutManager(getActivity()));
+        gridBookmark.setItemAnimator(new DefaultItemAnimator());
+        gridBookmark.setHasFixedSize(true);
         gridBookmarkAdapter = new NavigationHomeAdapter(presenter);
-        gridBookmark.setAdapter(gridBookmarkAdapter);
-        return gridBookmark;
+        presenter.getNavigationBookmark().subscribe(new Action1<List<Bookmark>>() {
+            @Override
+            public void call(List<Bookmark> bookmarks) {
+                gridBookmarkAdapter.setBookmarks(bookmarks);
+                gridBookmark.setAdapter(gridBookmarkAdapter);
+            }
+        });
+        layout.addView(gridBookmark);
+        //return gridBookmark;
+        return layout;
     }
 
     private CustomWebView initWebView(){
@@ -479,8 +504,17 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     public void onResume() {
         super.onResume();
         if(webHolder==null) {
-            webHolder = initWebView();
-            webHolder.setDrawingCacheEnabled(true);
+//            webHolder = initWebView();
+//            webHolder.setDrawingCacheEnabled(true);
+//            boolean hasUrl = getArguments().getBoolean("hasUrl");
+//            if (hasUrl) {
+//                loadTargetUrl(getArguments().getString("url"));
+//            } else {
+//                loadTargetUrl("");
+//            }
+
+            webviewContainer.removeAllViews();
+            webviewContainer.addView(initGridView());
             configViews();
         }
     }
@@ -489,6 +523,6 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        webHolder.destroy();
+        //webHolder.destroy();
     }
 }

@@ -23,6 +23,9 @@ public class HistoryPresenter {
         this.view=view;
     }
     private HistoryModel model=new HistoryModel(context);
+    public void changeGarbageIconStatus(boolean status){
+        view.setGarbageIconStatus(status);
+    }
     public Observable<List<History>> getAllHistory(){
         return model.getAllHistory();
     }
@@ -33,5 +36,8 @@ public class HistoryPresenter {
                 view.refreshList(histories);
             }
         });
+    }
+    public Observable<String> deleteSelectedHistories(List<History> histories){
+        return model.deleteSelectedHistories(histories);
     }
 }

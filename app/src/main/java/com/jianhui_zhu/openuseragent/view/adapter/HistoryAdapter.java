@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -25,11 +26,13 @@ import com.jianhui_zhu.openuseragent.view.HomeView;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import rx.functions.Action1;
 
 /**
@@ -41,11 +44,25 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     private Context context;
     private HistoryPresenter presenter;
     private int lastPosition = -1;
-
+    private List<History> selected = new ArrayList<>();
     public List<History> getHistories() {
         return histories;
     }
 
+    public List<History> getSelected() {
+        return selected;
+    }
+
+    public void setSelected(List<History> selected) {
+        this.selected = selected;
+    }
+    public void deleteSelected(){
+        for(History history : selected){
+            histories.remove(history);
+        }
+        selected.clear();
+        notifyDataSetChanged();
+    }
     public void setHistories(List<History> histories) {
         this.histories = histories;
         notifyDataSetChanged();
@@ -87,11 +104,11 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
                     holder.avatar.setImageBitmap(result);
                 }
             });
-            int hour = date.getHours();
-            String  min = date.getMinutes()<10 ? "0"+date.getMinutes() : String.valueOf(date.getMinutes());
-            String time = hour+":"+min;
+            //int hour = date.getHours();
+            //String  min = date.getMinutes()<10 ? "0"+date.getMinutes() : String.valueOf(date.getMinutes());
+            //String time = hour+":"+min;
             holder.title.setText(history.getName());
-            holder.time.setText(time);
+            //holder.time.setText(time);
             holder.url.setText(history.getUrl());
             setAnimation(holder.container,position);
         } catch (URISyntaxException e) {
@@ -110,11 +127,27 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         RelativeLayout container;
         @Bind(R.id.history_avatar)
         ImageView avatar;
-        int position;
+        volatile int position;
         @Bind(R.id.history_title)
         TextView title;
-        @Bind(R.id.history_time)
-        TextView time;
+        @OnClick(R.id.history_item_checkbox)
+        public void click(CheckBox checkBox){
+            History history = histories.get(position);
+            if(checkBox.isChecked()){
+                selected.add(history);
+                    presenter.changeGarbageIconStatus(true);
+
+            }else{
+                selected.remove(history);
+                if(selected.isEmpty()){
+                    presenter.changeGarbageIconStatus(false);
+                }
+
+
+            }
+        }
+//        @Bind(R.id.history_time)
+//        TextView time;
         @Bind(R.id.history_url)
         TextView url;
         public ViewHolder(View itemView) {

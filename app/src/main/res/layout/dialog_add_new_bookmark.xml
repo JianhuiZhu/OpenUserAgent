@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <TextView
+        android:layout_alignParentTop="true"
         android:id="@+id/bookmark_dialog_title"
         android:text="New Bookmark"
         android:gravity="center"
@@ -49,6 +50,7 @@
             android:inputType="textUri" />
     </android.support.design.widget.TextInputLayout>
     <RelativeLayout
+        android:layout_alignParentBottom="true"
         android:id="@+id/buttons_area"
         android:layout_below="@+id/url_area"
         android:layout_centerHorizontal="true"

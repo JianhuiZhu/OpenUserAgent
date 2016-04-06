@@ -6,8 +6,11 @@ import android.webkit.URLUtil;
 import android.webkit.WebView;
 
 import com.jianhui_zhu.openuseragent.model.HomeModel;
+import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
 import com.jianhui_zhu.openuseragent.view.custom.CustomWebView;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
+
+import java.util.List;
 
 import rx.Observable;
 import rx.functions.Action1;
@@ -20,7 +23,9 @@ public class HomePresenter {
     private HomeViewInterface homeView;
 
     private HomeModel homeModel;
-
+    public Observable<List<Bookmark>> getNavigationBookmark(){
+        return homeModel.getNavigationBookmark();
+    }
     public HomePresenter(HomeViewInterface homeView, Context context) {
         if(instance==null) {
             this.homeView = homeView;

@@ -133,6 +133,25 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
     }
 
     @Override
+    public Observable<String> deleteSelectedHistory(final List<History> histories) {
+        return Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                StringBuilder sb = new StringBuilder();
+                for(History history : histories){
+                    sb.append(history.getrID()+",");
+                }
+                sb = sb.deleteCharAt(sb.length()-1);
+
+                LocalDatabaseHelper.getInstance(context).getWritableDatabase()
+                        .rawQuery("Delete FROM Histories WHERE _id IN("+sb.toString()+")",null);
+                subscriber.onNext("Selected histories has been deleted");
+                subscriber.onCompleted();
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    @Override
     public void deleteBookmark(final Bookmark bookmark){
         Observable.create(new Observable.OnSubscribe<String>() {
             @Override
@@ -222,6 +241,31 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 
+    }
+    public Observable<List<Bookmark>> getNavigationBookmark(){
+
+        return Observable.create(new Observable.OnSubscribe<List<Bookmark>>() {
+            @Override
+            public void call(Subscriber<? super List<Bookmark>> subscriber) {
+                List<Bookmark> result = new ArrayList<>();
+                SQLiteDatabase db = LocalDatabaseHelper.getInstance(context).getReadableDatabase();
+                Cursor cursor = db.query("Bookmarks",null,null,null,null,null,"id DESC","8");
+                if(cursor.moveToFirst()){
+                    do{
+                        Bookmark bookmark = new Bookmark();
+                        bookmark.setbID(cursor.getString(0));
+                        bookmark.setName(cursor.getString(1));
+                        bookmark.setUrl(cursor.getString(2));
+                        result.add(bookmark);
+                    }while (cursor.moveToNext());
+                }
+                subscriber.onNext(result);
+                cursor.close();
+                db.close();
+                subscriber.onCompleted();
+
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
     @Override
     public List<Bookmark> getAllBookmarks() {

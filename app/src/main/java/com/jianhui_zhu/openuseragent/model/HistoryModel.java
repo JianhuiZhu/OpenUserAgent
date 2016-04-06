@@ -26,4 +26,7 @@ public class HistoryModel {
     public Observable<List<History>> getHistoryByDate(int year, int month, int day){
         return LocalDatabaseSingleton.getInstance().getHistoryByDate(year,month,day);
     }
+    public Observable<String> deleteSelectedHistories(List<History> histories){
+        return LocalDatabaseSingleton.getInstance().deleteSelectedHistory(histories);
+    }
 }
