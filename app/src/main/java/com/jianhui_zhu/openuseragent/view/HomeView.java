@@ -12,6 +12,8 @@ import android.support.design.widget.NavigationView;
 import android.support.percent.PercentRelativeLayout;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -26,6 +28,7 @@ import android.webkit.WebIconDatabase;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -41,6 +44,7 @@ import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.RemoteDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.util.SettingSingleton;
 import com.jianhui_zhu.openuseragent.util.WebUtil;
+import com.jianhui_zhu.openuseragent.view.adapter.NavigationHomeAdapter;
 import com.jianhui_zhu.openuseragent.view.adapter.SearchSuggestionAdapter;
 import com.jianhui_zhu.openuseragent.view.adapter.WebViewAdapter;
 import com.jianhui_zhu.openuseragent.view.custom.CustomDrawerLayout;
@@ -63,7 +67,6 @@ import rx.schedulers.Schedulers;
  * Created by Jianhui Zhu on 2016-01-27.
  */
 public class HomeView extends AbstractFragment implements HomeViewInterface,SwipeRefreshLayout.OnRefreshListener {
-    private Bundle webViewBundle;
     @Bind(R.id.webview_holder)
     FrameLayout webviewContainer;
     User user;
@@ -71,6 +74,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     @Bind(R.id.tool_bar_area)
     PercentRelativeLayout toolBarArea;
     boolean isHomePage=true;
+    NavigationHomeAdapter gridBookmarkAdapter;
     CustomWebView webHolder;
     @Bind(R.id.setting_drawer)
     CustomDrawerLayout settingDrawer;
@@ -86,18 +90,6 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     ImageView backwardIcon;
     @Bind(R.id.forward)
     ImageView forwardIcon;
-    @Bind(R.id.backward_area)
-    RippleView backward;
-    @Bind(R.id.forward_area)
-    RippleView forward;
-    @Bind(R.id.refresh_area)
-    RippleView refresh;
-    @Bind(R.id.tab_area)
-    RippleView tab;
-    @Bind(R.id.add_bookmark_area)
-    RippleView addBookmark;
-    @Bind(R.id.home_area)
-    RippleView home;
     @Bind(R.id.tab)
     ImageView tabIcon;
     SearchSuggestionAdapter suggestionAdapter;
@@ -248,11 +240,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if(webHolder==null) {
-            webHolder = initWebView();
-            webHolder.setDrawingCacheEnabled(true);
-            configViews();
-        }
+
 
     }
 
@@ -382,7 +370,8 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                 if (swipeRefreshLayout.isRefreshing()) {
                     swipeRefreshLayout.setRefreshing(false);
                 }
-
+                webviewContainer.removeAllViewsInLayout();
+                webviewContainer.addView(webHolder, 0);
                 if (url != null && !url.equals("about:blank")) {
                     webViewAdapter.addWebView(webHolder);
                     presenter.saveHistory(url, view.getTitle());
@@ -444,6 +433,15 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
             webHolder=web;
     }
 
+    private RecyclerView initGridView(){
+        RecyclerView gridBookmark = new RecyclerView(getActivity());
+        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
+        gridBookmark.setLayoutManager(layoutManager);
+        gridBookmarkAdapter = new NavigationHomeAdapter(presenter);
+        gridBookmark.setAdapter(gridBookmarkAdapter);
+        return gridBookmark;
+    }
+
     private CustomWebView initWebView(){
         CustomWebView web = new CustomWebView(getActivity());
         WebViewClient client = new CustomWebViewClient();
@@ -465,8 +463,8 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
         para.setMargins(0, 0, 0, 0);
         web.setLayoutParams(para);
         web.setHomeViewInterface(this);
-        webviewContainer.removeAllViewsInLayout();
-        webviewContainer.addView(web, 0);
+//        webviewContainer.removeAllViewsInLayout();
+//        webviewContainer.addView(web, 0);
         backwardIcon.setColorFilter(R.color.cardview_shadow_end_color,PorterDuff.Mode.MULTIPLY);
         forwardIcon.setColorFilter(R.color.cardview_shadow_end_color,PorterDuff.Mode.MULTIPLY);
         return web;
@@ -480,19 +478,13 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     @Override
     public void onResume() {
         super.onResume();
+        if(webHolder==null) {
+            webHolder = initWebView();
+            webHolder.setDrawingCacheEnabled(true);
+            configViews();
+        }
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
-
-
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
 
     @Override
     public void onDestroyView() {
