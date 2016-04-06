@@ -99,6 +99,10 @@ public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
         }
     }
 
+    @Override
+    public boolean isEmpty() {
+        return webViews == null || (webViews.isEmpty());
+    }
 
     @Override
     public int getCount() {

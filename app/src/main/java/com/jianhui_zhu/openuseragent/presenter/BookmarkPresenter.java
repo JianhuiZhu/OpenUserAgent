@@ -20,24 +20,18 @@ public class BookmarkPresenter {
     private Context context;
     private BookmarkModel bookmarkModel;
     private BookmarkViewInterface view;
-    private BookmarkAdapterInterface adapterInterface;
-    public BookmarkPresenter(Context context, BookmarkViewInterface view, BookmarkAdapterInterface adapterInterface){
+    private BookmarkPresenter(Context context, BookmarkViewInterface view){
         if(instance==null) {
             this.context = context;
             bookmarkModel = new BookmarkModel(context);
             this.view = view;
-            this.adapterInterface = adapterInterface;
             instance = this;
         }
     }
 
-    public void setAdapterInterface(BookmarkAdapterInterface adapterInterface) {
-        this.adapterInterface = adapterInterface;
-    }
-
-    public static BookmarkPresenter getInstance() throws Exception {
+    public static BookmarkPresenter getInstance(Context context, BookmarkViewInterface view){
         if(instance==null){
-            throw new Exception("Bookmark Presenter not instantiated");
+            new BookmarkPresenter(context,view);
         }
         return instance;
     }
@@ -45,25 +39,27 @@ public class BookmarkPresenter {
         return bookmarkModel.getAllBookmarks();
     }
 
-    public void updateBookmark(Bookmark bookmark){
+    public void updateBookmark(final Bookmark bookmark){
         bookmarkModel.updateBookmark(bookmark).subscribe(new Action1() {
             @Override
             public void call(Object o) {
+                view.updateBookmark(bookmark);
                 view.showTag("bookmark updated");
             }
         });
     }
 
     public void deleteBookmark(Bookmark bookmark){
-
+        view.deleteBookmark(bookmark);
         bookmarkModel.deleteBookmark(bookmark);
     }
     public void addBookmark(final Bookmark bookmark){
         bookmarkModel.addBookmark(bookmark).subscribe(new Action1<String>() {
             @Override
             public void call(String s) {
+                view.addNewBookmark(bookmark);
                 view.showTag(s);
-                adapterInterface.addNewBookmark(bookmark);
+
             }
         });
     }

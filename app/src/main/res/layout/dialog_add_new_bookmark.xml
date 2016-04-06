@@ -50,7 +50,7 @@
             android:inputType="textUri" />
     </android.support.design.widget.TextInputLayout>
     <RelativeLayout
-        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="8dp"
         android:id="@+id/buttons_area"
         android:layout_below="@+id/url_area"
         android:layout_centerHorizontal="true"

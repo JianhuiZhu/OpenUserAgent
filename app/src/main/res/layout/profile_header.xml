@@ -4,14 +4,13 @@
     android:layout_height="match_parent"
     android:background="@color/mdtp_accent_color">
 
-    <ImageView
-        android:id="@+id/home_avatar"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:src="@drawable/placeholder"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-/>
+    <de.hdodenhof.circleimageview.CircleImageView
+    android:id="@+id/home_avatar"
+    android:layout_width="56dp"
+    android:layout_height="56dp"
+    android:layout_marginLeft="16dp"
+    android:layout_marginTop="16dp"
+    android:src="@drawable/ic_placeholder"/>
 
     <TextView
         android:id="@+id/home_name"

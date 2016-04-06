@@ -31,6 +31,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Observable;
 
 /**
  * Created by Jianhui Zhu on 2016-02-06.
@@ -43,7 +44,7 @@ public class BookmarkView extends AbstractFragment implements BookmarkViewInterf
         if(view.getId()==R.id.general_tool_bar_go_back)
             FragmenUtil.backToPreviousFragment(getActivity(),this);
         else
-            FragmenUtil.switchToFragment(getActivity(),new NewBookmarkDialog());
+            FragmenUtil.switchToFragment(getActivity(),NewBookmarkDialog.newInstance(presenter));
     }
     BookmarkPresenter presenter;
     BookmarkAdapter bookmarkAdapter;
@@ -75,9 +76,8 @@ public class BookmarkView extends AbstractFragment implements BookmarkViewInterf
         } catch (Exception e) {
             e.printStackTrace();
         }
-        presenter =new BookmarkPresenter(getActivity(),this,null);
+        presenter = BookmarkPresenter.getInstance(getActivity(),this);
         this.bookmarkAdapter=new BookmarkAdapter(bookmarks,getActivity(),presenter,homePresenter,this);
-        presenter.setAdapterInterface(this.bookmarkAdapter);
         bookmarkList.setAdapter(bookmarkAdapter);
         bookmarks.addAll(presenter.getAllBookmarks());
     }
@@ -86,5 +86,20 @@ public class BookmarkView extends AbstractFragment implements BookmarkViewInterf
     @Override
     public void showTag(String str) {
         Toast.makeText(getActivity(),str,Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void addNewBookmark(Bookmark bookmark) {
+        bookmarkAdapter.addNewBookmark(bookmark);
+    }
+
+    @Override
+    public void updateBookmark(Bookmark bookmark) {
+        bookmarkAdapter.updatedBookmark(bookmark);
+    }
+
+    @Override
+    public void deleteBookmark(Bookmark bookmark) {
+        bookmarkAdapter.deletedBookmark(bookmark);
     }
 }

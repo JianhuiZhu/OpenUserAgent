@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">OpenUserAgent</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="login">Login via Google</string>
     <string-array name="search_engines">
         <item>Google</item>

@@ -13,7 +13,6 @@ import android.support.percent.PercentRelativeLayout;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -30,7 +29,6 @@ import android.webkit.WebIconDatabase;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -64,6 +62,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.hdodenhof.circleimageview.CircleImageView;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action1;
@@ -76,6 +75,8 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     @Bind(R.id.webview_holder)
     FrameLayout webviewContainer;
     User user;
+    CircleImageView avatar;
+    TextView homeName;
     private boolean drawerIsOpen = false;
     @Bind(R.id.tool_bar_area)
     PercentRelativeLayout toolBarArea;
@@ -154,6 +155,22 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
 
     private HomePresenter presenter;
     public void configViews(){
+        avatar = (CircleImageView)profileTitle.getHeaderView(0).findViewById(R.id.home_avatar);
+        homeName = (TextView)profileTitle.getHeaderView(0).findViewById(R.id.home_name);
+        avatar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(SettingSingleton.getInstance(getActivity()).isLoginStatus()==false){
+                    Picasso.with(getActivity())
+                            .load(R.drawable.ic_avatar_konata)
+                            .fit()
+                            .into(avatar);
+                    SettingSingleton.getInstance(getActivity())
+                            .setLoginStatus(true);
+                    homeName.setText(SettingSingleton.getInstance(getActivity()).getName());
+                }
+            }
+        });
         profileTitle.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
@@ -166,6 +183,21 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                         break;
                     case R.id.history_option:
                         FragmenUtil.switchToFragment(getActivity(), new HistoryView());
+                        break;
+                    case R.id.download_option:
+                        FragmenUtil.switchToFragment(getActivity(),new DownloadView());
+                        break;
+                    case R.id.add_tab_option:
+                        loadTargetUrl(SettingSingleton.getInstance(getActivity()).getHomePage());
+                        break;
+                    case R.id.sign_out_option:
+                        Picasso.with(getActivity())
+                                .load(R.drawable.ic_placeholder)
+                                .fit()
+                                .into(avatar);
+                        SettingSingleton.getInstance(getActivity())
+                                .setLoginStatus(false);
+                        homeName.setText("Please click avatar to login");
                         break;
                 }
                 settingDrawer.closeDrawers();
@@ -254,6 +286,8 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
             webHolder = initWebView();
             //webViewAdapter.addWebView(webHolder);
             //presenter.changeNumTabsIcon(webViewAdapter.getCount());
+        }else{
+            webHolder = initWebView();
         }
         if (url != null && !url.equals("")) {
             this.webHolder.loadUrl(url);
@@ -303,6 +337,9 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
         switch(num){
             case 0:
                 tabIcon.setImageResource(R.drawable.ic_tab);
+                webHolder = null;
+                webviewContainer.removeAllViews();
+                webviewContainer.addView(initPanelView());
                 break;
             case 1:
                 tabIcon.setImageResource(R.drawable.ic_tab_1);
@@ -441,10 +478,11 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
             webHolder=web;
     }
 
-    private LinearLayout initGridView(){
+    private LinearLayout initPanelView(){
         LinearLayout layout = new LinearLayout(getActivity());
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layout.setOrientation(LinearLayout.VERTICAL);
+        params.setMargins(0,8,0,0);
         layout.setLayoutParams(params);
         TextView title = new TextView(getActivity());
         title.setText("Visit Often visited website");
@@ -514,11 +552,10 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
 //            }
 
             webviewContainer.removeAllViews();
-            webviewContainer.addView(initGridView());
+            webviewContainer.addView(initPanelView());
             configViews();
         }
     }
-
 
     @Override
     public void onDestroyView() {

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 import com.jianhui_zhu.openuseragent.R;
@@ -16,19 +17,33 @@ import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.SettingSingleton;
 import com.jianhui_zhu.openuseragent.util.SharePreferenceUtil;
 import com.jianhui_zhu.openuseragent.view.adapter.SearchEngineAdapter;
+import com.squareup.picasso.Picasso;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by Jianhui Zhu on 2016-02-05.
  */
 public class SettingView extends AbstractFragment {
+    @Bind(R.id.setting_profile_area)
+    LinearLayout profileArea;
+    @Bind(R.id.setting_avatar)
+    CircleImageView avatar;
     @Bind(R.id.setting_home_page)
     EditText homePage;
     @Bind(R.id.search_engine_spinner)
     Spinner searchEngine;
+    @Bind(R.id.name)
+            EditText name;
+    @Bind(R.id.username)
+            EditText username;
+    @Bind(R.id.email)
+            EditText email;
+    @Bind(R.id.password)
+            EditText password;
     SettingSingleton settings;
     @OnClick(R.id.general_tool_bar_go_back)
     public void click(){
@@ -76,5 +91,28 @@ public class SettingView extends AbstractFragment {
 
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        SettingSingleton singleton = SettingSingleton.getInstance(getActivity());
+        if(singleton.isLoginStatus()){
+            Picasso.with(getActivity())
+                    .load(R.drawable.ic_avatar_konata)
+                    .fit()
+                    .into(avatar);
+            name.setText(singleton.getName());
+            email.setText(singleton.getEmail());
+            username.setText(singleton.getUsername());
+            password.setText(singleton.getPassword());
+            profileArea.setVisibility(View.VISIBLE);
+        }else{
+            Picasso.with(getActivity())
+                    .load(R.drawable.ic_placeholder)
+                    .fit()
+                    .into(avatar);
+            profileArea.setVisibility(View.GONE);
+        }
     }
 }

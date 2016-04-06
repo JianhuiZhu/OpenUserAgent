@@ -16,4 +16,12 @@
         android:id="@+id/add_tab_option"
         android:title="new tab"
         android:icon="@drawable/ic_add_tab"/>
+    <item
+        android:id="@+id/download_option"
+        android:title="Download"
+        android:icon="@drawable/ic_file_download"/>
+    <item
+        android:id="@+id/sign_out_option"
+        android:title="sign out"
+        android:icon="@drawable/ic_logout"/>
 </menu>

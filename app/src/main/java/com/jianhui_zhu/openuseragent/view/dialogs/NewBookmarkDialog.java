@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -22,7 +23,7 @@ import butterknife.OnClick;
  * Created by jianhuizhu on 2016-04-05.
  */
 public class NewBookmarkDialog extends AbstractDialogFragment {
-
+    BookmarkPresenter presenter;
     @Bind(R.id.name)
     EditText name;
     @Bind(R.id.url)
@@ -37,12 +38,8 @@ public class NewBookmarkDialog extends AbstractDialogFragment {
             Bookmark bookmark = new Bookmark();
             bookmark.setName(name.getText().toString());
             bookmark.setUrl(url.getText().toString());
-            try {
-                BookmarkPresenter.getInstance().addBookmark(bookmark);
+             presenter.addBookmark(bookmark);
                 this.dismiss();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }else{
             this.dismiss();
         }
@@ -50,6 +47,7 @@ public class NewBookmarkDialog extends AbstractDialogFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         View view = inflater.inflate(R.layout.dialog_add_new_bookmark,container,false);
         ButterKnife.bind(this,view);
         return view;
@@ -59,5 +57,9 @@ public class NewBookmarkDialog extends AbstractDialogFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
     }
-
+    public static NewBookmarkDialog newInstance(BookmarkPresenter presenter){
+        NewBookmarkDialog dialog = new NewBookmarkDialog();
+        dialog.presenter = presenter;
+        return dialog;
+    }
 }

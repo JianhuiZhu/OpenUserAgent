@@ -34,7 +34,7 @@ import rx.functions.Action1;
 /**
  * Created by Jianhui Zhu on 2016-02-05.
  */
-public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHolder> implements BookmarkAdapterInterface{
+public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHolder>{
     List<Bookmark> bookmarks;
     Context context;
     private BookmarkView bookmarkView;
@@ -90,27 +90,35 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
         return bookmarks==null?0:bookmarks.size();
     }
 
-    @Override
-    public void updatedBookmark(int position, Bookmark bookmark) {
-        Bookmark cur=bookmarks.get(position);
-        bookmarkPresenter.updateBookmark(bookmark);
-        cur.setName(bookmark.getName());
-        cur.setUrl(bookmark.getUrl());
-        this.notifyItemChanged(position);
+    public void updatedBookmark(Bookmark bookmark) {
+        int position = -1;
+        for(int count = 0; count<bookmarks.size(); count++){
+            if(bookmarks.get(count).equals(bookmark)){
+                position = count;
+                break;
+            }
+        }
+        if(position != -1) {
+            bookmarks.set(position,bookmark);
+            this.notifyItemChanged(position);
+        }
     }
 
-    @Override
-    public void deletedBookmark(int position) {
-        Bookmark bookmark=bookmarks.get(position);
-        bookmarkPresenter.deleteBookmark(bookmark);
-        bookmarks.remove(position);
-        //recyclerView.removeViewAt(position);
-        this.notifyItemRemoved(position);
-        this.notifyItemRangeChanged(position,bookmarks.size());
-
+    public void deletedBookmark(Bookmark bookmark) {
+        int position = -1;
+        for(int count = 0; count<bookmarks.size(); count++){
+            if(bookmarks.get(count).equals(bookmark)){
+                position = count;
+                break;
+            }
+        }
+        if(position != -1) {
+            bookmarks.remove(position);
+            this.notifyItemChanged(position);
+            this.notifyItemRangeChanged(position,bookmarks.size());
+        }
     }
 
-    @Override
     public void addNewBookmark(Bookmark bookmark) {
         bookmarks.add(bookmark);
         notifyDataSetChanged();
@@ -137,7 +145,7 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
 
         @Override
         public boolean onLongClick(View v) {
-           FragmenUtil.switchToFragment(context, EditBookmarkDialog.newInstance(bookmarks.get(location),location,adapterInterface));
+           FragmenUtil.switchToFragment(context, EditBookmarkDialog.newInstance(bookmarks.get(location),bookmarkPresenter));
             return true;
         }
 

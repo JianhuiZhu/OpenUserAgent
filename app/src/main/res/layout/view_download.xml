@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:background="@color/mdtp_white"
+    android:layout_height="match_parent">
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:background="@color/mdtp_accent_color"
+        android:layout_height="48dp">
+        <com.andexert.library.RippleView
+            android:id="@+id/backward_area"
+            app:rv_rippleDuration="150"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            rv_centered="true">
+            <ImageView
+                android:clickable="true"
+                android:id="@+id/download_go_back"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="16dp"
+                android:layout_width="24dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_back"
+                android:layout_height="24dp" />
+        </com.andexert.library.RippleView>
+        <TextView
+            android:id="@+id/general_tool_bar_title"
+            android:layout_toRightOf="@+id/backward_area"
+            android:text="Download"
+            android:textSize="14sp"
+            android:textColor="@android:color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="12dp"/>
+
+    </RelativeLayout>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/download_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+</LinearLayout>

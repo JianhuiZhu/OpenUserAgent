@@ -93,6 +93,7 @@ public class HomePresenter {
     }
     public void changeNumTabsIcon(int num){
         homeView.changeNumTabsIcon(num);
+
     }
     public void changeWebView(CustomWebView webView){
         homeView.changeWebView(webView);

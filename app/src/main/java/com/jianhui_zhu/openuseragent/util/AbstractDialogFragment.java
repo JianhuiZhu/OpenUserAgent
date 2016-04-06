@@ -2,7 +2,14 @@ package com.jianhui_zhu.openuseragent.util;
 
 import android.app.DialogFragment;
 import android.os.Bundle;
-import android.util.Log;import java.lang.Override;
+import android.support.annotation.Nullable;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+
+import java.lang.Override;
 
 
 
@@ -11,25 +18,10 @@ import android.util.Log;import java.lang.Override;
  */
 public class AbstractDialogFragment extends DialogFragment {
 
-//	@Inject
 
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
-
-//	@Override
-//	public void onResume() {
-//		super.onResume();
-//		Log.d(this.getClass().getName(), "registered bus");
-//		mEventBus.register(this);
-//	}
-//
-//	@Override
-//	public void onPause() {
-//		super.onPause();
-//		Log.d(this.getClass().getName(), "unregistered bus");
-//		mEventBus.unregister(this);
-//	}
 }
