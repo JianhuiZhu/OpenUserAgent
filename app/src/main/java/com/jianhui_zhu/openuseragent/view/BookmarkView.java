@@ -2,7 +2,9 @@ package com.jianhui_zhu.openuseragent.view;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,8 +12,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
@@ -21,6 +21,7 @@ import com.jianhui_zhu.openuseragent.util.AbstractFragment;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.LocalDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.util.RemoteDatabaseSingleton;
+import com.jianhui_zhu.openuseragent.util.activity.MainActivity;
 import com.jianhui_zhu.openuseragent.view.adapter.BookmarkAdapter;
 import com.jianhui_zhu.openuseragent.view.dialogs.NewBookmarkDialog;
 import com.jianhui_zhu.openuseragent.view.interfaces.BookmarkViewInterface;
@@ -37,6 +38,7 @@ import rx.Observable;
  * Created by Jianhui Zhu on 2016-02-06.
  */
 public class BookmarkView extends AbstractFragment implements BookmarkViewInterface{
+    CoordinatorLayout container;
     @Bind(R.id.list)
     RecyclerView bookmarkList;
     @OnClick({R.id.general_tool_bar_go_back,R.id.add_bookmark_manual_btn})
@@ -65,7 +67,7 @@ public class BookmarkView extends AbstractFragment implements BookmarkViewInterf
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        container = ((MainActivity)getActivity()).getContainer();
         bookmarkList.setLayoutManager(new LinearLayoutManager(getActivity()));
         bookmarkList.setItemAnimator(new DefaultItemAnimator());
         bookmarkList.setHasFixedSize(true);
@@ -85,7 +87,7 @@ public class BookmarkView extends AbstractFragment implements BookmarkViewInterf
 
     @Override
     public void showTag(String str) {
-        Toast.makeText(getActivity(),str,Toast.LENGTH_LONG).show();
+        Snackbar.make(container,str,Snackbar.LENGTH_SHORT).show();
     }
 
     @Override

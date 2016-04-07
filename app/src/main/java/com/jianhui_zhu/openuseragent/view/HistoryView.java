@@ -3,6 +3,8 @@ package com.jianhui_zhu.openuseragent.view;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.History;
@@ -19,12 +20,12 @@ import com.jianhui_zhu.openuseragent.presenter.HistoryPresenter;
 import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
 import com.jianhui_zhu.openuseragent.util.AbstractFragment;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
+import com.jianhui_zhu.openuseragent.util.activity.MainActivity;
 import com.jianhui_zhu.openuseragent.view.adapter.HistoryAdapter;
 import com.jianhui_zhu.openuseragent.view.interfaces.HistoryViewInterface;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import butterknife.Bind;
@@ -36,6 +37,7 @@ import rx.functions.Action1;
  * Created by jianhuizhu on 2016-02-16.
  */
 public class HistoryView extends AbstractFragment implements DatePickerDialog.OnDateSetListener,HistoryViewInterface{
+    CoordinatorLayout container;
     HistoryView historyView;
     @Bind(R.id.general_tool_bar_title)
     TextView toolbarTitle;
@@ -66,7 +68,7 @@ public class HistoryView extends AbstractFragment implements DatePickerDialog.On
                         @Override
                         public void call(String s) {
                             adapter.deleteSelected();
-                            Toast.makeText(getActivity(),s,Toast.LENGTH_SHORT).show();
+                            Snackbar.make(container,s,Snackbar.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -96,6 +98,7 @@ public class HistoryView extends AbstractFragment implements DatePickerDialog.On
         list.setLayoutManager(new LinearLayoutManager(getActivity()));
         list.setItemAnimator(new DefaultItemAnimator());
         list.setHasFixedSize(true);
+        container =((MainActivity)getActivity()).getContainer();
         presenter.getAllHistory().subscribe(new Action1<List<History>>() {
             @Override
             public void call(List<History> histories) {

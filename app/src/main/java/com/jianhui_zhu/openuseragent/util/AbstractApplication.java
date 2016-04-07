@@ -3,7 +3,6 @@ package com.jianhui_zhu.openuseragent.util;
 import android.app.Application;
 import android.os.Build;
 import android.os.StrictMode;
-import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.ndk.CrashlyticsNdk;
@@ -38,17 +37,4 @@ public class AbstractApplication extends Application {
 
 
 	}
-//	private boolean checkPlayServices() {
-//		int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-//		if (status != ConnectionResult.SUCCESS) {
-//			if (GooglePlayServicesUtil.isUserRecoverableError(status)) {
-//				showErrorDialog(status);
-//			} else {
-//				Toast.makeText(this, "This device is not supported.",
-//						Toast.LENGTH_LONG).show();
-//			}
-//			return false;
-//		}
-//		return true;
-//	}
 }

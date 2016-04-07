@@ -2,7 +2,6 @@ package com.jianhui_zhu.openuseragent.model;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.widget.Toast;
 
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
 import com.jianhui_zhu.openuseragent.model.beans.History;

@@ -8,7 +8,9 @@ import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.percent.PercentRelativeLayout;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -34,7 +36,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.andexert.library.RippleView;
 import com.jianhui_zhu.openuseragent.R;
@@ -46,6 +47,7 @@ import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.RemoteDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.util.SettingSingleton;
 import com.jianhui_zhu.openuseragent.util.WebUtil;
+import com.jianhui_zhu.openuseragent.util.activity.MainActivity;
 import com.jianhui_zhu.openuseragent.view.adapter.NavigationHomeAdapter;
 import com.jianhui_zhu.openuseragent.view.adapter.SearchSuggestionAdapter;
 import com.jianhui_zhu.openuseragent.view.adapter.WebViewAdapter;
@@ -72,6 +74,7 @@ import rx.schedulers.Schedulers;
  * Created by Jianhui Zhu on 2016-01-27.
  */
 public class HomeView extends AbstractFragment implements HomeViewInterface,SwipeRefreshLayout.OnRefreshListener {
+    CoordinatorLayout container;
     @Bind(R.id.webview_holder)
     FrameLayout webviewContainer;
     User user;
@@ -123,7 +126,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                 break;
             case R.id.tab_area:
                 if(webViewAdapter.isEmpty()){
-                    Toast.makeText(getActivity(),"No tab exists.",Toast.LENGTH_SHORT).show();
+                    Snackbar.make(container,"No tab exists",Snackbar.LENGTH_SHORT).show();
                 }else {
                     FragmenUtil.switchToFragment(getActivity(), new TabStackDialog());
                 }
@@ -167,6 +170,8 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                             .into(avatar);
                     SettingSingleton.getInstance(getActivity())
                             .setLoginStatus(true);
+                    Snackbar.make(container,"login successful",Snackbar.LENGTH_SHORT).show();
+                    settingDrawer.closeDrawers();
                     homeName.setText(SettingSingleton.getInstance(getActivity()).getName());
                 }
             }
@@ -273,7 +278,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        this.container=((MainActivity)getActivity()).getContainer();
 
 
     }
@@ -289,7 +294,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
         }else{
             webHolder = initWebView();
         }
-        if (url != null && !url.equals("")) {
+        if (url != null && !url.equals("")&&URLUtil.isValidUrl(url)) {
             this.webHolder.loadUrl(url);
         } else {
             this.webHolder.loadUrl(SettingSingleton.getInstance(getActivity()).getHomePage());
@@ -300,7 +305,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
 
     @Override
     public void showTag(String info) {
-        Toast.makeText(getActivity(), info, Toast.LENGTH_SHORT).show();
+        Snackbar.make(container,info,Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
@@ -508,7 +513,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     private CustomWebView initWebView(){
         CustomWebView web = new CustomWebView(getActivity());
         WebViewClient client = new CustomWebViewClient();
-
+        web.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         WebChromeClient chromeClient = new CustomWebChrome();
         web.setWebViewClient(client);
         web.setSaveEnabled(true);
@@ -541,7 +546,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     @Override
     public void onResume() {
         super.onResume();
-        if(webHolder==null) {
+        if(webHolder==null||webViewAdapter.isEmpty()) {
 //            webHolder = initWebView();
 //            webHolder.setDrawingCacheEnabled(true);
 //            boolean hasUrl = getArguments().getBoolean("hasUrl");
