@@ -4,9 +4,12 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.StackView;
 
 import com.jianhui_zhu.openuseragent.R;
@@ -24,7 +27,7 @@ import butterknife.ButterKnife;
 public class TabStackDialog extends AbstractDialogFragment {
     HomePresenter homePresenter;
     @Bind(R.id.tab_pager)
-    StackView stackView;
+    ListView stackView;
     WebViewAdapter adapter;
     @Nullable
     @Override

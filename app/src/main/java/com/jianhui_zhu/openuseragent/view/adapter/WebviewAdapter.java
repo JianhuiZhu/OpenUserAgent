@@ -25,6 +25,10 @@ import com.squareup.picasso.Picasso;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 /**
  * Created by jianhuizhu on 2016-03-23.
  */
@@ -88,64 +92,22 @@ public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-
-        final WebViewInfoHolder holder = webViews.get(position);
+        ViewHolder holder;
+        final WebViewInfoHolder webviewHolder = webViews.get(position);
         String title = webViews.get(position).getTitle();
         if(convertView==null){
             LayoutInflater vi = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView=vi.inflate(R.layout.item_webview, null);
+            holder = new ViewHolder(convertView);
+            convertView.setTag(holder);
+        }else{
+            holder=(ViewHolder)convertView.getTag();
         }
-        ImageView closeIcon = (ImageView)convertView.findViewById(R.id.close_btn);
-        TextView titleView = (TextView)convertView.findViewById(R.id.title);
-        final ImageView snapshotView = (ImageView)convertView.findViewById(R.id.snapshot);
-
-        titleView.setText(title);
-                    //Picture picture = holder.getWebView().capturePicture();
-                    Bitmap bitmap = holder.getWebView().getDrawingCache();
-                    //Canvas canvas = new Canvas(bitmap);
-                    //picture.draw(canvas);
-                    holder.setBitmap(bitmap);
-
-
-                    snapshotView.setImageBitmap(holder.getBitmap());
-                    notifyDataSetChanged();
-
-
-        closeIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                webViews.remove(position);
-                if(webViews.isEmpty()){
-                    if(homePresenter!=null&&tabStackDialog!=null){
-                        homePresenter.clearWebHolder();
-                        tabStackDialog.dismiss();
-                    }
-                }
-                notifyDataSetChanged();
-            }
-        });
-        titleView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(homePresenter!=null&&tabStackDialog!=null){
-                    homePresenter.changeWebView(holder.getWebView());
-                    tabStackDialog.dismiss();
-                }else{
-                    FragmenUtil.switchToFragment(context,HomeView.newInstanceWithUrl(holder.getWebView().getUrl()));
-                }
-            }
-        });
-        snapshotView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(homePresenter!=null&&tabStackDialog!=null){
-                    homePresenter.changeWebView(holder.getWebView());
-                    tabStackDialog.dismiss();
-                }else{
-                    FragmenUtil.switchToFragment(context,HomeView.newInstanceWithUrl(holder.getWebView().getUrl()));
-                }
-            }
-        });
+        holder.position = position;
+        holder.title.setText(title);
+        Bitmap bitmap = webviewHolder.getWebView().getDrawingCache();
+        holder.snapshot.setImageBitmap(bitmap);
+        notifyDataSetChanged();
         return convertView;
     }
 
@@ -155,5 +117,35 @@ public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
                 return true;
         }
         return false;
+    }
+    class ViewHolder{
+        int position;
+        @Bind(R.id.title)
+        TextView title;
+        @Bind(R.id.snapshot)
+        ImageView snapshot;
+        @OnClick({R.id.close_btn,R.id.title,R.id.snapshot})
+        public void click(View view){
+            if(view.getId()==R.id.close_btn){
+                webViews.remove(position);
+                if(webViews.isEmpty()){
+                    if(homePresenter!=null&&tabStackDialog!=null){
+                        homePresenter.clearWebHolder();
+                        tabStackDialog.dismiss();
+                    }
+                }
+                notifyDataSetChanged();
+            }else{
+                if(homePresenter!=null&&tabStackDialog!=null){
+                    homePresenter.changeWebView(webViews.get(position).getWebView());
+                    tabStackDialog.dismiss();
+                }else{
+                    FragmenUtil.switchToFragment(context,HomeView.newInstanceWithUrl(webViews.get(position).getWebView().getUrl()));
+                }
+            }
+        }
+        public ViewHolder(View view){
+            ButterKnife.bind(this,view);
+        }
     }
 }
