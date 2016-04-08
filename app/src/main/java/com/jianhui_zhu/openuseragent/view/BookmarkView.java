@@ -104,4 +104,10 @@ public class BookmarkView extends AbstractFragment implements BookmarkViewInterf
     public void deleteBookmark(Bookmark bookmark) {
         bookmarkAdapter.deletedBookmark(bookmark);
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
+    }
 }

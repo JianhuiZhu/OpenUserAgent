@@ -115,4 +115,10 @@ public class SettingView extends AbstractFragment {
             profileArea.setVisibility(View.GONE);
         }
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
+    }
 }

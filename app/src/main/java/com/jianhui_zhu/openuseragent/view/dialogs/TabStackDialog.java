@@ -57,6 +57,7 @@ public class TabStackDialog extends AbstractDialogFragment {
         super.onDestroyView();
         try {
             HomePresenter.getInstance().changeNumTabsIcon(adapter.getCount());
+            ButterKnife.unbind(this);
         } catch (Exception e) {
             e.printStackTrace();
         }

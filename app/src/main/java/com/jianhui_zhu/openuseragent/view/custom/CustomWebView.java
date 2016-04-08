@@ -2,6 +2,7 @@ package com.jianhui_zhu.openuseragent.view.custom;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
 import android.webkit.DownloadListener;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -13,7 +14,14 @@ import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
  */
 public class CustomWebView extends WebView {
     private void initSettings(){
-
+        this.setDrawingCacheEnabled(true);
+        WebSettings settings=this.getSettings();
+        settings.setDefaultTextEncodingName("UTF-8");
+        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        settings.setAppCacheEnabled(true);
+        settings.setJavaScriptEnabled(true);
+        setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        setSaveEnabled(true);
     }
 
     public void setHomeViewInterface(HomeViewInterface homeViewInterface) {
@@ -24,10 +32,8 @@ public class CustomWebView extends WebView {
 
     public CustomWebView(Context context){
         super(context);
-        WebSettings settings=this.getSettings();
-        settings.setDefaultTextEncodingName("UTF-8");
-        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
-        settings.setJavaScriptEnabled(true);
+        initSettings();
+
     }
     public CustomWebView(Context context, AttributeSet attrs) {
         super(context, attrs);

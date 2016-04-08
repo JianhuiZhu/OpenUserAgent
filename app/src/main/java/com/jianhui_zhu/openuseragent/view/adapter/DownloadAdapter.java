@@ -29,9 +29,6 @@ import butterknife.OnClick;
 public class DownloadAdapter  extends RecyclerView.Adapter<DownloadAdapter.ViewHolder>{
     Context context;
     private int lastPosition = -1;
-    public List<DownloadedFile> getDownloadedFiles() {
-        return downloadedFiles;
-    }
 
     public void setDownloadedFiles(List<DownloadedFile> downloadedFiles) {
         this.downloadedFiles = downloadedFiles;

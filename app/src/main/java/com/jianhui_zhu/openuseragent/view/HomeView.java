@@ -80,10 +80,6 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     User user;
     CircleImageView avatar;
     TextView homeName;
-    private boolean drawerIsOpen = false;
-    @Bind(R.id.tool_bar_area)
-    PercentRelativeLayout toolBarArea;
-    boolean isHomePage=true;
     NavigationHomeAdapter gridBookmarkAdapter;
     CustomWebView webHolder;
     @Bind(R.id.setting_drawer)
@@ -119,7 +115,6 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                 username.setText(user.getUsername());
             }
             settingDrawer.openDrawer(Gravity.RIGHT);
-            drawerIsOpen = true;
                 break;
             case R.id.refresh_area:
                 onRefresh();
@@ -287,13 +282,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     @Override
     public void loadTargetUrl(String url) {
         swipeRefreshLayout.setRefreshing(true);
-        if(webHolder == null){
-            webHolder = initWebView();
-            //webViewAdapter.addWebView(webHolder);
-            //presenter.changeNumTabsIcon(webViewAdapter.getCount());
-        }else{
-            webHolder = initWebView();
-        }
+        webHolder = initWebView();
         if (url != null && !url.equals("")&&URLUtil.isValidUrl(url)) {
             this.webHolder.loadUrl(url);
         } else {
@@ -475,17 +464,11 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
         return homeView;
     }
 
-    private void swapWebView(){
-            CustomWebView web = initWebView();
-            if(webHolder!=null&&webHolder.getHeight()>0&&webHolder.getWidth()>0){
-                webViewAdapter.addWebView(webHolder);
-            }
-            webHolder=web;
-    }
-
     private LinearLayout initPanelView(){
         LinearLayout layout = new LinearLayout(getActivity());
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams params =
+                new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT
+                        , ViewGroup.LayoutParams.WRAP_CONTENT);
         layout.setOrientation(LinearLayout.VERTICAL);
         params.setMargins(0,8,0,0);
         layout.setLayoutParams(params);
@@ -493,30 +476,27 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
         title.setText("Visit Often visited website");
         title.setGravity(Gravity.CENTER);
         layout.addView(title);
-        final RecyclerView gridBookmark = new RecyclerView(getActivity());
-        gridBookmark.setLayoutManager(new LinearLayoutManager(getActivity()));
-        gridBookmark.setItemAnimator(new DefaultItemAnimator());
-        gridBookmark.setHasFixedSize(true);
+        final RecyclerView bookmarkRecycler = new RecyclerView(getActivity());
+        bookmarkRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
+        bookmarkRecycler.setItemAnimator(new DefaultItemAnimator());
+        bookmarkRecycler.setHasFixedSize(true);
         gridBookmarkAdapter = new NavigationHomeAdapter(presenter);
         presenter.getNavigationBookmark().subscribe(new Action1<List<Bookmark>>() {
             @Override
             public void call(List<Bookmark> bookmarks) {
                 gridBookmarkAdapter.setBookmarks(bookmarks);
-                gridBookmark.setAdapter(gridBookmarkAdapter);
+                bookmarkRecycler.setAdapter(gridBookmarkAdapter);
             }
         });
-        layout.addView(gridBookmark);
-        //return gridBookmark;
+        layout.addView(bookmarkRecycler);
         return layout;
     }
 
     private CustomWebView initWebView(){
         CustomWebView web = new CustomWebView(getActivity());
         WebViewClient client = new CustomWebViewClient();
-        web.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         WebChromeClient chromeClient = new CustomWebChrome();
         web.setWebViewClient(client);
-        web.setSaveEnabled(true);
         web.setWebChromeClient(chromeClient);
         web.setDownloadListener(new DownloadListener() {
             @Override
@@ -531,8 +511,6 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
         para.setMargins(0, 0, 0, 0);
         web.setLayoutParams(para);
         web.setHomeViewInterface(this);
-//        webviewContainer.removeAllViewsInLayout();
-//        webviewContainer.addView(web, 0);
         backwardIcon.setColorFilter(R.color.cardview_shadow_end_color,PorterDuff.Mode.MULTIPLY);
         forwardIcon.setColorFilter(R.color.cardview_shadow_end_color,PorterDuff.Mode.MULTIPLY);
         return web;
@@ -547,15 +525,6 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     public void onResume() {
         super.onResume();
         if(webHolder==null||webViewAdapter.isEmpty()) {
-//            webHolder = initWebView();
-//            webHolder.setDrawingCacheEnabled(true);
-//            boolean hasUrl = getArguments().getBoolean("hasUrl");
-//            if (hasUrl) {
-//                loadTargetUrl(getArguments().getString("url"));
-//            } else {
-//                loadTargetUrl("");
-//            }
-
             webviewContainer.removeAllViews();
             webviewContainer.addView(initPanelView());
             configViews();
@@ -565,6 +534,6 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        //webHolder.destroy();
+        ButterKnife.unbind(this);
     }
 }

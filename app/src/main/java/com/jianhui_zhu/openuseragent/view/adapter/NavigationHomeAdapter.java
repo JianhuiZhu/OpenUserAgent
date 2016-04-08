@@ -32,16 +32,12 @@ public class NavigationHomeAdapter extends RecyclerView.Adapter<NavigationHomeAd
     Context context;
     private List<Bookmark> bookmarks = new ArrayList<>();
 
-    public List<Bookmark> getBookmarks() {
-        return bookmarks;
-    }
 
     public void setBookmarks(List<Bookmark> bookmarks) {
         this.bookmarks = bookmarks;
     }
 
     public NavigationHomeAdapter(HomePresenter presenter){
-        //super();
         this.presenter = presenter;
     }
     @Override

@@ -132,4 +132,10 @@ public class HistoryView extends AbstractFragment implements DatePickerDialog.On
             delete.setColorFilter(R.color.mdtp_light_gray, PorterDuff.Mode.MULTIPLY);
         }
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
+    }
 }

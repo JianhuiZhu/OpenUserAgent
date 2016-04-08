@@ -63,4 +63,10 @@ public class DownloadView extends AbstractFragment{
         adapter.setDownloadedFiles(files);
         downloadList.setAdapter(adapter);
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
+    }
 }

@@ -4,11 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Picture;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,24 +18,12 @@ import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.WebUtil;
 import com.jianhui_zhu.openuseragent.view.HomeView;
-import com.jianhui_zhu.openuseragent.view.TabView;
 import com.jianhui_zhu.openuseragent.view.custom.CustomWebView;
 import com.jianhui_zhu.openuseragent.view.dialogs.TabStackDialog;
+import com.squareup.picasso.Picasso;
 
 import java.net.URISyntaxException;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.Stack;
-import java.util.Vector;
-
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 /**
  * Created by jianhuizhu on 2016-03-23.
@@ -74,14 +57,7 @@ public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
         this.tabStackDialog = tabStackDialog;
         return this;
     }
-    private WebViewInfoHolder getWebViewInfoHolderByWebView(final CustomWebView webView){
-        for(WebViewInfoHolder holder : webViews){
-            if(holder.getWebView()==webView)
-                return holder;
 
-        }
-        return null;
-    }
     public void addWebView(final CustomWebView webView){
         if(isWebViewExists(webView)==false) {
             WebViewInfoHolder holder = new WebViewInfoHolder();
@@ -109,21 +85,12 @@ public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
         return webViews == null ? 0 : webViews.size();
     }
 
-    private void swapWebViews(int position){
-        WebViewInfoHolder temp = webViews.get(position);
-        webViews.remove(position);
-        webViews.add(temp);
-//        clear();
-//        addAll(webViews);
-        notifyDataSetChanged();
-    }
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
 
         final WebViewInfoHolder holder = webViews.get(position);
         String title = webViews.get(position).getTitle();
-        Bitmap snapshot = holder.getBitmap();
         if(convertView==null){
             LayoutInflater vi = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView=vi.inflate(R.layout.item_webview, null);
@@ -133,19 +100,17 @@ public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
         final ImageView snapshotView = (ImageView)convertView.findViewById(R.id.snapshot);
 
         titleView.setText(title);
-        if(holder.getBitmap()==null) {
-                    Picture picture = holder.getWebView().capturePicture();
-                    Bitmap bitmap = Bitmap.createBitmap(picture.getWidth(),
-                            picture.getHeight(), Bitmap.Config.ARGB_8888);
-                    Canvas canvas = new Canvas(bitmap);
-                    picture.draw(canvas);
+                    //Picture picture = holder.getWebView().capturePicture();
+                    Bitmap bitmap = holder.getWebView().getDrawingCache();
+                    //Canvas canvas = new Canvas(bitmap);
+                    //picture.draw(canvas);
                     holder.setBitmap(bitmap);
+
+
                     snapshotView.setImageBitmap(holder.getBitmap());
                     notifyDataSetChanged();
 
-        }else{
-            snapshotView.setImageBitmap(holder.getBitmap());
-        }
+
         closeIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

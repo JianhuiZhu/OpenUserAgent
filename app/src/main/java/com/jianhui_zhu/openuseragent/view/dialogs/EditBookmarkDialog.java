@@ -12,7 +12,6 @@ import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
 import com.jianhui_zhu.openuseragent.presenter.BookmarkPresenter;
 import com.jianhui_zhu.openuseragent.util.AbstractDialogFragment;
-import com.jianhui_zhu.openuseragent.view.interfaces.BookmarkAdapterInterface;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -69,5 +68,9 @@ public class EditBookmarkDialog extends AbstractDialogFragment {
         return fragment;
     }
 
-
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
+    }
 }

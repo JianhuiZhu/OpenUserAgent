@@ -4,8 +4,6 @@ import android.content.Context;
 
 import com.jianhui_zhu.openuseragent.model.BookmarkModel;
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
-import com.jianhui_zhu.openuseragent.view.BookmarkView;
-import com.jianhui_zhu.openuseragent.view.interfaces.BookmarkAdapterInterface;
 import com.jianhui_zhu.openuseragent.view.interfaces.BookmarkViewInterface;
 
 import java.util.List;

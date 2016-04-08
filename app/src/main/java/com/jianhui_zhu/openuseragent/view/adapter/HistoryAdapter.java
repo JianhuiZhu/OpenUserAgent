@@ -51,19 +51,11 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     public List<History> getSelected() {
         return selected;
     }
-
-    public void setSelected(List<History> selected) {
-        this.selected = selected;
-    }
     public void deleteSelected(){
         for(History history : selected){
             histories.remove(history);
         }
         selected.clear();
-        notifyDataSetChanged();
-    }
-    public void setHistories(List<History> histories) {
-        this.histories = histories;
         notifyDataSetChanged();
     }
     public void changeHistoriesDataSet(List<History> histories){
@@ -95,7 +87,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         History history=histories.get(position);
         try {
             String host = WebUtil.getDomainbyUrl(history.getUrl());
-            Date date=new Date(history.getTimestamp());
             holder.position=position;
             WebUtil.getInstance().getIconByName(host).subscribe(new Action1<Bitmap>() {
                 @Override
@@ -103,11 +94,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
                     holder.avatar.setImageBitmap(result);
                 }
             });
-            //int hour = date.getHours();
-            //String  min = date.getMinutes()<10 ? "0"+date.getMinutes() : String.valueOf(date.getMinutes());
-            //String time = hour+":"+min;
             holder.title.setText(history.getName());
-            //holder.time.setText(time);
             holder.url.setText(history.getUrl());
             setAnimation(holder.container,position);
         } catch (URISyntaxException e) {
@@ -145,8 +132,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
             }
         }
-//        @Bind(R.id.history_time)
-//        TextView time;
         @Bind(R.id.history_url)
         TextView url;
         public ViewHolder(View itemView) {

@@ -22,7 +22,6 @@ import com.jianhui_zhu.openuseragent.util.WebUtil;
 import com.jianhui_zhu.openuseragent.view.BookmarkView;
 import com.jianhui_zhu.openuseragent.view.HomeView;
 import com.jianhui_zhu.openuseragent.view.dialogs.EditBookmarkDialog;
-import com.jianhui_zhu.openuseragent.view.interfaces.BookmarkAdapterInterface;
 
 import java.net.URISyntaxException;
 import java.util.List;
@@ -38,7 +37,6 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
     List<Bookmark> bookmarks;
     Context context;
     private BookmarkView bookmarkView;
-    private BookmarkAdapter adapterInterface;
     private BookmarkPresenter bookmarkPresenter;
     private int lastPosition = -1;
     private HomePresenter homePresenter;
@@ -51,7 +49,6 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
         this.bookmarkPresenter=bookmarkPresenter;
         this.homePresenter=homePresenter;
         this.bookmarkView=bookmarkView;
-        adapterInterface=this;
     }
 
     @Override
