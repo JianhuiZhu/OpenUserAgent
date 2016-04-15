@@ -408,25 +408,32 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
         private boolean isRedirect =false;
         private String host;
         @Override
-        public void onLoadResource(WebView view, String url) {
-            String host="";
-            String resourceHost="";
+        public void onLoadResource(WebView view, final String url) {
+            final String viewUrl = view.getUrl();
+            Observable.create(new Observable.OnSubscribe<Object>() {
+                @Override
+                public void call(Subscriber<? super Object> subscriber) {
+                    String host="";
+                    String resourceHost="";
 
-            host = Uri.parse(view.getUrl()).getHost();
-            resourceHost = Uri.parse(url).getHost();
-            host =InternetDomainName.from(host).topPrivateDomain().toString();
-            resourceHost =InternetDomainName.from(resourceHost).topPrivateDomain().toString();
-            total++;
-            if(!host.equals(resourceHost)){
-                if(recordForThirdParty!=null){
-                    try {
-                        recordForThirdParty.append(resourceHost+"\n");
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    host = Uri.parse(viewUrl).getHost();
+                    resourceHost = Uri.parse(url).getHost();
+                    host =InternetDomainName.from(host).topPrivateDomain().toString();
+                    resourceHost =InternetDomainName.from(resourceHost).topPrivateDomain().toString();
+                    total++;
+                    if(!host.equals(resourceHost)){
+                        if(recordForThirdParty!=null){
+                            try {
+                                recordForThirdParty.append(resourceHost+"\n");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        count++;
                     }
                 }
-                count++;
-            }
+            }).subscribeOn(Schedulers.io()).subscribe();
+
         }
 
         @Override
@@ -463,26 +470,33 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
 //        }
 
         @Override
-        public void onPageStarted(WebView view, String url, Bitmap favicon) {
-            try {
-                File path = Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_DOWNLOADS);
-                if(!path.exists()){
-                    if(!path.mkdir()){
-                        Log.e(this.getClass().getSimpleName(),"cannot create directory");
-                    }
-                }
-                File file = new File(path,"record.txt");
+        public void onPageStarted(final WebView view, String url, Bitmap favicon) {
+            final String viewUrl=view.getUrl();
+            Observable.create(new Observable.OnSubscribe<Object>() {
+                @Override
+                public void call(Subscriber<? super Object> subscriber) {
+                    try {
+                        File path = Environment.getExternalStoragePublicDirectory(
+                                Environment.DIRECTORY_DOWNLOADS);
+                        if(!path.exists()){
+                            if(!path.mkdir()){
+                                Log.e(this.getClass().getSimpleName(),"cannot create directory");
+                            }
+                        }
+                        File file = new File(path,"record.txt");
 
                         recordForThirdParty =
                                 new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
-                        recordForThirdParty.append("\nThe target url to be visited").append(view.getUrl()).append("\n").append("third party web are:\n");
+                        recordForThirdParty.append("\nThe target url to be visited").append(viewUrl).append("\n").append("third party web are:\n");
 
 
 
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).subscribeOn(Schedulers.io()).subscribe();
+
             swipeRefreshLayout.setRefreshing(true);
             URI uri= null;
             try {
@@ -499,15 +513,21 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
         @Override
         public void onPageFinished(WebView view, String url) {
             if(isRedirect==false) {
-                if(recordForThirdParty!=null){
-                    try {
-                        recordForThirdParty.flush();
-                        recordForThirdParty.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                Observable.create(new Observable.OnSubscribe<Object>() {
+                    @Override
+                    public void call(Subscriber<? super Object> subscriber) {
+                        if(recordForThirdParty!=null){
+                            try {
+                                recordForThirdParty.flush();
+                                recordForThirdParty.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            recordForThirdParty=null;
+                        }
                     }
-                    recordForThirdParty=null;
-                }
+                }).subscribeOn(Schedulers.io()).subscribe();
+
                 System.out.println("total resource loaded"+total);
                 System.out.println("third party resource loaded"+count);
                 if (swipeRefreshLayout.isRefreshing()) {
