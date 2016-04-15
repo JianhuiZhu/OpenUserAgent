@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
@@ -28,6 +29,8 @@ import android.webkit.DownloadListener;
 import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
 import android.webkit.WebIconDatabase;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
@@ -36,9 +39,10 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
-
+import com.google.common.net.InternetDomainName;
 import com.andexert.library.RippleView;
 import com.jianhui_zhu.openuseragent.R;
+import com.jianhui_zhu.openuseragent.model.DownloadModel;
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
 import com.jianhui_zhu.openuseragent.model.beans.User;
 import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
@@ -57,7 +61,18 @@ import com.jianhui_zhu.openuseragent.view.dialogs.TabStackDialog;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 import com.squareup.picasso.Picasso;
 
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
@@ -74,6 +89,9 @@ import rx.schedulers.Schedulers;
  * Created by Jianhui Zhu on 2016-01-27.
  */
 public class HomeView extends AbstractFragment implements HomeViewInterface,SwipeRefreshLayout.OnRefreshListener {
+    int total;
+    int count;
+    BufferedWriter recordForThirdParty;
     CoordinatorLayout container;
     @Bind(R.id.webview_holder)
     FrameLayout webviewContainer;
@@ -167,7 +185,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                             .setLoginStatus(true);
                     Snackbar.make(container,"login successful",Snackbar.LENGTH_SHORT).show();
                     settingDrawer.closeDrawers();
-                    homeName.setText(SettingSingleton.getInstance(getActivity()).getName());
+                    //homeName.setText(SettingSingleton.getInstance(getActivity()).getName());
                 }
             }
         });
@@ -388,23 +406,110 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
 
     private class CustomWebViewClient extends WebViewClient {
         private boolean isRedirect =false;
+        private String host;
+        @Override
+        public void onLoadResource(WebView view, String url) {
+            String host="";
+            String resourceHost="";
+
+            host = Uri.parse(view.getUrl()).getHost();
+            resourceHost = Uri.parse(url).getHost();
+            host =InternetDomainName.from(host).topPrivateDomain().toString();
+            resourceHost =InternetDomainName.from(resourceHost).topPrivateDomain().toString();
+            total++;
+            if(!host.equals(resourceHost)){
+                if(recordForThirdParty!=null){
+                    try {
+                        recordForThirdParty.append(resourceHost+"\n");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                count++;
+            }
+        }
+
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             view.loadUrl(url);
+
             isRedirect = true;
             return true;
         }
 
+//        @Override
+//        public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+//            String host = Uri.parse(view.getUrl()).getHost();
+//            total++;
+//            if(host.equals(Uri.parse(url).getHost())) {
+//                return super.shouldInterceptRequest(view, url);
+//            }else{
+//                count++;
+//                return super.shouldInterceptRequest(view, url);
+//
+//            }
+//
+//        }
+
+
+//        @Override
+//        public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+//            String host = Uri.parse(view.getUrl()).getHost();
+//            total++;
+//            if(!host.equals(Uri.parse(request.toString()).getHost())) {
+//                count++;
+//            }
+//            return super.shouldInterceptRequest(view, request);
+//        }
+
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            try {
+                File path = Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_DOWNLOADS);
+                if(!path.exists()){
+                    if(!path.mkdir()){
+                        Log.e(this.getClass().getSimpleName(),"cannot create directory");
+                    }
+                }
+                File file = new File(path,"record.txt");
+
+                        recordForThirdParty =
+                                new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
+                        recordForThirdParty.append("\nThe target url to be visited").append(view.getUrl()).append("\n").append("third party web are:\n");
+
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             swipeRefreshLayout.setRefreshing(true);
+            URI uri= null;
+            try {
+                uri = new URI(view.getUrl());
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+            if (uri != null) {
+                this.host =uri.getHost();
+            }
             isRedirect = false;
         }
-
 
         @Override
         public void onPageFinished(WebView view, String url) {
             if(isRedirect==false) {
+                if(recordForThirdParty!=null){
+                    try {
+                        recordForThirdParty.flush();
+                        recordForThirdParty.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    recordForThirdParty=null;
+                }
+                System.out.println("total resource loaded"+total);
+                System.out.println("third party resource loaded"+count);
                 if (swipeRefreshLayout.isRefreshing()) {
                     swipeRefreshLayout.setRefreshing(false);
                 }
@@ -445,6 +550,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                 e.printStackTrace();
             }
         }
+
     }
 
     public static AbstractFragment newInstance() {

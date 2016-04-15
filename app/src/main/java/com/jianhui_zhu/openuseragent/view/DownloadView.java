@@ -1,7 +1,6 @@
 package com.jianhui_zhu.openuseragent.view;
 
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,10 +8,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.jianhui_zhu.openuseragent.R;
-import com.jianhui_zhu.openuseragent.model.beans.DownloadedFile;
+import com.jianhui_zhu.openuseragent.model.beans.FileDescriptor;
 import com.jianhui_zhu.openuseragent.util.AbstractFragment;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.view.adapter.DownloadAdapter;
@@ -45,12 +43,12 @@ public class DownloadView extends AbstractFragment{
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        List<DownloadedFile> files = new ArrayList<>();
-        DownloadedFile file1 = new DownloadedFile();
+        List<FileDescriptor> files = new ArrayList<>();
+        FileDescriptor file1 = new FileDescriptor();
         file1.setName("windows.jpg");
         file1.setPath("https://www.google.com/download/blablabla...");
         file1.setName("jpg");
-        DownloadedFile file2 = new DownloadedFile();
+        FileDescriptor file2 = new FileDescriptor();
         file2.setName("Concordia.jpg");
         file2.setPath("https://www.google.com/download/blablabla...");
         file2.setName("jpg");
@@ -60,7 +58,7 @@ public class DownloadView extends AbstractFragment{
         downloadList.setItemAnimator(new DefaultItemAnimator());
         downloadList.setHasFixedSize(true);
         DownloadAdapter adapter = new DownloadAdapter();
-        adapter.setDownloadedFiles(files);
+        adapter.setFileDescriptors(files);
         downloadList.setAdapter(adapter);
     }
 

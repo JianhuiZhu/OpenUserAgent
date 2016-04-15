@@ -29,10 +29,10 @@ public class AbstractApplication extends Application {
 		Firebase.getDefaultConfig().setLogLevel(Logger.Level.DEBUG);
 		Firebase.getDefaultConfig().enablePersistence();
 		SettingSingleton.getInstance(getApplicationContext());
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-			StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
-			StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build());
-		}
+//		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+//			StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
+//			StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build());
+//		}
 
 
 

@@ -13,8 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jianhui_zhu.openuseragent.R;
-import com.jianhui_zhu.openuseragent.model.beans.DownloadedFile;
-import com.jianhui_zhu.openuseragent.util.FragmenUtil;
+import com.jianhui_zhu.openuseragent.model.beans.FileDescriptor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,11 +29,11 @@ public class DownloadAdapter  extends RecyclerView.Adapter<DownloadAdapter.ViewH
     Context context;
     private int lastPosition = -1;
 
-    public void setDownloadedFiles(List<DownloadedFile> downloadedFiles) {
-        this.downloadedFiles = downloadedFiles;
+    public void setFileDescriptors(List<FileDescriptor> fileDescriptors) {
+        this.fileDescriptors = fileDescriptors;
     }
 
-    List<DownloadedFile> downloadedFiles = new ArrayList<>();
+    List<FileDescriptor> fileDescriptors = new ArrayList<>();
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         this.context = parent.getContext();
@@ -47,7 +46,7 @@ public class DownloadAdapter  extends RecyclerView.Adapter<DownloadAdapter.ViewH
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        DownloadedFile file = downloadedFiles.get(position);
+        FileDescriptor file = fileDescriptors.get(position);
         holder.position = position;
         holder.title.setText(file.getName());
         String filePath = file.getPath();
@@ -61,7 +60,7 @@ public class DownloadAdapter  extends RecyclerView.Adapter<DownloadAdapter.ViewH
 
     @Override
     public int getItemCount() {
-        return downloadedFiles==null ? 0 : downloadedFiles.size();
+        return fileDescriptors ==null ? 0 : fileDescriptors.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -80,7 +79,7 @@ public class DownloadAdapter  extends RecyclerView.Adapter<DownloadAdapter.ViewH
         public void click(ImageView view){
             switch (view.getId()){
                 case R.id.download_delete:
-                    downloadedFiles.remove(downloadedFiles.get(position));
+                    fileDescriptors.remove(fileDescriptors.get(position));
                     notifyDataSetChanged();
                     break;
                 case R.id.download_status_action:

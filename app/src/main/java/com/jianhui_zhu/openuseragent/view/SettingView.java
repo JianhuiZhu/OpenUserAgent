@@ -102,10 +102,6 @@ public class SettingView extends AbstractFragment {
                     .load(R.drawable.ic_avatar_konata)
                     .fit()
                     .into(avatar);
-            name.setText(singleton.getName());
-            email.setText(singleton.getEmail());
-            username.setText(singleton.getUsername());
-            password.setText(singleton.getPassword());
             profileArea.setVisibility(View.VISIBLE);
         }else{
             Picasso.with(getActivity())

@@ -26,12 +26,12 @@ import rx.schedulers.Schedulers;
 public class WebUtil {
     private String DEFAULT_IMAGE_SUFFIX=".png";
     private String DEFAULT_ICON_FOLDER="icons";
-    ContextWrapper cw;
+    //ContextWrapper cw;
     Context context;
     private static WebUtil instance;
     private WebUtil(Context context){
         this.context=context;
-        this.cw=new ContextWrapper(context);
+        //this.cw=new ContextWrapper(context);
     }
     private boolean isIconExist(String name){
 
@@ -104,10 +104,6 @@ public class WebUtil {
                 }
             }).subscribeOn(Schedulers.io()).subscribe();
         }
-    }
-    public File getIconByNameAsFile(final String name) {
-        String path=cw.getDir(DEFAULT_ICON_FOLDER, Context.MODE_PRIVATE).getPath()+ File.separator+name+DEFAULT_IMAGE_SUFFIX;
-        return new File(path);
     }
     public static String getDomainbyUrl(final String url) throws URISyntaxException {
 
