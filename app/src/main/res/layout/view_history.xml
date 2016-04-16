@@ -20,7 +20,7 @@
             android:layout_height="24dp" />
         <TextView
             android:id="@+id/general_tool_bar_title"
-            android:layout_toRightOf="@+id/backward_area"
+            android:layout_toRightOf="@+id/history_go_back"
             android:text="History"
             android:textSize="14sp"
             android:textColor="@android:color/white"

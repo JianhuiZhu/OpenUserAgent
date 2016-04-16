@@ -423,10 +423,18 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                     host = Uri.parse(viewUrl).getHost();
                     resourceHost = Uri.parse(url).getHost();
                     if (host != null) {
-                        host =InternetDomainName.from(host).topPrivateDomain().toString();
+                        try {
+                            host = InternetDomainName.from(host).topPrivateDomain().toString();
+                        }catch (Exception e){
+                            Log.d(this.getClass().getSimpleName(),e.getMessage());
+                        }
                     }
                     if(resourceHost!=null) {
-                        resourceHost = InternetDomainName.from(resourceHost).topPrivateDomain().toString();
+                        try {
+                            resourceHost = InternetDomainName.from(resourceHost).topPrivateDomain().toString();
+                        }catch (Exception e){
+                            Log.d(this.getClass().getSimpleName(),e.getMessage());
+                        }
                     }
                     total++;
                     if(host!=null&&resourceHost!=null&&!host.equals(resourceHost)){

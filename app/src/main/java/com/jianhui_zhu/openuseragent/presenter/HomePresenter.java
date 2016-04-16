@@ -21,15 +21,19 @@ import rx.functions.Action1;
 public class HomePresenter {
     private static HomePresenter instance;
     private HomeViewInterface homeView;
-
+    private static Context context;
     private HomeModel homeModel;
     public Observable<List<Bookmark>> getNavigationBookmark(){
+        if(homeModel==null) {
+            homeModel = new HomeModel(context);
+        }
         return homeModel.getNavigationBookmark();
     }
     public HomePresenter(HomeViewInterface homeView, Context context) {
         if(instance==null) {
             this.homeView = homeView;
             this.homeModel = new HomeModel(context);
+            HomePresenter.context = context;
             instance = this;
         }
     }
