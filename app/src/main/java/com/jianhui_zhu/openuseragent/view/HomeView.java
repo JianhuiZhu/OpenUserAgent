@@ -12,7 +12,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
-import android.support.percent.PercentRelativeLayout;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -27,9 +26,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.DownloadListener;
 import android.webkit.URLUtil;
-import android.webkit.WebChromeClient;
 import android.webkit.WebIconDatabase;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -40,7 +37,6 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import com.google.common.net.InternetDomainName;
-import com.andexert.library.RippleView;
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.DownloadModel;
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
@@ -62,18 +58,13 @@ import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 import com.squareup.picasso.Picasso;
 
 import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.Bind;
@@ -91,6 +82,8 @@ import rx.schedulers.Schedulers;
 public class HomeView extends AbstractFragment implements HomeViewInterface,SwipeRefreshLayout.OnRefreshListener {
     int total;
     int count;
+    String curHost;
+    HashMap<String,Integer> thirdPartyCounter;
     BufferedWriter recordForThirdParty;
     CoordinatorLayout container;
     @Bind(R.id.webview_holder)
@@ -118,11 +111,11 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     ImageView tabIcon;
     SearchSuggestionAdapter suggestionAdapter;
     WebViewAdapter webViewAdapter;
-    @OnClick({R.id.menu_area,R.id.refresh_area,R.id.tab_area,R.id.add_bookmark_area,R.id.backward_area,R.id.forward_area})
-    public void click(RippleView view) {
+    @OnClick({R.id.home_menu_icon,R.id.refresh_area,R.id.tab_area,R.id.add_bookmark_area,R.id.backward_area,R.id.forward_area})
+    public void click(View view) {
 
         switch (view.getId()) {
-            case R.id.menu_area:
+            case R.id.home_menu_icon:
             if (RemoteDatabaseSingleton.getInstance().isUserLoggedIn()) {
                 this.user = RemoteDatabaseSingleton.getInstance().getUser();
             }
@@ -284,7 +277,6 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.view_home, container, false);
         ButterKnife.bind(this, view);
-
         return view;
     }
 
@@ -292,8 +284,6 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         this.container=((MainActivity)getActivity()).getContainer();
-
-
     }
 
 
@@ -405,26 +395,45 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
 
 
     private class CustomWebViewClient extends WebViewClient {
+        private boolean blockAllThirdParty;
+        private boolean blockBlackList;
         private boolean isRedirect =false;
         private String host;
+        public void blockAllThirdParty(){
+            blockAllThirdParty = true;
+            blockBlackList = false;
+        }
+        public void blockBlackList(){
+            blockAllThirdParty = false;
+            blockBlackList = true;
+        }
+        public void allowAllThirdParty(){
+            blockAllThirdParty = false;
+            blockBlackList = false;
+        }
         @Override
         public void onLoadResource(WebView view, final String url) {
             final String viewUrl = view.getUrl();
             Observable.create(new Observable.OnSubscribe<Object>() {
                 @Override
                 public void call(Subscriber<? super Object> subscriber) {
-                    String host="";
-                    String resourceHost="";
+                    String host;
+                    String resourceHost;
 
                     host = Uri.parse(viewUrl).getHost();
                     resourceHost = Uri.parse(url).getHost();
-                    host =InternetDomainName.from(host).topPrivateDomain().toString();
-                    resourceHost =InternetDomainName.from(resourceHost).topPrivateDomain().toString();
+                    if (host != null) {
+                        host =InternetDomainName.from(host).topPrivateDomain().toString();
+                    }
+                    if(resourceHost!=null) {
+                        resourceHost = InternetDomainName.from(resourceHost).topPrivateDomain().toString();
+                    }
                     total++;
-                    if(!host.equals(resourceHost)){
+                    if(host!=null&&resourceHost!=null&&!host.equals(resourceHost)){
                         if(recordForThirdParty!=null){
                             try {
-                                recordForThirdParty.append(resourceHost+"\n");
+                                recordForThirdParty.append
+                                        (resourceHost+"\n");
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -439,39 +448,25 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             view.loadUrl(url);
-
             isRedirect = true;
             return true;
         }
 
-//        @Override
-//        public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-//            String host = Uri.parse(view.getUrl()).getHost();
-//            total++;
-//            if(host.equals(Uri.parse(url).getHost())) {
-//                return super.shouldInterceptRequest(view, url);
-//            }else{
-//                count++;
-//                return super.shouldInterceptRequest(view, url);
-//
-//            }
-//
-//        }
-
-
-//        @Override
-//        public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-//            String host = Uri.parse(view.getUrl()).getHost();
-//            total++;
-//            if(!host.equals(Uri.parse(request.toString()).getHost())) {
-//                count++;
-//            }
-//            return super.shouldInterceptRequest(view, request);
-//        }
+        @Override
+        public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+            if(blockAllThirdParty) {
+                String resourceHost = InternetDomainName.from(Uri.parse(url).getHost()).topPrivateDomain().toString();
+                if (!resourceHost.equals(curHost)) {
+                    return new WebResourceResponse("text/css", "UTF-8", null);
+                }
+            }
+            return super.shouldInterceptRequest(view, url);
+        }
 
         @Override
         public void onPageStarted(final WebView view, String url, Bitmap favicon) {
             final String viewUrl=view.getUrl();
+            curHost = InternetDomainName.from(Uri.parse(viewUrl).getHost()).topPrivateDomain().toString();
             Observable.create(new Observable.OnSubscribe<Object>() {
                 @Override
                 public void call(Subscriber<? super Object> subscriber) {
@@ -484,11 +479,10 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                             }
                         }
                         File file = new File(path,"record.txt");
-
                         recordForThirdParty =
-                                new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
+                                new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file,true)));
                         recordForThirdParty.append("\nThe target url to be visited").append(viewUrl).append("\n").append("third party web are:\n");
-
+                        thirdPartyCounter = new HashMap<>();
 
 
                     } catch (Exception e) {
@@ -556,22 +550,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
 
     }
 
-    private class CustomWebChrome extends WebChromeClient {
 
-        @Override
-        public void onReceivedIcon(WebView view, Bitmap icon) {
-            super.onReceivedIcon(view, icon);
-            try {
-                URL uri=new URL(view.getUrl()) ;
-                String host=uri.getHost();
-                WebUtil webUtil = WebUtil.getInstance();
-                webUtil.setIcon(icon,host);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
 
     public static AbstractFragment newInstance() {
         HomeView homeView = new HomeView();
@@ -621,9 +600,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     private CustomWebView initWebView(){
         CustomWebView web = new CustomWebView(getActivity());
         WebViewClient client = new CustomWebViewClient();
-        WebChromeClient chromeClient = new CustomWebChrome();
         web.setWebViewClient(client);
-        web.setWebChromeClient(chromeClient);
         web.setDownloadListener(new DownloadListener() {
             @Override
             public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {

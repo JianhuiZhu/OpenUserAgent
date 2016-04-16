@@ -9,13 +9,6 @@ public class SettingSingleton {
     boolean allowAutomaticDownload;
 
 
-    public boolean isLoginStatus() {
-        return loginStatus;
-    }
-
-    public void setLoginStatus(boolean loginStatus) {
-        this.loginStatus = loginStatus;
-    }
 
     private  boolean loginStatus = false;
 
@@ -42,13 +35,19 @@ public class SettingSingleton {
 
     private String homePage;
     private String searchEngine;
-    public static SettingSingleton getInstance(Context context){
+    public synchronized static SettingSingleton getInstance(Context context){
         if(instance==null){
             return new SettingSingleton(context);
         }
         return instance;
     }
+    public boolean isLoginStatus() {
+        return loginStatus;
+    }
 
+    public void setLoginStatus(boolean loginStatus) {
+        this.loginStatus = loginStatus;
+    }
     private SettingSingleton(Context context) {
         this.context=context;
         instance =this;

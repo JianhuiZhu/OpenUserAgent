@@ -1,13 +1,19 @@
 package com.jianhui_zhu.openuseragent.view.custom;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.AttributeSet;
 import android.view.View;
 import android.webkit.DownloadListener;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
+import com.jianhui_zhu.openuseragent.util.WebUtil;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Created by jianhuizhu on 2016-03-09.
@@ -22,6 +28,7 @@ public class CustomWebView extends WebView {
         settings.setJavaScriptEnabled(true);
         setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         setSaveEnabled(true);
+        setWebChromeClient(new CustomWebChrome());
     }
 
     public void setHomeViewInterface(HomeViewInterface homeViewInterface) {
@@ -66,6 +73,20 @@ public class CustomWebView extends WebView {
             }
         }
     }
+    private class CustomWebChrome extends WebChromeClient {
 
+        @Override
+        public void onReceivedIcon(WebView view, Bitmap icon) {
+            super.onReceivedIcon(view, icon);
+            try {
+                URL uri=new URL(view.getUrl()) ;
+                String host=uri.getHost();
+                WebUtil webUtil = WebUtil.getInstance();
+                webUtil.setIcon(icon,host);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 }

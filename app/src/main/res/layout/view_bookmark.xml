@@ -10,12 +10,6 @@
         android:layout_width="match_parent"
         android:background="@color/mdtp_accent_color"
         android:layout_height="48dp">
-        <com.andexert.library.RippleView
-            android:id="@+id/backward_area"
-            app:rv_rippleDuration="150"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            rv_centered="true">
         <ImageView
             android:layout_centerInParent="true"
             android:id="@+id/general_tool_bar_go_back"
@@ -25,7 +19,6 @@
             android:layout_width="24dp"
             android:src="@drawable/ic_back"
             android:layout_height="24dp" />
-        </com.andexert.library.RippleView>
         <TextView
             android:id="@+id/general_tool_bar_title"
             android:layout_toRightOf="@+id/backward_area"
