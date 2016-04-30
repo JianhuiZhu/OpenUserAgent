@@ -5,26 +5,16 @@ import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
-import android.widget.CursorAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-
-import com.jianhui_zhu.openuseragent.R;
-import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
-
-import java.util.List;
 
 /**
  * Created by jianhuizhu on 2016-03-07.
  */
 public class SearchSuggestionAdapter extends SimpleCursorAdapter {
-    HomePresenter homePresenter;
 
-    public SearchSuggestionAdapter(Context context,HomePresenter homePresenter) {
+    public SearchSuggestionAdapter(Context context) {
         super(context, android.R.layout.simple_list_item_1, null, new String[]{"query"},new int[]{android.R.id.text1} , 0);
-        this.homePresenter=homePresenter;
 
     }
 

@@ -38,23 +38,22 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import com.google.common.net.InternetDomainName;
 import com.jianhui_zhu.openuseragent.R;
-import com.jianhui_zhu.openuseragent.model.DownloadModel;
-import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
+import com.jianhui_zhu.openuseragent.model.BookmarkManager;
+import com.jianhui_zhu.openuseragent.model.HistoryManager;
+import com.jianhui_zhu.openuseragent.model.QueryKeyWordManager;
 import com.jianhui_zhu.openuseragent.model.beans.User;
-import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
 import com.jianhui_zhu.openuseragent.util.AbstractFragment;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
-import com.jianhui_zhu.openuseragent.util.RemoteDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.util.SettingSingleton;
-import com.jianhui_zhu.openuseragent.util.WebUtil;
 import com.jianhui_zhu.openuseragent.util.activity.MainActivity;
 import com.jianhui_zhu.openuseragent.view.adapter.NavigationHomeAdapter;
 import com.jianhui_zhu.openuseragent.view.adapter.SearchSuggestionAdapter;
-import com.jianhui_zhu.openuseragent.view.adapter.WebViewAdapter;
+import com.jianhui_zhu.openuseragent.view.adapter.WebViewAdapterNew;
 import com.jianhui_zhu.openuseragent.view.custom.CustomDrawerLayout;
 import com.jianhui_zhu.openuseragent.view.custom.CustomWebView;
 import com.jianhui_zhu.openuseragent.view.dialogs.TabStackDialog;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
+import com.jianhui_zhu.openuseragent.viewmodel.HomeViewModel;
 import com.squareup.picasso.Picasso;
 
 import java.io.BufferedWriter;
@@ -65,7 +64,6 @@ import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -73,7 +71,6 @@ import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 import rx.Observable;
 import rx.Subscriber;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -83,6 +80,11 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     int total;
     int count;
     String curHost;
+    HomeView homeView;
+    HistoryManager historyManager = new HistoryManager();
+    BookmarkManager bookmarkManager = new BookmarkManager();
+    QueryKeyWordManager queryKeyWordManager = new QueryKeyWordManager();
+    HomeViewModel viewModel = new HomeViewModel();
     HashMap<String,Integer> thirdPartyCounter;
     BufferedWriter recordForThirdParty;
     CoordinatorLayout container;
@@ -110,15 +112,12 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     @Bind(R.id.tab)
     ImageView tabIcon;
     SearchSuggestionAdapter suggestionAdapter;
-    WebViewAdapter webViewAdapter;
+    WebViewAdapterNew webViewAdapter;
     @OnClick({R.id.home_menu_icon,R.id.refresh_area,R.id.tab_area,R.id.add_bookmark_area,R.id.backward_area,R.id.forward_area})
     public void click(View view) {
 
         switch (view.getId()) {
             case R.id.home_menu_icon:
-            if (RemoteDatabaseSingleton.getInstance().isUserLoggedIn()) {
-                this.user = RemoteDatabaseSingleton.getInstance().getUser();
-            }
             if (user != null) {
                 ImageView avatar = (ImageView) getActivity().findViewById(R.id.home_avatar);
                 TextView username = (TextView) getActivity().findViewById(R.id.home_name);
@@ -131,15 +130,15 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                 onRefresh();
                 break;
             case R.id.tab_area:
-                if(webViewAdapter.isEmpty()){
+                if(webViewAdapter.getItemCount()==0){
                     Snackbar.make(container,"No tab exists",Snackbar.LENGTH_SHORT).show();
                 }else {
-                    FragmenUtil.switchToFragment(getActivity(), new TabStackDialog());
+                    FragmenUtil.switchToFragment(getActivity(), TabStackDialog.newInstance(homeView));
                 }
                 break;
             case R.id.add_bookmark_area:
                 if(webHolder!=null) {
-                    presenter.saveBookmark(webHolder.getUrl(), webHolder.getTitle(), user == null ? null : user.getuID());
+                    viewModel.saveBookmark(bookmarkManager.saveBookmark(webHolder.getUrl(), webHolder.getTitle()),container);
                 }
                 break;
             case R.id.home_area:
@@ -162,7 +161,6 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
         }
     }
 
-    private HomePresenter presenter;
     public void configViews(){
         avatar = (CircleImageView)profileTitle.getHeaderView(0).findViewById(R.id.home_avatar);
         homeName = (TextView)profileTitle.getHeaderView(0).findViewById(R.id.home_name);
@@ -190,10 +188,10 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                         FragmenUtil.switchToFragment(getActivity(),new SettingView());
                         break;
                     case R.id.bookmark_option:
-                        FragmenUtil.switchToFragment(getActivity(), new BookmarkView());
+                        FragmenUtil.switchToFragment(getActivity(), BookmarkView.newInstance(homeView));
                         break;
                     case R.id.history_option:
-                        FragmenUtil.switchToFragment(getActivity(), new HistoryView());
+                        FragmenUtil.switchToFragment(getActivity(), HistoryView.newInstance(homeView));
                         break;
                     case R.id.download_option:
                         FragmenUtil.switchToFragment(getActivity(),new DownloadView());
@@ -232,7 +230,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                     loadTargetUrl(SettingSingleton.getInstance(getActivity()).getSearchEngine() + query);
 
                 }
-                presenter.saveQuery(query);
+                queryKeyWordManager.saveQueryText(query);
                 suggestionAdapter.changeCursor(null);
                 changeToolBarVisibility(View.GONE);
                 return true;
@@ -243,7 +241,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                 if (newText.equals("")) {
                     suggestionAdapter.changeCursor(null);
                 } else {
-                    presenter.queryText(newText);
+                    viewModel.queryText(queryKeyWordManager.queryText(newText),homeView);
                 }
                 return true;
             }
@@ -255,19 +253,14 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActivity();
-        presenter = new HomePresenter(this, getActivity());
         Observable.create(new Observable.OnSubscribe<Object>() {
             @Override
             public void call(Subscriber<? super Object> subscriber) {
                 String path=getActivity().getDir("icons", Context.MODE_PRIVATE).getPath();
                 WebIconDatabase.getInstance().open(path);
-                suggestionAdapter = new SearchSuggestionAdapter(getActivity(), presenter);
-                webViewAdapter =WebViewAdapter.getInstance(getActivity());
-                webViewAdapter.setHomePresenter(presenter);
-                if (RemoteDatabaseSingleton.getInstance().isUserLoggedIn()) {
-                    user = RemoteDatabaseSingleton.getInstance().getUser();
-                }
+                suggestionAdapter = new SearchSuggestionAdapter(getActivity());
+                webViewAdapter =WebViewAdapterNew.getInstance(homeView);
+
             }
         }).subscribeOn(Schedulers.io()).subscribe();
 
@@ -539,8 +532,8 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                 webviewContainer.addView(webHolder, 0);
                 if (url != null && !url.equals("about:blank")) {
                     webViewAdapter.addWebView(webHolder);
-                    presenter.changeNumTabsIcon(webViewAdapter.getCount());
-                    presenter.saveHistory(url, view.getTitle());
+                    changeNumTabsIcon(webViewAdapter.getItemCount());
+                    viewModel.saveHistory(historyManager.saveHistoryLocal(url,view.getTitle()));
                 }
                 if (webHolder != null && webHolder.canGoBack() == false) {
                     backwardIcon.setColorFilter(R.color.cardview_shadow_end_color, PorterDuff.Mode.MULTIPLY);
@@ -562,6 +555,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
 
     public static AbstractFragment newInstance() {
         HomeView homeView = new HomeView();
+        homeView.homeView = homeView;
         Bundle bundle = new Bundle();
         bundle.putBoolean("hasUrl", false);
         homeView.setArguments(bundle);
@@ -570,6 +564,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
 
     public static AbstractFragment newInstanceWithUrl(String url) {
         HomeView homeView = new HomeView();
+        homeView.homeView = homeView;
         Bundle bundle = new Bundle();
         bundle.putBoolean("hasUrl", true);
         bundle.putString("url", url);
@@ -593,14 +588,8 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
         bookmarkRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         bookmarkRecycler.setItemAnimator(new DefaultItemAnimator());
         bookmarkRecycler.setHasFixedSize(true);
-        gridBookmarkAdapter = new NavigationHomeAdapter(presenter);
-        presenter.getNavigationBookmark().subscribe(new Action1<List<Bookmark>>() {
-            @Override
-            public void call(List<Bookmark> bookmarks) {
-                gridBookmarkAdapter.setBookmarks(bookmarks);
-                bookmarkRecycler.setAdapter(gridBookmarkAdapter);
-            }
-        });
+        gridBookmarkAdapter = new NavigationHomeAdapter(homeView);
+        viewModel.inflatePanelView(historyManager.getTop8FrequentWebPage(),gridBookmarkAdapter,bookmarkRecycler);
         layout.addView(bookmarkRecycler);
         return layout;
     }
@@ -635,9 +624,10 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     @Override
     public void onResume() {
         super.onResume();
-        if(webHolder==null||webViewAdapter.isEmpty()) {
+        if(webHolder==null||webViewAdapter.getItemCount()==0) {
             webviewContainer.removeAllViews();
             webviewContainer.addView(initPanelView());
+
             configViews();
         }
     }

@@ -11,10 +11,12 @@ import android.view.Window;
 import android.widget.EditText;
 
 import com.jianhui_zhu.openuseragent.R;
+import com.jianhui_zhu.openuseragent.model.BookmarkManager;
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
-import com.jianhui_zhu.openuseragent.presenter.BookmarkPresenter;
 import com.jianhui_zhu.openuseragent.util.AbstractDialogFragment;
 import com.jianhui_zhu.openuseragent.util.activity.MainActivity;
+import com.jianhui_zhu.openuseragent.view.adapter.BookmarkAdapter;
+import com.jianhui_zhu.openuseragent.viewmodel.BookmarkViewModel;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -24,8 +26,10 @@ import butterknife.OnClick;
  * Created by jianhuizhu on 2016-04-05.
  */
 public class NewBookmarkDialog extends AbstractDialogFragment {
+    BookmarkAdapter adapter;
     CoordinatorLayout container;
-    BookmarkPresenter presenter;
+    BookmarkManager manager = new BookmarkManager();
+    BookmarkViewModel viewModel = new BookmarkViewModel();
     @Bind(R.id.name)
     EditText name;
     @Bind(R.id.url)
@@ -40,8 +44,8 @@ public class NewBookmarkDialog extends AbstractDialogFragment {
             Bookmark bookmark = new Bookmark();
             bookmark.setName(name.getText().toString());
             bookmark.setUrl(url.getText().toString());
-             presenter.addBookmark(bookmark);
-                this.dismiss();
+            viewModel.addBookmark(manager.addBookmark(bookmark),bookmark,container,adapter);
+            this.dismiss();
         }else{
             this.dismiss();
         }
@@ -60,9 +64,9 @@ public class NewBookmarkDialog extends AbstractDialogFragment {
         super.onViewCreated(view, savedInstanceState);
         container = ((MainActivity)getActivity()).getContainer();
     }
-    public static NewBookmarkDialog newInstance(BookmarkPresenter presenter){
+    public static NewBookmarkDialog newInstance(BookmarkAdapter adapter){
         NewBookmarkDialog dialog = new NewBookmarkDialog();
-        dialog.presenter = presenter;
+        dialog.adapter = adapter;
         return dialog;
     }
 

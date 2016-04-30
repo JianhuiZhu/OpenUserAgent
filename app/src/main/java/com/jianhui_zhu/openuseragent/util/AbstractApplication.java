@@ -25,7 +25,6 @@ public class AbstractApplication extends Application {
 		Firebase.setAndroidContext(this);
 		WebUtil.instantiate(this);
 		LocalDatabaseSingleton.instantiate(this);
-		RemoteDatabaseSingleton.instantiate(this);
 		Firebase.getDefaultConfig().setLogLevel(Logger.Level.DEBUG);
 		Firebase.getDefaultConfig().enablePersistence();
 		SettingSingleton.getInstance(getApplicationContext());

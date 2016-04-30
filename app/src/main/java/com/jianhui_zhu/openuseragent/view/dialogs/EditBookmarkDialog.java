@@ -2,6 +2,7 @@ package com.jianhui_zhu.openuseragent.view.dialogs;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,9 +10,11 @@ import android.view.Window;
 import android.widget.EditText;
 
 import com.jianhui_zhu.openuseragent.R;
+import com.jianhui_zhu.openuseragent.model.BookmarkManager;
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
-import com.jianhui_zhu.openuseragent.presenter.BookmarkPresenter;
 import com.jianhui_zhu.openuseragent.util.AbstractDialogFragment;
+import com.jianhui_zhu.openuseragent.view.adapter.BookmarkAdapter;
+import com.jianhui_zhu.openuseragent.viewmodel.BookmarkViewModel;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -21,22 +24,25 @@ import butterknife.OnClick;
  * Created by jianhuizhu on 2016-03-04.
  */
 public class EditBookmarkDialog extends AbstractDialogFragment {
-    BookmarkPresenter presenter;
+    BookmarkViewModel viewModel = new BookmarkViewModel();
+    BookmarkManager manager = new BookmarkManager();
+    CoordinatorLayout container;
+    BookmarkAdapter adapter;
     Bookmark bookmark;
     @Bind(R.id.name)
     EditText name;
     @Bind(R.id.url)
     EditText url;
     @OnClick(R.id.done_bookmark)
-    public void done(){
+    public void update(){
         bookmark.setName(name.getText().toString());
         bookmark.setUrl(url.getText().toString());
-        presenter.updateBookmark(bookmark);
+        viewModel.updateBookmark(manager.updateBookmark(bookmark),container,adapter);
         dismiss();
     }
     @OnClick(R.id.delete_bookmark)
     public void delete(){
-        presenter.deleteBookmark(bookmark);
+        viewModel.deleteBookmark(manager.deleteBookmark(bookmark),bookmark,container,adapter);
         dismiss();
     }
     @Override
@@ -60,11 +66,11 @@ public class EditBookmarkDialog extends AbstractDialogFragment {
         url.setText(bookmark.getUrl());
     }
 
-    public static EditBookmarkDialog newInstance(Bookmark bookmark, BookmarkPresenter presenter) {
-
+    public static EditBookmarkDialog newInstance(Bookmark bookmark, CoordinatorLayout container, BookmarkAdapter adapter) {
         EditBookmarkDialog fragment = new EditBookmarkDialog();
         fragment.bookmark = bookmark;
-        fragment.presenter = presenter;
+        fragment.container = container;
+        fragment.adapter = adapter;
         return fragment;
     }
 

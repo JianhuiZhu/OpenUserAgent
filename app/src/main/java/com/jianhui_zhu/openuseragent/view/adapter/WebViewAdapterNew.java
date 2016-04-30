@@ -2,66 +2,54 @@ package com.jianhui_zhu.openuseragent.view.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Picture;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.WebViewInfoHolder;
-import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.WebUtil;
 import com.jianhui_zhu.openuseragent.view.HomeView;
 import com.jianhui_zhu.openuseragent.view.custom.CustomWebView;
 import com.jianhui_zhu.openuseragent.view.dialogs.TabStackDialog;
-import com.squareup.picasso.Picasso;
+import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import butterknife.Bind;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
- * Created by jianhuizhu on 2016-03-23.
+ * Created by jianhuizhu on 2016-04-29.
  */
-public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
-    private static WebViewAdapter instance;
+public class WebViewAdapterNew extends RecyclerView.Adapter<WebViewAdapterNew.ViewHolder> {
     private Context context;
-    private WebViewAdapter(Context context, int resource) {
-        super(context, resource);
-        this.context = context;
+    private HomeViewInterface home;
+    private ArrayList<WebViewInfoHolder> webViews=new ArrayList<>();
+    private static WebViewAdapterNew instance;
+
+    public TabStackDialog getTabStackDialog() {
+        return tabStackDialog;
     }
-    private HomePresenter homePresenter = null;
+
+    public void setTabStackDialog(TabStackDialog tabStackDialog) {
+        this.tabStackDialog = tabStackDialog;
+    }
+
     private TabStackDialog tabStackDialog = null;
-    public static WebViewAdapter getInstance(Context context){
-        if(instance==null){
-            instance = new WebViewAdapter(context,R.layout.item_webview);
+    public static synchronized WebViewAdapterNew getInstance(HomeViewInterface viewInterface){
+        if(WebViewAdapterNew.instance==null){
+            instance = new WebViewAdapterNew();
+            instance.home = viewInterface;
         }
         return instance;
     }
-    ArrayList<WebViewInfoHolder> webViews=new ArrayList<>();
-    public WebViewAdapter setHomePresenter(HomePresenter homePresenter){
-        this.homePresenter = homePresenter;
-        return this;
-    }
-
-    public HomePresenter getHomePresenter() {
-        return homePresenter;
-    }
-
-    public WebViewAdapter setTabStackDialog(TabStackDialog tabStackDialog){
-        this.tabStackDialog = tabStackDialog;
-        return this;
-    }
-
     public void addWebView(final CustomWebView webView){
         if(isWebViewExists(webView)==false) {
             WebViewInfoHolder holder = new WebViewInfoHolder();
@@ -69,7 +57,7 @@ public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
             String title = webView.getTitle();
             String domain ="";
             try {
-                domain = WebUtil.getDomainbyUrl(webView.getUrl());
+                domain = WebUtil.getDomainByUrl(webView.getUrl());
             } catch (URISyntaxException e) {
                 Log.d(this.getClass().getSimpleName(),e.toString());
             }
@@ -78,39 +66,30 @@ public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
             notifyDataSetChanged();
         }
     }
-
     @Override
-    public boolean isEmpty() {
-        return webViews == null || (webViews.isEmpty());
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        if(context==null) {
+            this.context = parent.getContext();
+        }
+        View view = LayoutInflater.from(context)
+                .inflate(R.layout.item_webview,parent,false);
+        return new ViewHolder(view);
     }
 
     @Override
-    public int getCount() {
-        return webViews == null ? 0 : webViews.size();
-    }
-
-
-    @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
+    public void onBindViewHolder(ViewHolder holder, int position) {
         final WebViewInfoHolder webviewHolder = webViews.get(position);
         String title = webViews.get(position).getTitle();
-        if(convertView==null){
-            LayoutInflater vi = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView=vi.inflate(R.layout.item_webview, null);
-            holder = new ViewHolder(convertView);
-            convertView.setTag(holder);
-        }else{
-            holder=(ViewHolder)convertView.getTag();
-        }
-        holder.position = position;
         holder.title.setText(title);
         Bitmap bitmap = webviewHolder.getWebView().getDrawingCache();
         holder.snapshot.setImageBitmap(bitmap);
         notifyDataSetChanged();
-        return convertView;
     }
 
+    @Override
+    public int getItemCount() {
+        return webViews == null ? 0 : webViews.size();
+    }
     private boolean isWebViewExists(final CustomWebView webView){
         for(WebViewInfoHolder holder : webViews){
             if(holder.getWebView().equals(webView))
@@ -118,8 +97,7 @@ public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
         }
         return false;
     }
-    class ViewHolder{
-        int position;
+    public class ViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.title)
         TextView title;
         @Bind(R.id.snapshot)
@@ -127,25 +105,25 @@ public class WebViewAdapter extends ArrayAdapter<WebViewInfoHolder> {
         @OnClick({R.id.close_btn,R.id.title,R.id.snapshot})
         public void click(View view){
             if(view.getId()==R.id.close_btn){
-                webViews.remove(position);
+                webViews.remove(getAdapterPosition());
                 if(webViews.isEmpty()){
-                    if(homePresenter!=null&&tabStackDialog!=null){
-                        homePresenter.clearWebHolder();
+                    if(home!=null&&tabStackDialog!=null){
+                        home.clearWebHolder();
                         tabStackDialog.dismiss();
                     }
                 }
                 notifyDataSetChanged();
             }else{
-                if(homePresenter!=null&&tabStackDialog!=null){
-                    homePresenter.changeWebView(webViews.get(position).getWebView());
+                if(home!=null&&tabStackDialog!=null){
+                    home.changeWebView(webViews.get(getAdapterPosition()).getWebView());
                     tabStackDialog.dismiss();
                 }else{
-                    FragmenUtil.switchToFragment(context,HomeView.newInstanceWithUrl(webViews.get(position).getWebView().getUrl()));
+                    FragmenUtil.switchToFragment(context, HomeView.newInstanceWithUrl(webViews.get(getAdapterPosition()).getWebView().getUrl()));
                 }
             }
         }
-        public ViewHolder(View view){
-            ButterKnife.bind(this,view);
+        public ViewHolder(View itemView) {
+            super(itemView);
         }
     }
 }

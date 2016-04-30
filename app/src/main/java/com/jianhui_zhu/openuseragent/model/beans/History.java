@@ -11,22 +11,14 @@ public class History implements Parcelable{
     String name;
     String url;
     long timestamp;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-
+    int visitCount;
 
     protected History(Parcel in) {
         rID = in.readString();
-        name=in.readString();
+        name = in.readString();
         url = in.readString();
         timestamp = in.readLong();
+        visitCount = in.readInt();
     }
 
     public static final Creator<History> CREATOR = new Creator<History>() {
@@ -40,6 +32,24 @@ public class History implements Parcelable{
             return new History[size];
         }
     };
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getVisitCount() {
+        return visitCount;
+    }
+
+    public void setVisitCount(int visitCount) {
+        this.visitCount = visitCount;
+    }
+
+
 
     public String getrID() {
         return rID;
@@ -80,5 +90,6 @@ public class History implements Parcelable{
         dest.writeString(name);
         dest.writeString(url);
         dest.writeLong(timestamp);
+        dest.writeInt(visitCount);
     }
 }

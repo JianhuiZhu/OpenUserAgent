@@ -2,6 +2,7 @@ package com.jianhui_zhu.openuseragent.view.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,15 +16,15 @@ import android.widget.TextView;
 
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
-import com.jianhui_zhu.openuseragent.presenter.BookmarkPresenter;
-import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.WebUtil;
 import com.jianhui_zhu.openuseragent.view.BookmarkView;
 import com.jianhui_zhu.openuseragent.view.HomeView;
 import com.jianhui_zhu.openuseragent.view.dialogs.EditBookmarkDialog;
+import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -34,23 +35,24 @@ import rx.functions.Action1;
  * Created by Jianhui Zhu on 2016-02-05.
  */
 public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHolder>{
-    List<Bookmark> bookmarks;
+    HomeViewInterface home;
+    BookmarkAdapter instance;
+    CoordinatorLayout container;
+    List<Bookmark> bookmarks = new ArrayList<>();
     Context context;
     private BookmarkView bookmarkView;
-    private BookmarkPresenter bookmarkPresenter;
     private int lastPosition = -1;
-    private HomePresenter homePresenter;
-    public  BookmarkAdapter(List<Bookmark> bookmarks
-            ,Context context
-            ,BookmarkPresenter bookmarkPresenter
-            ,HomePresenter homePresenter,BookmarkView bookmarkView){
-        this.bookmarks=bookmarks;
+    public  BookmarkAdapter(Context context,HomeViewInterface viewInterface,BookmarkView bookmarkView,CoordinatorLayout container){
         this.context=context;
-        this.bookmarkPresenter=bookmarkPresenter;
-        this.homePresenter=homePresenter;
+        this.home = viewInterface;
         this.bookmarkView=bookmarkView;
+        this.container = container;
+        instance = this;
     }
-
+    public void addAllBookmarks(List<Bookmark> bookmarks){
+        this.bookmarks = bookmarks;
+        notifyDataSetChanged();
+    }
     @Override
     public BookmarkAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         this.context = parent.getContext();
@@ -63,23 +65,41 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
 
 
     @Override
-    public void onBindViewHolder(final BookmarkAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(final BookmarkAdapter.ViewHolder holder, final int position) {
         Bookmark bookmark=bookmarks.get(position);
         holder.name.setText(bookmark.getName());
-        holder.location=position;
         holder.url.setText(bookmark.getUrl());
         try {
-            String host = WebUtil.getDomainbyUrl(bookmark.getUrl());
+            String host = WebUtil.getDomainByUrl(bookmark.getUrl());
             WebUtil.getInstance().getIconByName(host).subscribe(new Action1<Bitmap>() {
                 @Override
                 public void call(Bitmap bitmap) {
                     holder.avatar.setImageBitmap(bitmap);
                 }
             });
-            setAnimation(holder.container,position);
+            setAnimation(holder.layout,position);
         } catch (URISyntaxException e) {
             Log.e(this.getClass().getSimpleName(),e.getMessage());
         }
+        holder.layout.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                FragmenUtil.switchToFragment(context, EditBookmarkDialog.newInstance(bookmarks.get(position),container,instance));
+                return true;
+            }
+        });
+        holder.layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(home==null)
+                    FragmenUtil.switchToFragment(context,HomeView.newInstanceWithUrl(bookmarks.get(position).getUrl()));
+                else{
+                    home.loadTargetUrl(bookmarks.get(position).getUrl());
+                    FragmenUtil.backToPreviousFragment(context,bookmarkView);
+                }
+            }
+        });
     }
 
     @Override
@@ -122,10 +142,9 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
     }
 
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener,View.OnClickListener{
+    public class ViewHolder extends RecyclerView.ViewHolder{
         @Bind(R.id.bookmark_container)
-        RelativeLayout container;
-        int location;
+        RelativeLayout layout;
         @Bind(R.id.bookmark_avatar)
         ImageView avatar;
         @Bind(R.id.bookmark_name)
@@ -134,28 +153,9 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
         TextView url;
         public ViewHolder(View itemView) {
             super(itemView);
-            itemView.setOnLongClickListener(this);
-            itemView.setOnClickListener(this);
             ButterKnife.bind(this,itemView);
         }
 
-
-        @Override
-        public boolean onLongClick(View v) {
-           FragmenUtil.switchToFragment(context, EditBookmarkDialog.newInstance(bookmarks.get(location),bookmarkPresenter));
-            return true;
-        }
-
-        @Override
-        public void onClick(View v) {
-            if(homePresenter==null)
-                FragmenUtil.switchToFragment(context,HomeView.newInstanceWithUrl(bookmarks.get(location).getUrl()));
-            else{
-                homePresenter.swapUrl(bookmarks.get(location).getUrl());
-                FragmenUtil.backToPreviousFragment(context,bookmarkView);
-            }
-
-        }
     }
     private void setAnimation(View viewToAnimate, int position)
     {

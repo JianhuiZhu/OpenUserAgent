@@ -15,18 +15,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.jianhui_zhu.openuseragent.R;
+import com.jianhui_zhu.openuseragent.model.HistoryManager;
 import com.jianhui_zhu.openuseragent.model.beans.History;
-import com.jianhui_zhu.openuseragent.presenter.HistoryPresenter;
-import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.WebUtil;
 import com.jianhui_zhu.openuseragent.view.HistoryView;
 import com.jianhui_zhu.openuseragent.view.HomeView;
+import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
+import com.jianhui_zhu.openuseragent.viewmodel.HistoryViewModel;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import butterknife.Bind;
@@ -38,10 +37,11 @@ import rx.functions.Action1;
  * Created by jianhuizhu on 2016-02-16.
  */
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder>{
-    private HomePresenter homePresenter;
+    private HomeViewInterface home;
     private HistoryView historyView;
     private Context context;
-    private HistoryPresenter presenter;
+    HistoryViewModel viewModel = new HistoryViewModel();
+    HistoryManager manager = new HistoryManager();
     private int lastPosition = -1;
     private List<History> selected = new ArrayList<>();
     public List<History> getHistories() {
@@ -63,12 +63,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         this.histories.addAll(histories);
         notifyDataSetChanged();
     }
-    List<History> histories;
-    public HistoryAdapter(Context context,HistoryPresenter presenter,List<History> histories,HomePresenter homePresenter, HistoryView historyView){
+    List<History> histories = new ArrayList<>();
+    public HistoryAdapter(Context context,HomeViewInterface viewInterface, HistoryView historyView){
         this.context=context;
-        this.presenter=presenter;
-        this.histories=histories;
-        this.homePresenter=homePresenter;
+        this.home = viewInterface;
         this.historyView=historyView;
 
     }
@@ -86,7 +84,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     public void onBindViewHolder(final ViewHolder holder, int position) {
         History history=histories.get(position);
         try {
-            String host = WebUtil.getDomainbyUrl(history.getUrl());
+            String host = WebUtil.getDomainByUrl(history.getUrl());
             holder.position=position;
             WebUtil.getInstance().getIconByName(host).subscribe(new Action1<Bitmap>() {
                 @Override
@@ -121,15 +119,13 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
             History history = histories.get(position);
             if(checkBox.isChecked()){
                 selected.add(history);
-                    presenter.changeGarbageIconStatus(true);
+                viewModel.changeGarbageIconStatus(true,historyView.delete);
 
             }else{
                 selected.remove(history);
                 if(selected.isEmpty()){
-                    presenter.changeGarbageIconStatus(false);
+                    viewModel.changeGarbageIconStatus(false,historyView.delete);
                 }
-
-
             }
         }
         @Bind(R.id.history_url)
@@ -142,10 +138,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
         @Override
         public void onClick(View v) {
-            if(homePresenter==null)
+            if(home==null)
                 FragmenUtil.switchToFragment(context, HomeView.newInstanceWithUrl(histories.get(position).getUrl()));
             else{
-                homePresenter.swapUrl(histories.get(position).getUrl());
+                home.loadTargetUrl(histories.get(position).getUrl());
                 FragmenUtil.backToPreviousFragment(context,historyView);
             }
         }
@@ -159,5 +155,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
             viewToAnimate.startAnimation(animation);
             lastPosition = position;
         }
+    }
+
+    public void addAllHistories(List<History> histories){
+        this.histories = histories;
+        notifyDataSetChanged();
     }
 }

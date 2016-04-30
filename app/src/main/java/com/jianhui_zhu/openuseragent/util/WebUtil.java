@@ -105,7 +105,7 @@ public class WebUtil {
             }).subscribeOn(Schedulers.io()).subscribe();
         }
     }
-    public static String getDomainbyUrl(final String url) throws URISyntaxException {
+    public static String getDomainByUrl(final String url) throws URISyntaxException {
 
             URI uri = new URI(url);
             return uri.getHost();

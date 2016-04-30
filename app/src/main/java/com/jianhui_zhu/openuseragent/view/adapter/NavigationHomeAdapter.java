@@ -2,7 +2,6 @@ package com.jianhui_zhu.openuseragent.view.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,8 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jianhui_zhu.openuseragent.R;
-import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
-import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
+import com.jianhui_zhu.openuseragent.model.beans.History;
 import com.jianhui_zhu.openuseragent.util.WebUtil;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 
@@ -28,18 +26,18 @@ import rx.functions.Action1;
  * Created by jianhuizhu on 2016-04-05.
  */
 public class NavigationHomeAdapter extends RecyclerView.Adapter<NavigationHomeAdapter.ViewHolder> {
-    HomePresenter presenter;
+    HomeViewInterface home;
     Context context;
-    private List<Bookmark> bookmarks = new ArrayList<>();
-
-
-    public void setBookmarks(List<Bookmark> bookmarks) {
-        this.bookmarks = bookmarks;
+    private List<History> histories = new ArrayList<>();
+    public NavigationHomeAdapter(HomeViewInterface viewInterface){
+        home = viewInterface;
     }
 
-    public NavigationHomeAdapter(HomePresenter presenter){
-        this.presenter = presenter;
+    public void setFrequentVisitPages(List<History> histories) {
+        this.histories = histories;
     }
+
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         this.context = parent.getContext();
@@ -53,16 +51,16 @@ public class NavigationHomeAdapter extends RecyclerView.Adapter<NavigationHomeAd
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        Bookmark bookmark = bookmarks.get(position);
+        History history = histories.get(position);
         holder.position = position;
-        holder.url.setText(bookmark.getUrl());
+        holder.url.setText(history.getUrl());
         String host = null;
         try {
-            host = WebUtil.getDomainbyUrl(bookmark.getUrl());
+            host = WebUtil.getDomainByUrl(history.getUrl());
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        holder.title.setText(bookmark.getName());
+        holder.title.setText(history.getName());
         WebUtil.getInstance().getIconByName(host).subscribe(new Action1<Bitmap>() {
             @Override
             public void call(Bitmap bitmap) {
@@ -73,7 +71,7 @@ public class NavigationHomeAdapter extends RecyclerView.Adapter<NavigationHomeAd
 
     @Override
     public int getItemCount() {
-        return bookmarks == null ? 0 : bookmarks.size();
+        return histories == null ? 0 : histories.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -92,7 +90,7 @@ public class NavigationHomeAdapter extends RecyclerView.Adapter<NavigationHomeAd
 
         @Override
         public void onClick(View v) {
-            presenter.swapUrl(bookmarks.get(position).getUrl());
+            home.loadTargetUrl(histories.get(position).getUrl());
         }
     }
 }

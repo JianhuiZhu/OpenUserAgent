@@ -3,20 +3,17 @@ package com.jianhui_zhu.openuseragent.view.dialogs;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.view.ViewPager;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.StackView;
 
 import com.jianhui_zhu.openuseragent.R;
-import com.jianhui_zhu.openuseragent.presenter.HomePresenter;
 import com.jianhui_zhu.openuseragent.util.AbstractDialogFragment;
-import com.jianhui_zhu.openuseragent.util.activity.MainActivity;
-import com.jianhui_zhu.openuseragent.view.adapter.WebViewAdapter;
+import com.jianhui_zhu.openuseragent.view.adapter.WebViewAdapterNew;
+import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -25,10 +22,10 @@ import butterknife.ButterKnife;
  * Created by jianhuizhu on 2016-03-23.
  */
 public class TabStackDialog extends AbstractDialogFragment {
-    HomePresenter homePresenter;
+    HomeViewInterface viewInterface;
     @Bind(R.id.tab_pager)
-    ListView stackView;
-    WebViewAdapter adapter;
+    RecyclerView tabs;
+    WebViewAdapterNew adapter;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -40,17 +37,18 @@ public class TabStackDialog extends AbstractDialogFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        adapter = WebViewAdapter.getInstance(getActivity());
+        adapter = WebViewAdapterNew.getInstance(viewInterface);
         adapter.setTabStackDialog(this);
-        stackView.setAdapter(adapter);
-        homePresenter = adapter.getHomePresenter();
+        tabs.setItemAnimator(new DefaultItemAnimator());
+        tabs.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false));
+        tabs.setAdapter(adapter);
     }
 
     @Override
     public void onDismiss(DialogInterface dialog) {
         super.onDismiss(dialog);
         try {
-            HomePresenter.getInstance().changeNumTabsIcon(adapter.getCount());
+            viewInterface.changeNumTabsIcon(adapter.getItemCount());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -59,10 +57,15 @@ public class TabStackDialog extends AbstractDialogFragment {
     public void onDestroyView() {
         super.onDestroyView();
         try {
-            HomePresenter.getInstance().changeNumTabsIcon(adapter.getCount());
+            viewInterface.changeNumTabsIcon(adapter.getItemCount());
             ButterKnife.unbind(this);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    public static TabStackDialog newInstance(HomeViewInterface viewInterface){
+        TabStackDialog dialog = new TabStackDialog();
+        dialog.viewInterface = viewInterface;
+        return dialog;
     }
 }
