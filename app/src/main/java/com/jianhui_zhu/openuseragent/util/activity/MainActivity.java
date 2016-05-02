@@ -1,5 +1,6 @@
 package com.jianhui_zhu.openuseragent.util.activity;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 
@@ -13,7 +14,7 @@ import butterknife.ButterKnife;
 /**
  * Created by jianhuizhu on 2016-01-27
  */
-public class MainActivity extends AbstractActivity {
+public class MainActivity extends Activity {
 	@Bind(R.id.container)
 	CoordinatorLayout container;
 	public CoordinatorLayout getContainer(){

@@ -1,6 +1,7 @@
 package com.jianhui_zhu.openuseragent.util;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -18,8 +19,8 @@ public final class FragmenUtil {
 	private static String DIALOG_FRAGMENT_TAG = "dialog_fragment";
 	public static void switchToFragment(Context context, Fragment fragment){
 		if(context instanceof Activity){
-			if(fragment instanceof AbstractDialogFragment){
-				((AbstractDialogFragment) fragment).show(((Activity) context).getFragmentManager(), DIALOG_FRAGMENT_TAG);
+			if(fragment instanceof DialogFragment){
+				((DialogFragment) fragment).show(((Activity) context).getFragmentManager(), DIALOG_FRAGMENT_TAG);
 			} else{
 				FragmentTransaction transaction = ((Activity) context).getFragmentManager().beginTransaction();
 				transaction.setCustomAnimations(R.animator.fragment_slide_right_enter,R.animator.fragment_slide_left_exit);

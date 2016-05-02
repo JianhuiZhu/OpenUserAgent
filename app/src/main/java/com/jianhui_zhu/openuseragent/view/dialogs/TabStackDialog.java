@@ -1,5 +1,6 @@
 package com.jianhui_zhu.openuseragent.view.dialogs;
 
+import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.jianhui_zhu.openuseragent.R;
-import com.jianhui_zhu.openuseragent.util.AbstractDialogFragment;
 import com.jianhui_zhu.openuseragent.view.adapter.WebViewAdapterNew;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 
@@ -21,7 +21,7 @@ import butterknife.ButterKnife;
 /**
  * Created by jianhuizhu on 2016-03-23.
  */
-public class TabStackDialog extends AbstractDialogFragment {
+public class TabStackDialog extends DialogFragment {
     HomeViewInterface viewInterface;
     @Bind(R.id.tab_pager)
     RecyclerView tabs;
@@ -63,9 +63,9 @@ public class TabStackDialog extends AbstractDialogFragment {
             e.printStackTrace();
         }
     }
-    public static TabStackDialog newInstance(HomeViewInterface viewInterface){
-        TabStackDialog dialog = new TabStackDialog();
-        dialog.viewInterface = viewInterface;
+    public static DialogFragment newInstance(HomeViewInterface viewInterface){
+        DialogFragment dialog = new TabStackDialog();
+        ((TabStackDialog)dialog).viewInterface = viewInterface;
         return dialog;
     }
 }

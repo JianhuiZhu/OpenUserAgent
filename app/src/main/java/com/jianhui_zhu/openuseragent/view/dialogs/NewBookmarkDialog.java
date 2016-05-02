@@ -1,5 +1,6 @@
 package com.jianhui_zhu.openuseragent.view.dialogs;
 
+import android.app.DialogFragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
@@ -13,7 +14,6 @@ import android.widget.EditText;
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.BookmarkManager;
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
-import com.jianhui_zhu.openuseragent.util.AbstractDialogFragment;
 import com.jianhui_zhu.openuseragent.util.activity.MainActivity;
 import com.jianhui_zhu.openuseragent.view.adapter.BookmarkAdapter;
 import com.jianhui_zhu.openuseragent.viewmodel.BookmarkViewModel;
@@ -25,7 +25,7 @@ import butterknife.OnClick;
 /**
  * Created by jianhuizhu on 2016-04-05.
  */
-public class NewBookmarkDialog extends AbstractDialogFragment {
+public class NewBookmarkDialog extends DialogFragment {
     BookmarkAdapter adapter;
     CoordinatorLayout container;
     BookmarkManager manager = new BookmarkManager();

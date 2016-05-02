@@ -1,23 +1,20 @@
 package com.jianhui_zhu.openuseragent.view;
 
+import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 import com.jianhui_zhu.openuseragent.R;
-import com.jianhui_zhu.openuseragent.util.AbstractFragment;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.SettingSingleton;
-import com.jianhui_zhu.openuseragent.util.SharePreferenceUtil;
 import com.jianhui_zhu.openuseragent.view.adapter.SearchEngineAdapter;
-import com.squareup.picasso.Picasso;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -27,7 +24,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * Created by Jianhui Zhu on 2016-02-05.
  */
-public class SettingView extends AbstractFragment {
+public class SettingView extends Fragment {
     @Bind(R.id.setting_profile_area)
     LinearLayout profileArea;
     @Bind(R.id.setting_avatar)
@@ -97,19 +94,7 @@ public class SettingView extends AbstractFragment {
     public void onResume() {
         super.onResume();
         SettingSingleton singleton = SettingSingleton.getInstance(getActivity());
-        if(singleton.isLoginStatus()){
-            Picasso.with(getActivity())
-                    .load(R.drawable.ic_avatar_konata)
-                    .fit()
-                    .into(avatar);
-            profileArea.setVisibility(View.VISIBLE);
-        }else{
-            Picasso.with(getActivity())
-                    .load(R.drawable.ic_placeholder)
-                    .fit()
-                    .into(avatar);
-            profileArea.setVisibility(View.GONE);
-        }
+
     }
 
     @Override

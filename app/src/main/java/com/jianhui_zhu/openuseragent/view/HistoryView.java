@@ -1,5 +1,6 @@
 package com.jianhui_zhu.openuseragent.view;
 
+import android.app.Fragment;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,7 +16,6 @@ import android.widget.TextView;
 
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.HistoryManager;
-import com.jianhui_zhu.openuseragent.util.AbstractFragment;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.activity.MainActivity;
 import com.jianhui_zhu.openuseragent.view.adapter.HistoryAdapter;
@@ -32,7 +32,7 @@ import butterknife.OnClick;
 /**
  * Created by jianhuizhu on 2016-02-16.
  */
-public class HistoryView extends AbstractFragment implements DatePickerDialog.OnDateSetListener{
+public class HistoryView extends Fragment implements DatePickerDialog.OnDateSetListener{
     HomeViewInterface viewInterface;
     CoordinatorLayout container;
     HistoryView historyView;

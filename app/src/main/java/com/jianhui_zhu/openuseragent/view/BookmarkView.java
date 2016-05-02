@@ -1,5 +1,6 @@
 package com.jianhui_zhu.openuseragent.view;
 
+import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
@@ -12,7 +13,6 @@ import android.view.ViewGroup;
 
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.BookmarkManager;
-import com.jianhui_zhu.openuseragent.util.AbstractFragment;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.activity.MainActivity;
 import com.jianhui_zhu.openuseragent.view.adapter.BookmarkAdapter;
@@ -27,7 +27,7 @@ import butterknife.OnClick;
 /**
  * Created by Jianhui Zhu on 2016-02-06.
  */
-public class BookmarkView extends AbstractFragment{
+public class BookmarkView extends Fragment{
     HomeViewInterface viewInterface;
     CoordinatorLayout container;
     @Bind(R.id.list)

@@ -1,5 +1,6 @@
 package com.jianhui_zhu.openuseragent.view;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -43,10 +44,10 @@ import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.BookmarkManager;
 import com.jianhui_zhu.openuseragent.model.HistoryManager;
 import com.jianhui_zhu.openuseragent.model.QueryKeyWordManager;
-import com.jianhui_zhu.openuseragent.util.AbstractFragment;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.RxBus;
 import com.jianhui_zhu.openuseragent.util.SettingSingleton;
+import com.jianhui_zhu.openuseragent.util.TrafficStatisticUtil;
 import com.jianhui_zhu.openuseragent.util.activity.MainActivity;
 import com.jianhui_zhu.openuseragent.util.event.ThirdPartyEvent;
 import com.jianhui_zhu.openuseragent.view.adapter.NavigationHomeAdapter;
@@ -57,7 +58,6 @@ import com.jianhui_zhu.openuseragent.view.custom.CustomWebView;
 import com.jianhui_zhu.openuseragent.view.dialogs.TabStackDialog;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 import com.jianhui_zhu.openuseragent.viewmodel.HomeViewModel;
-import com.squareup.picasso.Picasso;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -83,7 +83,7 @@ import rx.subscriptions.CompositeSubscription;
 /**
  * Created by Jianhui Zhu on 2016-01-27.
  */
-public class HomeView extends AbstractFragment implements HomeViewInterface,SwipeRefreshLayout.OnRefreshListener {
+public class HomeView extends Fragment implements HomeViewInterface,SwipeRefreshLayout.OnRefreshListener {
     int total;
     int count;
     boolean switchInitialized =false;
@@ -130,7 +130,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                     Switch thirdPartySwitch = (Switch) view.getRootView().findViewById(R.id.third_party_switch);
                     if(!switchInitialized){
                         switchInitialized = true;
-                        thirdPartySwitch.setChecked(true);
+                        thirdPartySwitch.setChecked(false);
                     }
 
                     thirdPartySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -198,15 +198,6 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                         break;
                     case R.id.add_tab_option:
                         loadTargetUrl(SettingSingleton.getInstance(getActivity()).getHomePage());
-                        break;
-                    case R.id.sign_out_option:
-                        Picasso.with(getActivity())
-                                .load(R.drawable.ic_placeholder)
-                                .fit()
-                                .into(avatar);
-                        SettingSingleton.getInstance(getActivity())
-                                .setLoginStatus(false);
-                        homeName.setText("Please click avatar to login");
                         break;
                 }
                 settingDrawer.closeDrawers();
@@ -394,7 +385,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
         }
         private CompositeSubscription compositeSubscription;
         private long startTime;
-        private boolean blockAllThirdParty = true;
+        private boolean blockAllThirdParty;
         private boolean blockBlackList;
         private boolean isRedirect =false;
         private String host;
@@ -541,11 +532,11 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                             try {
                                 for(Map.Entry<String,Integer> entry: thirdPartyCounter.entrySet()){
                                     recordForThirdParty.append(entry.getKey()+" "+entry.getValue()+"\n");
-
                                 }
                                 recordForThirdParty.append("Policy: Block all third party: "+blockAllThirdParty+"\n");
                                 recordForThirdParty.append("Time comsume to load the page: "+(System.currentTimeMillis()-startTime)+" milliseconds\n");
                                 recordForThirdParty.append("total resource requested: "+total+"  third party count: "+count+"\n");
+                                recordForThirdParty.append("Total bandwidth consumed: "+ TrafficStatisticUtil.getInstance().getCurTotalBytesConsume()+" Bytes\n");
                                 thirdPartyCounter.clear();
                                 recordForThirdParty.flush();
                                 recordForThirdParty.close();
@@ -558,8 +549,6 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                         }
                     }
                 }).subscribeOn(Schedulers.io()).subscribe();
-                System.out.println("total resource loaded"+total);
-                System.out.println("third party resource loaded"+count);
 
                 if (swipeRefreshLayout.isRefreshing()) {
                     swipeRefreshLayout.setRefreshing(false);
@@ -587,7 +576,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
 
 
 
-    public static AbstractFragment newInstance() {
+    public static Fragment newInstance() {
         HomeView homeView = new HomeView();
         homeView.homeView = homeView;
         Bundle bundle = new Bundle();
@@ -596,7 +585,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
         return homeView;
     }
 
-    public static AbstractFragment newInstanceWithUrl(String url) {
+    public static Fragment newInstanceWithUrl(String url) {
         HomeView homeView = new HomeView();
         homeView.homeView = homeView;
         Bundle bundle = new Bundle();
@@ -650,10 +639,6 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
         return web;
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
 
     @Override
     public void onResume() {
