@@ -8,8 +8,7 @@ import android.net.TrafficStats;
 public final class TrafficStatisticUtil {
     private static TrafficStatisticUtil INSTANCE;
     private static final int MY_UID = android.os.Process.myUid();
-    private static long preTotalByteConsume = TrafficStats.getTotalRxBytes()+TrafficStats.getTotalTxBytes();
-    private static long preMobileByteConsume = TrafficStats.getMobileRxBytes()+TrafficStats.getMobileTxBytes();
+    private static long preTotalByteConsume = TrafficStats.getUidRxBytes(MY_UID)+TrafficStats.getUidTxBytes(MY_UID);
     private TrafficStatisticUtil(){}
     public static synchronized TrafficStatisticUtil getInstance(){
         if(INSTANCE==null){
@@ -22,18 +21,11 @@ public final class TrafficStatisticUtil {
            INSTANCE = new TrafficStatisticUtil();
         }
     }
-    public  synchronized long getCurMobileBytesConsume(){
-        long cur = TrafficStats.getMobileTxBytes()+TrafficStats.getMobileRxBytes();
-        long result = cur - preMobileByteConsume;
-        preMobileByteConsume = cur;
-        preTotalByteConsume = TrafficStats.getTotalRxBytes()+TrafficStats.getTotalTxBytes();
-        return result;
-    }
+
     public  synchronized long getCurTotalBytesConsume(){
-        long cur = TrafficStats.getTotalRxBytes() + TrafficStats.getTotalTxBytes();
+        long cur = TrafficStats.getUidRxBytes(MY_UID) + TrafficStats.getUidTxBytes(MY_UID);
         long result = cur - preTotalByteConsume;
         preTotalByteConsume = cur;
-        preMobileByteConsume = TrafficStats.getMobileRxBytes()+ TrafficStats.getMobileTxBytes();
         return result;
     }
 }
