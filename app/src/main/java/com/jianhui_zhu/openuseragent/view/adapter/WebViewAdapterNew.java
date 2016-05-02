@@ -23,6 +23,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import butterknife.Bind;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
@@ -83,7 +84,6 @@ public class WebViewAdapterNew extends RecyclerView.Adapter<WebViewAdapterNew.Vi
         holder.title.setText(title);
         Bitmap bitmap = webviewHolder.getWebView().getDrawingCache();
         holder.snapshot.setImageBitmap(bitmap);
-        notifyDataSetChanged();
     }
 
     @Override
@@ -124,6 +124,7 @@ public class WebViewAdapterNew extends RecyclerView.Adapter<WebViewAdapterNew.Vi
         }
         public ViewHolder(View itemView) {
             super(itemView);
+            ButterKnife.bind(this,itemView);
         }
     }
 }

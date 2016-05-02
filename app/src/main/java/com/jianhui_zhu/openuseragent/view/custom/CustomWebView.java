@@ -8,8 +8,10 @@ import android.webkit.DownloadListener;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import com.jianhui_zhu.openuseragent.util.WebUtil;
+import com.jianhui_zhu.openuseragent.view.HomeView;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 
 import java.net.MalformedURLException;
@@ -19,6 +21,11 @@ import java.net.URL;
  * Created by jianhuizhu on 2016-03-09.
  */
 public class CustomWebView extends WebView {
+    public void setAllThirdPartyPolicy(boolean allThirdPartyPolicy) {
+        this.allThirdPartyPolicy = allThirdPartyPolicy;
+    }
+
+    private boolean allThirdPartyPolicy;
     private void initSettings(){
         this.setDrawingCacheEnabled(true);
         WebSettings settings=this.getSettings();
@@ -29,6 +36,10 @@ public class CustomWebView extends WebView {
         setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         setSaveEnabled(true);
         setWebChromeClient(new CustomWebChrome());
+    }
+
+    public boolean isAllThirdPartyPolicy() {
+        return allThirdPartyPolicy;
     }
 
     public void setHomeViewInterface(HomeViewInterface homeViewInterface) {
@@ -46,6 +57,11 @@ public class CustomWebView extends WebView {
         super(context, attrs);
     }
 
+    @Override
+    public void setWebViewClient(WebViewClient client) {
+        allThirdPartyPolicy = ((HomeView.CustomWebViewClient)client).getAllThirdPartyPolicy();
+        super.setWebViewClient(client);
+    }
 
     @Override
     public void loadUrl(String url) {

@@ -1,9 +1,6 @@
 package com.jianhui_zhu.openuseragent.model;
 
-import android.content.Context;
-
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
-import com.jianhui_zhu.openuseragent.util.DataValidationUtil;
 import com.jianhui_zhu.openuseragent.util.LocalDatabaseSingleton;
 
 import java.util.List;

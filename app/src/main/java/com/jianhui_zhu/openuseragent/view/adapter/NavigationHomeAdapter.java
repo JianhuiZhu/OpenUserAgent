@@ -34,7 +34,8 @@ public class NavigationHomeAdapter extends RecyclerView.Adapter<NavigationHomeAd
     }
 
     public void setFrequentVisitPages(List<History> histories) {
-        this.histories = histories;
+        this.histories.clear();
+        this.histories.addAll(histories);
     }
 
 

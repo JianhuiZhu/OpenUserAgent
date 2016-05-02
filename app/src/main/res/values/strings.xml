@@ -7,4 +7,11 @@
         <item>Baidu</item>
         <item>Bing</item>
     </string-array>
+
+    //Control area
+    <string name="third_party">Block 3rd party</string>
+
+    //Switch
+    <string name="off">OFF</string>
+    <string name="on">ON</string>
 </resources>

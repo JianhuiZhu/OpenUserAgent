@@ -26,7 +26,6 @@ import rx.schedulers.Schedulers;
 public class WebUtil {
     private String DEFAULT_IMAGE_SUFFIX=".png";
     private String DEFAULT_ICON_FOLDER="icons";
-    //ContextWrapper cw;
     Context context;
     private static WebUtil instance;
     private WebUtil(Context context){

@@ -30,22 +30,25 @@ import android.webkit.WebIconDatabase;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.Switch;
 import android.widget.TextView;
 import com.google.common.net.InternetDomainName;
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.BookmarkManager;
 import com.jianhui_zhu.openuseragent.model.HistoryManager;
 import com.jianhui_zhu.openuseragent.model.QueryKeyWordManager;
-import com.jianhui_zhu.openuseragent.model.beans.User;
 import com.jianhui_zhu.openuseragent.util.AbstractFragment;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
+import com.jianhui_zhu.openuseragent.util.RxBus;
 import com.jianhui_zhu.openuseragent.util.SettingSingleton;
 import com.jianhui_zhu.openuseragent.util.activity.MainActivity;
+import com.jianhui_zhu.openuseragent.util.event.ThirdPartyEvent;
 import com.jianhui_zhu.openuseragent.view.adapter.NavigationHomeAdapter;
 import com.jianhui_zhu.openuseragent.view.adapter.SearchSuggestionAdapter;
 import com.jianhui_zhu.openuseragent.view.adapter.WebViewAdapterNew;
@@ -64,6 +67,7 @@ import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -71,7 +75,10 @@ import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 import rx.Observable;
 import rx.Subscriber;
+import rx.Subscription;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 /**
  * Created by Jianhui Zhu on 2016-01-27.
@@ -79,6 +86,7 @@ import rx.schedulers.Schedulers;
 public class HomeView extends AbstractFragment implements HomeViewInterface,SwipeRefreshLayout.OnRefreshListener {
     int total;
     int count;
+    boolean switchInitialized =false;
     String curHost;
     HomeView homeView;
     HistoryManager historyManager = new HistoryManager();
@@ -90,7 +98,6 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     CoordinatorLayout container;
     @Bind(R.id.webview_holder)
     FrameLayout webviewContainer;
-    User user;
     CircleImageView avatar;
     TextView homeName;
     NavigationHomeAdapter gridBookmarkAdapter;
@@ -118,13 +125,24 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
 
         switch (view.getId()) {
             case R.id.home_menu_icon:
-            if (user != null) {
-                ImageView avatar = (ImageView) getActivity().findViewById(R.id.home_avatar);
-                TextView username = (TextView) getActivity().findViewById(R.id.home_name);
-                Picasso.with(getActivity()).load(user.getAvatarUrl()).fit().into(avatar);
-                username.setText(user.getUsername());
-            }
-            settingDrawer.openDrawer(Gravity.RIGHT);
+                if(webHolder!=null) {
+
+                    Switch thirdPartySwitch = (Switch) view.getRootView().findViewById(R.id.third_party_switch);
+                    if(!switchInitialized){
+                        switchInitialized = true;
+                        thirdPartySwitch.setChecked(true);
+                    }
+
+                    thirdPartySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                        @Override
+                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                            ThirdPartyEvent event = new ThirdPartyEvent();
+                            event.setBlockAllThirdParty(isChecked);
+                            RxBus.getInstance().send(event);
+                        }
+                    });
+                }
+                settingDrawer.openDrawer(Gravity.RIGHT);
                 break;
             case R.id.refresh_area:
                 onRefresh();
@@ -162,24 +180,6 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     }
 
     public void configViews(){
-        avatar = (CircleImageView)profileTitle.getHeaderView(0).findViewById(R.id.home_avatar);
-        homeName = (TextView)profileTitle.getHeaderView(0).findViewById(R.id.home_name);
-        avatar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(SettingSingleton.getInstance(getActivity()).isLoginStatus()==false){
-                    Picasso.with(getActivity())
-                            .load(R.drawable.ic_avatar_konata)
-                            .fit()
-                            .into(avatar);
-                    SettingSingleton.getInstance(getActivity())
-                            .setLoginStatus(true);
-                    Snackbar.make(container,"login successful",Snackbar.LENGTH_SHORT).show();
-                    settingDrawer.closeDrawers();
-                    //homeName.setText(SettingSingleton.getInstance(getActivity()).getName());
-                }
-            }
-        });
         profileTitle.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
@@ -277,6 +277,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         this.container=((MainActivity)getActivity()).getContainer();
+
     }
 
 
@@ -387,22 +388,46 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
     }
 
 
-    private class CustomWebViewClient extends WebViewClient {
-        private boolean blockAllThirdParty;
+    public class CustomWebViewClient extends WebViewClient {
+        public void unsubscribe(){
+            compositeSubscription.unsubscribe();
+        }
+        private CompositeSubscription compositeSubscription;
+        private long startTime;
+        private boolean blockAllThirdParty = true;
         private boolean blockBlackList;
         private boolean isRedirect =false;
         private String host;
-        public void blockAllThirdParty(){
-            blockAllThirdParty = true;
-            blockBlackList = false;
+        public boolean getAllThirdPartyPolicy(){
+            return blockAllThirdParty;
         }
-        public void blockBlackList(){
-            blockAllThirdParty = false;
-            blockBlackList = true;
+
+        public void setBlockAllThirdParty(boolean blockAllThirdParty) {
+            this.blockAllThirdParty = blockAllThirdParty;
         }
-        public void allowAllThirdParty(){
-            blockAllThirdParty = false;
-            blockBlackList = false;
+
+        public CustomWebViewClient(){
+            super();
+            if(compositeSubscription==null) {
+                compositeSubscription = new CompositeSubscription();
+            }
+            Subscription subscription = RxBus.getInstance().toObserverable()
+                    .subscribe(new Action1<Object>() {
+                        @Override
+                        public void call(Object o) {
+                            if(o instanceof ThirdPartyEvent){
+                                if(((ThirdPartyEvent)o).isBlockAllThirdParty()){
+                                    blockAllThirdParty = true;
+                                }else{
+                                    blockAllThirdParty =false;
+                                }
+                                if(webHolder!=null){
+                                    webHolder.reload();
+                                }
+                            }
+                        }
+                    });
+            compositeSubscription.add(subscription);
         }
         @Override
         public void onLoadResource(WebView view, final String url) {
@@ -432,11 +457,11 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                     total++;
                     if(host!=null&&resourceHost!=null&&!host.equals(resourceHost)){
                         if(recordForThirdParty!=null){
-                            try {
-                                recordForThirdParty.append
-                                        (resourceHost+"\n");
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                            if(thirdPartyCounter.containsKey(resourceHost)){
+                                int count = thirdPartyCounter.get(resourceHost);
+                                thirdPartyCounter.put(resourceHost,(count+1));
+                            }else{
+                                thirdPartyCounter.put(resourceHost,1);
                             }
                         }
                         count++;
@@ -468,6 +493,7 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
         public void onPageStarted(final WebView view, String url, Bitmap favicon) {
             final String viewUrl=view.getUrl();
             curHost = InternetDomainName.from(Uri.parse(viewUrl).getHost()).topPrivateDomain().toString();
+            startTime = System.currentTimeMillis();
             Observable.create(new Observable.OnSubscribe<Object>() {
                 @Override
                 public void call(Subscriber<? super Object> subscriber) {
@@ -483,9 +509,9 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                         recordForThirdParty =
                                 new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file,true)));
                         recordForThirdParty.append("\nThe target url to be visited").append(viewUrl).append("\n").append("third party web are:\n");
-                        thirdPartyCounter = new HashMap<>();
-
-
+                        if(thirdPartyCounter==null) {
+                            thirdPartyCounter = new HashMap<>();
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -513,8 +539,18 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                     public void call(Subscriber<? super Object> subscriber) {
                         if(recordForThirdParty!=null){
                             try {
+                                for(Map.Entry<String,Integer> entry: thirdPartyCounter.entrySet()){
+                                    recordForThirdParty.append(entry.getKey()+" "+entry.getValue()+"\n");
+
+                                }
+                                recordForThirdParty.append("Policy: Block all third party: "+blockAllThirdParty+"\n");
+                                recordForThirdParty.append("Time comsume to load the page: "+(System.currentTimeMillis()-startTime)+" milliseconds\n");
+                                recordForThirdParty.append("total resource requested: "+total+"  third party count: "+count+"\n");
+                                thirdPartyCounter.clear();
                                 recordForThirdParty.flush();
                                 recordForThirdParty.close();
+                                total = 0;
+                                count = 0;
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -522,9 +558,9 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                         }
                     }
                 }).subscribeOn(Schedulers.io()).subscribe();
-
                 System.out.println("total resource loaded"+total);
                 System.out.println("third party resource loaded"+count);
+
                 if (swipeRefreshLayout.isRefreshing()) {
                     swipeRefreshLayout.setRefreshing(false);
                 }
@@ -547,8 +583,6 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
                 }
             }
         }
-
-
     }
 
 
@@ -627,7 +661,6 @@ public class HomeView extends AbstractFragment implements HomeViewInterface,Swip
         if(webHolder==null||webViewAdapter.getItemCount()==0) {
             webviewContainer.removeAllViews();
             webviewContainer.addView(initPanelView());
-
             configViews();
         }
     }

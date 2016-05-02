@@ -50,7 +50,8 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
         instance = this;
     }
     public void addAllBookmarks(List<Bookmark> bookmarks){
-        this.bookmarks = bookmarks;
+        this.bookmarks.clear();
+        this.bookmarks.addAll(bookmarks);
         notifyDataSetChanged();
     }
     @Override
