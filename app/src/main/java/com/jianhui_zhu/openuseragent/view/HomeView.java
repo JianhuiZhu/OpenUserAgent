@@ -49,10 +49,12 @@ import com.jianhui_zhu.openuseragent.util.RxBus;
 import com.jianhui_zhu.openuseragent.util.SettingSingleton;
 import com.jianhui_zhu.openuseragent.util.TrafficStatisticUtil;
 import com.jianhui_zhu.openuseragent.util.activity.MainActivity;
-import com.jianhui_zhu.openuseragent.util.event.ThirdPartyEvent;
+import com.jianhui_zhu.openuseragent.util.event.GlobalBlackListEvent;
+import com.jianhui_zhu.openuseragent.util.event.ThirdPartyAllEvent;
+import com.jianhui_zhu.openuseragent.util.event.ThirdPartyTabSpecificEvent;
 import com.jianhui_zhu.openuseragent.view.adapter.NavigationHomeAdapter;
 import com.jianhui_zhu.openuseragent.view.adapter.SearchSuggestionAdapter;
-import com.jianhui_zhu.openuseragent.view.adapter.WebViewAdapterNew;
+import com.jianhui_zhu.openuseragent.view.adapter.WebViewAdapter;
 import com.jianhui_zhu.openuseragent.view.custom.CustomDrawerLayout;
 import com.jianhui_zhu.openuseragent.view.custom.CustomWebView;
 import com.jianhui_zhu.openuseragent.view.dialogs.TabStackDialog;
@@ -67,7 +69,9 @@ import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -84,22 +88,16 @@ import rx.subscriptions.CompositeSubscription;
  * Created by Jianhui Zhu on 2016-01-27.
  */
 public class HomeView extends Fragment implements HomeViewInterface,SwipeRefreshLayout.OnRefreshListener {
-    int total;
-    int count;
+
     boolean switchInitialized =false;
-    String curHost;
     HomeView homeView;
     HistoryManager historyManager = new HistoryManager();
     BookmarkManager bookmarkManager = new BookmarkManager();
     QueryKeyWordManager queryKeyWordManager = new QueryKeyWordManager();
     HomeViewModel viewModel = new HomeViewModel();
-    HashMap<String,Integer> thirdPartyCounter;
-    BufferedWriter recordForThirdParty;
     CoordinatorLayout container;
     @Bind(R.id.webview_holder)
     FrameLayout webviewContainer;
-    CircleImageView avatar;
-    TextView homeName;
     NavigationHomeAdapter gridBookmarkAdapter;
     CustomWebView webHolder;
     @Bind(R.id.setting_drawer)
@@ -119,7 +117,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
     @Bind(R.id.tab)
     ImageView tabIcon;
     SearchSuggestionAdapter suggestionAdapter;
-    WebViewAdapterNew webViewAdapter;
+    WebViewAdapter webViewAdapter;
     @OnClick({R.id.home_menu_icon,R.id.refresh_area,R.id.tab_area,R.id.add_bookmark_area,R.id.backward_area,R.id.forward_area})
     public void click(View view) {
 
@@ -136,7 +134,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                     thirdPartySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                         @Override
                         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                            ThirdPartyEvent event = new ThirdPartyEvent();
+                            ThirdPartyAllEvent event = new ThirdPartyAllEvent();
                             event.setBlockAllThirdParty(isChecked);
                             RxBus.getInstance().send(event);
                         }
@@ -250,7 +248,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                 String path=getActivity().getDir("icons", Context.MODE_PRIVATE).getPath();
                 WebIconDatabase.getInstance().open(path);
                 suggestionAdapter = new SearchSuggestionAdapter(getActivity());
-                webViewAdapter =WebViewAdapterNew.getInstance(homeView);
+                webViewAdapter = WebViewAdapter.getInstance(homeView);
 
             }
         }).subscribeOn(Schedulers.io()).subscribe();
@@ -380,6 +378,13 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
 
 
     public class CustomWebViewClient extends WebViewClient {
+        String curHost;
+        int total;
+        int count;
+        HashMap<String,Integer> thirdPartyCounter;
+        BufferedWriter recordForThirdParty;
+        private Set<String> globalBlackList = new HashSet<>();
+        private HashMap<String,Boolean> tabPolicy = new HashMap<>();
         public void unsubscribe(){
             compositeSubscription.unsubscribe();
         }
@@ -406,8 +411,8 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                     .subscribe(new Action1<Object>() {
                         @Override
                         public void call(Object o) {
-                            if(o instanceof ThirdPartyEvent){
-                                if(((ThirdPartyEvent)o).isBlockAllThirdParty()){
+                            if(o instanceof ThirdPartyAllEvent){
+                                if(((ThirdPartyAllEvent)o).isBlockAllThirdParty()){
                                     blockAllThirdParty = true;
                                 }else{
                                     blockAllThirdParty =false;
@@ -415,6 +420,10 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                                 if(webHolder!=null){
                                     webHolder.reload();
                                 }
+                            }else if(o instanceof ThirdPartyTabSpecificEvent){
+
+                            }else if(o instanceof GlobalBlackListEvent){
+
                             }
                         }
                     });
@@ -654,5 +663,14 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        webViewAdapter.destoryAll();
+        if(webHolder!=null){
+            webHolder.destroy();
+        }
+        super.onDestroy();
     }
 }

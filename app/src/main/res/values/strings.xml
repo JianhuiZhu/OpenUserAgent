@@ -14,4 +14,8 @@
     //Switch
     <string name="off">OFF</string>
     <string name="on">ON</string>
+    <string name="black_list">block it</string>
+
+    <string name="allow">ALLOWED</string>
+    <string name="block">BLOCKED</string>
 </resources>

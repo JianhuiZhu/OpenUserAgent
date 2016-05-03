@@ -38,4 +38,9 @@ public class MainActivity extends Activity {
 	protected void onPostResume() {
 		super.onPostResume();
 	}
+
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+	}
 }

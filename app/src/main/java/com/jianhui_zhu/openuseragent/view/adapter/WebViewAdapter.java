@@ -29,12 +29,17 @@ import butterknife.OnClick;
 /**
  * Created by jianhuizhu on 2016-04-29.
  */
-public class WebViewAdapterNew extends RecyclerView.Adapter<WebViewAdapterNew.ViewHolder> {
+public class WebViewAdapter extends RecyclerView.Adapter<WebViewAdapter.ViewHolder> {
     private Context context;
     private HomeViewInterface home;
     private ArrayList<WebViewInfoHolder> webViews=new ArrayList<>();
-    private static WebViewAdapterNew instance;
-
+    private static WebViewAdapter instance;
+    public void destoryAll(){
+        for(WebViewInfoHolder holder: webViews){
+            holder.getWebView().destroy();
+            webViews.remove(holder);
+        }
+    }
     public TabStackDialog getTabStackDialog() {
         return tabStackDialog;
     }
@@ -44,9 +49,9 @@ public class WebViewAdapterNew extends RecyclerView.Adapter<WebViewAdapterNew.Vi
     }
 
     private TabStackDialog tabStackDialog = null;
-    public static synchronized WebViewAdapterNew getInstance(HomeViewInterface viewInterface){
-        if(WebViewAdapterNew.instance==null){
-            instance = new WebViewAdapterNew();
+    public static synchronized WebViewAdapter getInstance(HomeViewInterface viewInterface){
+        if(WebViewAdapter.instance==null){
+            instance = new WebViewAdapter();
             instance.home = viewInterface;
         }
         return instance;

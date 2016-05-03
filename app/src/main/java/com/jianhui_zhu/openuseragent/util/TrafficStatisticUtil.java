@@ -22,7 +22,7 @@ public final class TrafficStatisticUtil {
         }
     }
 
-    public  synchronized long getCurTotalBytesConsume(){
+    public synchronized long getCurTotalBytesConsume(){
         long cur = TrafficStats.getUidRxBytes(MY_UID) + TrafficStats.getUidTxBytes(MY_UID);
         long result = cur - preTotalByteConsume;
         preTotalByteConsume = cur;

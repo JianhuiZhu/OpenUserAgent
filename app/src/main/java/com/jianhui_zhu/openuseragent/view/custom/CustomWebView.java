@@ -9,7 +9,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-
+import com.jianhui_zhu.openuseragent.view.HomeView.CustomWebViewClient;
 import com.jianhui_zhu.openuseragent.util.WebUtil;
 import com.jianhui_zhu.openuseragent.view.HomeView;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
@@ -21,6 +21,7 @@ import java.net.URL;
  * Created by jianhuizhu on 2016-03-09.
  */
 public class CustomWebView extends WebView {
+    WebViewClient client;
     public void setAllThirdPartyPolicy(boolean allThirdPartyPolicy) {
         this.allThirdPartyPolicy = allThirdPartyPolicy;
     }
@@ -60,6 +61,7 @@ public class CustomWebView extends WebView {
     @Override
     public void setWebViewClient(WebViewClient client) {
         allThirdPartyPolicy = ((HomeView.CustomWebViewClient)client).getAllThirdPartyPolicy();
+        this.client = client;
         super.setWebViewClient(client);
     }
 
@@ -105,4 +107,9 @@ public class CustomWebView extends WebView {
         }
     }
 
+    @Override
+    public void destroy() {
+        ((CustomWebViewClient)client).unsubscribe();
+        super.destroy();
+    }
 }

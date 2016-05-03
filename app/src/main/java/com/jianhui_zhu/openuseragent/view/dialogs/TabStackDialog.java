@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.jianhui_zhu.openuseragent.R;
-import com.jianhui_zhu.openuseragent.view.adapter.WebViewAdapterNew;
+import com.jianhui_zhu.openuseragent.view.adapter.WebViewAdapter;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 
 import butterknife.Bind;
@@ -25,7 +25,7 @@ public class TabStackDialog extends DialogFragment {
     HomeViewInterface viewInterface;
     @Bind(R.id.tab_pager)
     RecyclerView tabs;
-    WebViewAdapterNew adapter;
+    WebViewAdapter adapter;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -37,7 +37,7 @@ public class TabStackDialog extends DialogFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        adapter = WebViewAdapterNew.getInstance(viewInterface);
+        adapter = WebViewAdapter.getInstance(viewInterface);
         adapter.setTabStackDialog(this);
         tabs.setItemAnimator(new DefaultItemAnimator());
         tabs.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false));
