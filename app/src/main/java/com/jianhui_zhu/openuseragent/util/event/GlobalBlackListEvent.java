@@ -1,5 +1,6 @@
 package com.jianhui_zhu.openuseragent.util.event;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -9,14 +10,14 @@ public class GlobalBlackListEvent {
     public static final int CLEAR = 0;
     public static final int ADD = 1;
     public static final int REMOVE = 2;
-    private Set domains;
+    private Set<String> domains = new HashSet<>();
     private int action;
 
-    public Set getDomains() {
+    public Set<String> getDomains() {
         return domains;
     }
 
-    public void setDomains(Set domains) {
+    public void setDomains(Set<String> domains) {
         this.domains = domains;
     }
 

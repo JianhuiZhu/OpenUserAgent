@@ -43,7 +43,7 @@ import com.google.common.net.InternetDomainName;
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.BookmarkManager;
 import com.jianhui_zhu.openuseragent.model.HistoryManager;
-import com.jianhui_zhu.openuseragent.model.QueryKeyWordManager;
+import com.jianhui_zhu.openuseragent.model.HomeViewManager;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.RxBus;
 import com.jianhui_zhu.openuseragent.util.SettingSingleton;
@@ -76,7 +76,6 @@ import java.util.Set;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import de.hdodenhof.circleimageview.CircleImageView;
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
@@ -93,7 +92,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
     HomeView homeView;
     HistoryManager historyManager = new HistoryManager();
     BookmarkManager bookmarkManager = new BookmarkManager();
-    QueryKeyWordManager queryKeyWordManager = new QueryKeyWordManager();
+    HomeViewManager homeViewManager = new HomeViewManager();
     HomeViewModel viewModel = new HomeViewModel();
     CoordinatorLayout container;
     @Bind(R.id.webview_holder)
@@ -219,7 +218,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                     loadTargetUrl(SettingSingleton.getInstance(getActivity()).getSearchEngine() + query);
 
                 }
-                queryKeyWordManager.saveQueryText(query);
+                homeViewManager.saveQueryText(query);
                 suggestionAdapter.changeCursor(null);
                 changeToolBarVisibility(View.GONE);
                 return true;
@@ -230,7 +229,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                 if (newText.equals("")) {
                     suggestionAdapter.changeCursor(null);
                 } else {
-                    viewModel.queryText(queryKeyWordManager.queryText(newText),homeView);
+                    viewModel.queryText(homeViewManager.queryText(newText),homeView);
                 }
                 return true;
             }
@@ -404,6 +403,12 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
 
         public CustomWebViewClient(){
             super();
+            Observable.create(new Observable.OnSubscribe<Object>() {
+                @Override
+                public void call(Subscriber<? super Object> subscriber) {
+
+                }
+            }).subscribeOn(Schedulers.io()).subscribe();
             if(compositeSubscription==null) {
                 compositeSubscription = new CompositeSubscription();
             }
@@ -421,9 +426,21 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                                     webHolder.reload();
                                 }
                             }else if(o instanceof ThirdPartyTabSpecificEvent){
-
+                                ThirdPartyTabSpecificEvent event =(ThirdPartyTabSpecificEvent)o;
+                                tabPolicy.put(event.getDomain(),event.isStatus());
                             }else if(o instanceof GlobalBlackListEvent){
-
+                                GlobalBlackListEvent event = (GlobalBlackListEvent)o;
+                                switch (event.getAction()){
+                                    case GlobalBlackListEvent.ADD:
+                                        globalBlackList.addAll(event.getDomains());
+                                        break;
+                                    case GlobalBlackListEvent.CLEAR:
+                                        globalBlackList.clear();
+                                        break;
+                                    case GlobalBlackListEvent.REMOVE:
+                                        globalBlackList.removeAll(event.getDomains());
+                                        break;
+                                }
                             }
                         }
                     });
@@ -480,9 +497,9 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
 
         @Override
         public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-            if(blockAllThirdParty) {
-                String resourceHost = InternetDomainName.from(Uri.parse(url).getHost()).topPrivateDomain().toString();
-                if (!resourceHost.equals(curHost)) {
+            String resourceHost = InternetDomainName.from(Uri.parse(url).getHost()).topPrivateDomain().toString();
+            if(!resourceHost.equals(curHost)){
+                if(blockAllThirdParty||(blockBlackList&&tabPolicy.containsKey(resourceHost))){
                     return new WebResourceResponse("text/css", "UTF-8", null);
                 }
             }

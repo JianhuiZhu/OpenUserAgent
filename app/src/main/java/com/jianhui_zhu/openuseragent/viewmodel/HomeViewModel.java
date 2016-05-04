@@ -9,6 +9,9 @@ import com.jianhui_zhu.openuseragent.model.beans.History;
 import com.jianhui_zhu.openuseragent.view.HomeView;
 import com.jianhui_zhu.openuseragent.view.adapter.NavigationHomeAdapter;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -57,6 +60,9 @@ public class HomeViewModel {
                         view.setAdapter(adapter);
                     }
                 });
+    }
+    public void initTabPolicy(Set<String> globalBlackList, Map<String,Boolean> tabPolicy){
+
     }
 
 }

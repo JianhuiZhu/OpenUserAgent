@@ -5,6 +5,7 @@ import com.jianhui_zhu.openuseragent.model.beans.History;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import rx.Observable;
 
@@ -22,4 +23,5 @@ public interface DatabaseInterface {
     Observable<String> deleteAllHistories();
     Observable<List<History>> getHistoryByDate(int year, int month, int day);
     Observable<String> deleteSelectedHistory(List<History> histories);
+    Observable<Set<String>> getBlackList();
 }

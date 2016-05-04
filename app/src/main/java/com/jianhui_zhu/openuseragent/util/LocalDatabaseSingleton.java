@@ -16,8 +16,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -41,7 +43,6 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
     public static synchronized LocalDatabaseSingleton getInstance() {
         return instance;
     }
-
 
     @Override
     public Observable<Bookmark> updateBookmark(final Bookmark bookmark) {
@@ -149,6 +150,29 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
                 subscriber.onCompleted();
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    @Override
+    public Observable<Set<String>> getBlackList() {
+        return Observable.create(new Observable.OnSubscribe<Set<String>>() {
+            @Override
+            public void call(Subscriber<? super Set<String>> subscriber) {
+                Set<String> result = new HashSet<>();
+                Cursor cursor = LocalDatabaseHelper.getInstance(context).getReadableDatabase()
+                        .query("BlackList",null,null,null,null,null,null);
+                try {
+                    if (cursor.moveToFirst()) {
+                        do {
+                            result.add(cursor.getString(0));
+                        } while (cursor.moveToNext());
+                        subscriber.onNext(result);
+                        subscriber.onCompleted();
+                    }
+                }finally {
+                    cursor.close();
+                }
+            }
+        }).subscribeOn(Schedulers.io());
     }
 
     @Override
@@ -388,9 +412,12 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
                     "_id INTEGER NOT NULL PRIMARY KEY," +
                     "query VARCHAR(400) NOT NULL," +
                     "count INT NOT NULL DEFAULT 1)";
+            String createBlackListTable = "CREATE TABLE IF NOT EXISTS BlackList("+
+                    "domain VARCHAR(255) NOT NULL PRIMARY KEY)";
             db.execSQL(createQueryTable);
             db.execSQL(createBookmarksTable);
             db.execSQL(createRecordsTable);
+            db.execSQL(createBlackListTable);
         }
 
         @Override

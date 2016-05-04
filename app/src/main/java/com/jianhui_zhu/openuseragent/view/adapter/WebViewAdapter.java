@@ -37,8 +37,8 @@ public class WebViewAdapter extends RecyclerView.Adapter<WebViewAdapter.ViewHold
     public void destoryAll(){
         for(WebViewInfoHolder holder: webViews){
             holder.getWebView().destroy();
-            webViews.remove(holder);
         }
+        webViews.clear();
     }
     public TabStackDialog getTabStackDialog() {
         return tabStackDialog;
