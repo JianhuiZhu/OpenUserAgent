@@ -6,12 +6,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.util.RxBus;
 import com.jianhui_zhu.openuseragent.util.event.ThirdPartyTabSpecificEvent;
+import com.jianhui_zhu.openuseragent.viewmodel.ThirdPartyContentViewModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,18 +30,29 @@ import butterknife.OnClick;
  * Created by jianhuizhu on 2016-05-03.
  */
 public class ThirdPartyContentAdapter extends RecyclerView.Adapter<ThirdPartyContentAdapter.ViewHolder> {
+    private ThirdPartyContentViewModel viewModel = new ThirdPartyContentViewModel();
     private List<Map.Entry<String,Boolean>> policyList = new ArrayList<>();
-    private Set<String> globalBlackList = new HashSet<>();
+    private HashSet<String> globalBlackList = new HashSet<>();
+
+    public HashSet<String> getTobeAdded() {
+        return tobeAdded;
+    }
+
+    private HashSet<String> tobeAdded = new HashSet<>();
+    private TextView tv;
+    private ImageView icon;
     public List<Map.Entry<String, Boolean>> getPolicyList() {
         return policyList;
     }
-    public ThirdPartyContentAdapter(Set<String> globalBlackList, HashMap<String,Boolean> tabPolicyMap){
+    public ThirdPartyContentAdapter(Set<String> globalBlackList, HashMap<String,Boolean> tabPolicyMap, TextView tv, ImageView icon){
         if(globalBlackList!=null) {
             this.globalBlackList.addAll(globalBlackList);
         }
         if(tabPolicyMap!=null) {
             this.policyList.addAll(tabPolicyMap.entrySet());
         }
+        this.tv = tv;
+        this.icon = icon;
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -49,9 +62,19 @@ public class ThirdPartyContentAdapter extends RecyclerView.Adapter<ThirdPartyCon
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Map.Entry<String,Boolean> item = policyList.get(position);
+        final Map.Entry<String,Boolean> item = policyList.get(position);
         holder.switcher.setChecked(item.getValue());
         holder.domain.setText(item.getKey());
+        holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    tobeAdded.add(item.getKey());
+                }else{
+                    tobeAdded.remove(item.getKey());
+                }
+            }
+        });
         if(globalBlackList.contains(item.getKey())){
             holder.checkBox.setChecked(true);
         }else{

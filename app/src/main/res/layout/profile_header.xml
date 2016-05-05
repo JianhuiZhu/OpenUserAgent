@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/mdtp_accent_color">
     <TextView
         android:layout_marginTop="@dimen/material_top_bottom_margin"
@@ -44,4 +45,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
+    <RelativeLayout
+        android:layout_marginLeft="@dimen/material_side_margin"
+        android:layout_below="@+id/switch_area"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+    <Button
+        android:background="@color/mdtp_accent_color"
+        android:textColor="@color/mdtp_white"
+        android:id="@+id/third_party_dialog_entry"
+        tools:text = "Resource 169 / 179 blocked"
+        android:layout_width="wrap_content"
+        android:shadowDy="5dp"
+        android:layout_height="wrap_content" />
+    </RelativeLayout>
 </RelativeLayout>

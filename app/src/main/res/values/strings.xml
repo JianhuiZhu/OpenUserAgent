@@ -18,4 +18,7 @@
 
     <string name="allow">ALLOWED</string>
     <string name="block">BLOCKED</string>
+
+    <string name="third_party_dialog_title">Third Party</string>
+    <string name="third_party_dialog_block_hint">Add @blacklist</string>
 </resources>

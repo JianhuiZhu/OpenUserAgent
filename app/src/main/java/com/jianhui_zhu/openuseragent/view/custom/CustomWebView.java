@@ -21,7 +21,11 @@ import java.net.URL;
  * Created by jianhuizhu on 2016-03-09.
  */
 public class CustomWebView extends WebView {
-    WebViewClient client;
+    public CustomWebViewClient getClient() {
+        return client;
+    }
+
+    CustomWebViewClient client;
     public void setAllThirdPartyPolicy(boolean allThirdPartyPolicy) {
         this.allThirdPartyPolicy = allThirdPartyPolicy;
     }
@@ -61,7 +65,7 @@ public class CustomWebView extends WebView {
     @Override
     public void setWebViewClient(WebViewClient client) {
         allThirdPartyPolicy = ((HomeView.CustomWebViewClient)client).getAllThirdPartyPolicy();
-        this.client = client;
+        this.client = (CustomWebViewClient) client;
         super.setWebViewClient(client);
     }
 

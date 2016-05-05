@@ -1,9 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+<RelativeLayout
+    android:background="@color/materialAccent"
+    android:id="@+id/dialog_top_area"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <TextView
+        android:layout_marginTop="@dimen/material_top_bottom_margin"
+        android:layout_marginBottom="@dimen/material_top_bottom_margin"
+        android:layout_marginLeft="@dimen/material_side_margin"
+        android:id="@+id/third_party_dialog_title"
+        android:textColor="@color/mdtp_white"
+        android:text="@string/third_party"
+        android:textSize="@dimen/text_title_medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <RelativeLayout
+        android:id="@+id/block_button_area"
+        android:layout_marginTop="@dimen/material_top_bottom_margin"
+        android:layout_marginRight="@dimen/material_side_margin"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/global_block_icon"
+            android:id="@+id/global_block_hint_text"
+            android:text="@string/third_party_dialog_block_hint"
+            android:textSize="@dimen/text_caption"
+            android:textColor="@color/mdtp_white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <ImageView
+             android:layout_marginRight="@dimen/material_top_bottom_margin"
+            android:layout_centerVertical="true"
+            android:id="@+id/global_block_icon"
+            android:src="@drawable/ic_block"
+            android:layout_width="24dp"
+            android:layout_height="24dp" />
+    </RelativeLayout>
+</RelativeLayout>
 <android.support.v7.widget.RecyclerView
+    android:layout_below="@+id/dialog_top_area"
     android:id="@+id/third_party_list"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"/>

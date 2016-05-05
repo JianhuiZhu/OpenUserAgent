@@ -31,6 +31,7 @@ import android.webkit.WebIconDatabase;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -58,20 +59,20 @@ import com.jianhui_zhu.openuseragent.view.adapter.WebViewAdapter;
 import com.jianhui_zhu.openuseragent.view.custom.CustomDrawerLayout;
 import com.jianhui_zhu.openuseragent.view.custom.CustomWebView;
 import com.jianhui_zhu.openuseragent.view.dialogs.TabStackDialog;
+import com.jianhui_zhu.openuseragent.view.dialogs.ThirdPartyContentDialog;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 import com.jianhui_zhu.openuseragent.viewmodel.HomeViewModel;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -87,7 +88,7 @@ import rx.subscriptions.CompositeSubscription;
  * Created by Jianhui Zhu on 2016-01-27.
  */
 public class HomeView extends Fragment implements HomeViewInterface,SwipeRefreshLayout.OnRefreshListener {
-
+    private HashSet<String> globalBlackList = new HashSet<>();
     boolean switchInitialized =false;
     HomeView homeView;
     HistoryManager historyManager = new HistoryManager();
@@ -136,6 +137,24 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                             ThirdPartyAllEvent event = new ThirdPartyAllEvent();
                             event.setBlockAllThirdParty(isChecked);
                             RxBus.getInstance().send(event);
+
+                        }
+                    });
+                    Button entry = (Button)view.findViewById(R.id.third_party_dialog_entry);
+                    int count = 0;
+                    for(Map.Entry<String,Boolean> en : webHolder.getClient().getTabPolicy().entrySet() ){
+                        if(en.getValue()){
+                            count++;
+                        }
+                    }
+                    entry.setText(String.valueOf(count)+" resource blocked");
+                    entry.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            String host = webHolder.getClient().getCurHost();
+                            HashMap<String,Boolean> tabPolicy = webHolder.getClient().getTabPolicy();
+                            ThirdPartyContentDialog dialog = ThirdPartyContentDialog.newInstance(globalBlackList,tabPolicy,host);
+                            FragmenUtil.switchToFragment(getActivity(),dialog);
                         }
                     });
                 }
@@ -272,7 +291,9 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
     @Override
     public void loadTargetUrl(String url) {
         swipeRefreshLayout.setRefreshing(true);
-        webHolder = initWebView();
+        if(webHolder==null) {
+            webHolder = initWebView();
+        }
         if (url != null && !url.equals("")&&URLUtil.isValidUrl(url)) {
             this.webHolder.loadUrl(url);
         } else {
@@ -377,12 +398,24 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
 
 
     public class CustomWebViewClient extends WebViewClient {
+        public String getCurHost() {
+            return curHost;
+        }
+
         String curHost;
         int total;
         int count;
-        HashMap<String,Integer> thirdPartyCounter;
+        HashMap<String,Integer> thirdPartyCounter = new HashMap<>();
         BufferedWriter recordForThirdParty;
-        private Set<String> globalBlackList = new HashSet<>();
+
+        public HashMap<String, Boolean> getTabPolicy() {
+            return tabPolicy;
+        }
+
+        public void setTabPolicy(HashMap<String, Boolean> tabPolicy) {
+            this.tabPolicy = tabPolicy;
+        }
+
         private HashMap<String,Boolean> tabPolicy = new HashMap<>();
         public void unsubscribe(){
             compositeSubscription.unsubscribe();
@@ -510,30 +543,21 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
         public void onPageStarted(final WebView view, String url, Bitmap favicon) {
             final String viewUrl=view.getUrl();
             curHost = InternetDomainName.from(Uri.parse(viewUrl).getHost()).topPrivateDomain().toString();
-            startTime = System.currentTimeMillis();
-            Observable.create(new Observable.OnSubscribe<Object>() {
-                @Override
-                public void call(Subscriber<? super Object> subscriber) {
-                    try {
-                        File path = Environment.getExternalStoragePublicDirectory(
-                                Environment.DIRECTORY_DOWNLOADS);
-                        if(!path.exists()){
-                            if(!path.mkdir()){
-                                Log.e(this.getClass().getSimpleName(),"cannot create directory");
-                            }
-                        }
-                        File file = new File(path,"record.txt");
-                        recordForThirdParty =
-                                new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file,true)));
-                        recordForThirdParty.append("\nThe target url to be visited").append(viewUrl).append("\n").append("third party web are:\n");
-                        if(thirdPartyCounter==null) {
-                            thirdPartyCounter = new HashMap<>();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+            try {
+                File path = Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_DOWNLOADS);
+                if (!path.exists()) {
+                    if (!path.mkdir()) {
+                        Log.e(this.getClass().getSimpleName(), "cannot create directory");
                     }
                 }
-            }).subscribeOn(Schedulers.io()).subscribe();
+                File file = new File(path, "record.txt");
+                recordForThirdParty = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true)));
+                startTime = System.currentTimeMillis();
+                homeViewManager.startRecord(recordForThirdParty,curHost);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
 
             swipeRefreshLayout.setRefreshing(true);
             URI uri= null;
@@ -555,22 +579,9 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                     @Override
                     public void call(Subscriber<? super Object> subscriber) {
                         if(recordForThirdParty!=null){
-                            try {
-                                for(Map.Entry<String,Integer> entry: thirdPartyCounter.entrySet()){
-                                    recordForThirdParty.append(entry.getKey()+" "+entry.getValue()+"\n");
-                                }
-                                recordForThirdParty.append("Policy: Block all third party: "+blockAllThirdParty+"\n");
-                                recordForThirdParty.append("Time comsume to load the page: "+(System.currentTimeMillis()-startTime)+" milliseconds\n");
-                                recordForThirdParty.append("total resource requested: "+total+"  third party count: "+count+"\n");
-                                recordForThirdParty.append("Total bandwidth consumed: "+ TrafficStatisticUtil.getInstance().getCurTotalBytesConsume()+" Bytes\n");
-                                thirdPartyCounter.clear();
-                                recordForThirdParty.flush();
-                                recordForThirdParty.close();
-                                total = 0;
-                                count = 0;
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                            homeViewManager.flushRecord(recordForThirdParty,thirdPartyCounter,blockAllThirdParty,total,count,startTime);
+                            total = 0;
+                            count = 0;
                             recordForThirdParty=null;
                         }
                     }

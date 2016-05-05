@@ -17,7 +17,6 @@ public class WebViewInfoHolder {
     public void setTitle(String title) {
         this.title = title;
     }
-
     private String title;
     private CustomWebView webView;
     private Bitmap bitmap;
