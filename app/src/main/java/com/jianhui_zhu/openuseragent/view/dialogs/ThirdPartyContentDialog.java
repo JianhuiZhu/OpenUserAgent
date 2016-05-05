@@ -1,6 +1,7 @@
 package com.jianhui_zhu.openuseragent.view.dialogs;
 
 import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -19,6 +20,7 @@ import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.util.RxBus;
 import com.jianhui_zhu.openuseragent.util.event.GlobalBlackListEvent;
 import com.jianhui_zhu.openuseragent.util.event.ThirdPartyTabSpecificEvent;
+import com.jianhui_zhu.openuseragent.util.event.WebViewRefreshEvent;
 import com.jianhui_zhu.openuseragent.view.adapter.ThirdPartyContentAdapter;
 
 import java.io.Serializable;
@@ -86,5 +88,11 @@ public class ThirdPartyContentDialog extends DialogFragment {
         bundle.putString(ThirdPartyContentDialog.DOMAIN_TAG,domain);
         dialog.setArguments(bundle);
         return dialog;
+    }
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        super.onDismiss(dialog);
+        RxBus.getInstance().send(new WebViewRefreshEvent());
     }
 }

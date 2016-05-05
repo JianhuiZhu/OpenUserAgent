@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="@dimen/material_height_single_line_list_item_regular"
-    xmlns:tool="http://schemas.android.com/apk/res-auto"
+<RelativeLayout android:layout_width="match_parent"
+    android:layout_height="@dimen/material_height_double_line_list_item_regular"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
+    <TextView
+        android:layout_marginTop="@dimen/material_top_bottom_margin"
+        tools:text="googleadsblablabla.com"
+        android:layout_marginLeft="@dimen/material_side_margin"
+        android:textSize="@dimen/text_body"
+        android:id="@+id/third_party_domain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <RelativeLayout
+        android:layout_below="@+id/third_party_domain"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <CheckBox
         android:layout_centerVertical="true"
         android:layout_marginLeft="@dimen/material_side_margin"
@@ -12,28 +24,28 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <TextView
-        android:layout_toRightOf="@+id/third_party_dialog_global_checkbox"
-        android:layout_centerVertical="true"
-        tools:text="googleadsblablabla.com"
-        android:layout_marginLeft="@dimen/material_side_margin"
-        android:textSize="@dimen/text_body"
-        android:id="@+id/third_party_domain"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-    <TextView
+
         android:textSize="@dimen/text_caption"
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@+id/third_party_block_switch"
-        android:layout_marginRight="@dimen/material_side_margin"
+        android:layout_marginLeft="@dimen/material_side_margin"
         android:id="@+id/third_party_status"
         android:text="@string/allow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <Switch
         android:id="@+id/third_party_block_switch"
-        android:layout_centerVertical="true"
+        android:layout_marginLeft="@dimen/material_top_bottom_margin"
+        android:layout_marginTop="@dimen/material_top_bottom_margin"
+        android:layout_marginBottom="@dimen/material_top_bottom_margin"
         android:layout_marginRight="@dimen/material_side_margin"
         android:layout_alignParentRight="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+    </RelativeLayout>
+    <View
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"/>
 </RelativeLayout>

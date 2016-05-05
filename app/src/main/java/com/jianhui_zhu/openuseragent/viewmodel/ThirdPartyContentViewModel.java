@@ -14,7 +14,7 @@ public class ThirdPartyContentViewModel {
     public void changeIconStatus(Context context,boolean status, TextView textView, ImageView icon) {
         if (textView != null && icon != null) {
             if (status) {
-                textView.setTextColor(context.getResources().getColor(R.color.mdtp_transparent_black));
+                textView.setTextColor(context.getResources().getColor(R.color.mdtp_white));
                 icon.clearColorFilter();
             } else {
                 textView.setTextColor(context.getResources().getColor(R.color.mdtp_light_gray));

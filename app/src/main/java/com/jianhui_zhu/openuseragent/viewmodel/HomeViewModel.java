@@ -61,8 +61,13 @@ public class HomeViewModel {
                     }
                 });
     }
-    public void initTabPolicy(Set<String> globalBlackList, Map<String,Boolean> tabPolicy){
-
+    public void modifyGlobalBlackList(Observable<String> observable, final CoordinatorLayout container){
+        observable.subscribe(new Action1<String>() {
+            @Override
+            public void call(String s) {
+                Snackbar.make(container,s,Snackbar.LENGTH_SHORT).show();
+            }
+        });
     }
 
 }

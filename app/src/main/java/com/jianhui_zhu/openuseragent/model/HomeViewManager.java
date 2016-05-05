@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -40,8 +41,8 @@ public class HomeViewManager {
     public void saveQueryText(String text){
         LocalDatabaseSingleton.getInstance().saveQueryRecord(text);
     }
-    public void getGlobalBlackList(Observable<Set<String>>observable, final Set<String> globalBlackList){
-        observable.subscribe(new Action1<Set<String>>() {
+    public void initGlobalBlackList(final Set<String> globalBlackList){
+        LocalDatabaseSingleton.getInstance().getBlackList().subscribe(new Action1<Set<String>>() {
             @Override
             public void call(Set<String> strings) {
                 globalBlackList.addAll(strings);
@@ -78,5 +79,14 @@ public class HomeViewManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    public Observable<String> addToGlobalBlackList(Set<String> domains){
+        return LocalDatabaseSingleton.getInstance().addToBlackList(domains);
+    }
+    public Observable<String> removeFromGlobalBlackList(Set<String> domains){
+        return LocalDatabaseSingleton.getInstance().removeFromGlobalBlackList(domains);
+    }
+    public Observable<String> deleteAllFromGlobalBlackList(){
+        return LocalDatabaseSingleton.getInstance().deleteAllFromBlackList();
     }
 }

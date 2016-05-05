@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
@@ -14,6 +15,7 @@ import com.jianhui_zhu.openuseragent.util.interfaces.DatabaseInterface;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
@@ -171,6 +173,45 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
                 }finally {
                     cursor.close();
                 }
+            }
+        }).subscribeOn(Schedulers.io());
+    }
+
+    @Override
+    public Observable<String> addToBlackList(final Set<String> domains) {
+        return Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                ContentValues newValues = new ContentValues();
+                for(String domain : domains){
+                    newValues.put("domain",domain);
+                }
+                LocalDatabaseHelper.getInstance(context).getWritableDatabase().insert("BlackList",null,newValues);
+                subscriber.onNext("Added "+ domains.size()+" domain(s) into blacklist.");
+                subscriber.onCompleted();
+            }
+        }).subscribeOn(Schedulers.io());
+    }
+    @Override
+    public Observable<String> deleteAllFromBlackList(){
+        return Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                LocalDatabaseHelper.getInstance(context).getWritableDatabase().delete("BlackList",null,null);
+                subscriber.onNext("Blacklist has been cleared");
+                subscriber.onCompleted();
+            }
+        }).subscribeOn(Schedulers.io());
+    }
+    @Override
+    public Observable<String> removeFromGlobalBlackList(final Set<String> domains) {
+        return Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                String whereClause = String.format("domain" + " in (%s)", TextUtils.join(",", Collections.nCopies(domains.size(), "?")));
+                LocalDatabaseHelper.getInstance(context).getWritableDatabase().delete("BlackList", whereClause, domains.toArray(new String[0]));
+                subscriber.onNext("Removed "+domains.size()+" domain(s) from blacklist.");
+                subscriber.onCompleted();
             }
         }).subscribeOn(Schedulers.io());
     }

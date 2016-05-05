@@ -48,11 +48,11 @@ import com.jianhui_zhu.openuseragent.model.HomeViewManager;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.RxBus;
 import com.jianhui_zhu.openuseragent.util.SettingSingleton;
-import com.jianhui_zhu.openuseragent.util.TrafficStatisticUtil;
 import com.jianhui_zhu.openuseragent.util.activity.MainActivity;
 import com.jianhui_zhu.openuseragent.util.event.GlobalBlackListEvent;
 import com.jianhui_zhu.openuseragent.util.event.ThirdPartyAllEvent;
 import com.jianhui_zhu.openuseragent.util.event.ThirdPartyTabSpecificEvent;
+import com.jianhui_zhu.openuseragent.util.event.WebViewRefreshEvent;
 import com.jianhui_zhu.openuseragent.view.adapter.NavigationHomeAdapter;
 import com.jianhui_zhu.openuseragent.view.adapter.SearchSuggestionAdapter;
 import com.jianhui_zhu.openuseragent.view.adapter.WebViewAdapter;
@@ -71,7 +71,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 
 import butterknife.Bind;
@@ -118,6 +117,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
     ImageView tabIcon;
     SearchSuggestionAdapter suggestionAdapter;
     WebViewAdapter webViewAdapter;
+    CompositeSubscription compositeSubscription = new CompositeSubscription();
     @OnClick({R.id.home_menu_icon,R.id.refresh_area,R.id.tab_area,R.id.add_bookmark_area,R.id.backward_area,R.id.forward_area})
     public void click(View view) {
 
@@ -137,10 +137,10 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                             ThirdPartyAllEvent event = new ThirdPartyAllEvent();
                             event.setBlockAllThirdParty(isChecked);
                             RxBus.getInstance().send(event);
-
+                            settingDrawer.closeDrawers();
                         }
                     });
-                    Button entry = (Button)view.findViewById(R.id.third_party_dialog_entry);
+                    Button entry = (Button)view.getRootView().findViewById(R.id.third_party_dialog_entry);
                     int count = 0;
                     for(Map.Entry<String,Boolean> en : webHolder.getClient().getTabPolicy().entrySet() ){
                         if(en.getValue()){
@@ -155,6 +155,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                             HashMap<String,Boolean> tabPolicy = webHolder.getClient().getTabPolicy();
                             ThirdPartyContentDialog dialog = ThirdPartyContentDialog.newInstance(globalBlackList,tabPolicy,host);
                             FragmenUtil.switchToFragment(getActivity(),dialog);
+                            settingDrawer.closeDrawers();
                         }
                     });
                 }
@@ -240,6 +241,8 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                 homeViewManager.saveQueryText(query);
                 suggestionAdapter.changeCursor(null);
                 changeToolBarVisibility(View.GONE);
+                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(urlBar.getWindowToken(), 0);
                 return true;
             }
 
@@ -284,7 +287,17 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         this.container=((MainActivity)getActivity()).getContainer();
-
+        homeViewManager.initGlobalBlackList(globalBlackList);
+        Subscription subscription = RxBus.getInstance().toObserverable().subscribe(new Action1<Object>() {
+            @Override
+            public void call(Object o) {
+                if(o instanceof WebViewRefreshEvent){
+                    if(webHolder!=null){
+                        webHolder.reload();
+                    }
+                }
+            }
+        });
     }
 
 
@@ -439,7 +452,9 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
             Observable.create(new Observable.OnSubscribe<Object>() {
                 @Override
                 public void call(Subscriber<? super Object> subscriber) {
-
+                    for(String domain : globalBlackList){
+                        tabPolicy.put(domain , true);
+                    }
                 }
             }).subscribeOn(Schedulers.io()).subscribe();
             if(compositeSubscription==null) {
@@ -461,17 +476,21 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                             }else if(o instanceof ThirdPartyTabSpecificEvent){
                                 ThirdPartyTabSpecificEvent event =(ThirdPartyTabSpecificEvent)o;
                                 tabPolicy.put(event.getDomain(),event.isStatus());
+                                Log.d("Tab policy ",tabPolicy.toString());
                             }else if(o instanceof GlobalBlackListEvent){
                                 GlobalBlackListEvent event = (GlobalBlackListEvent)o;
                                 switch (event.getAction()){
                                     case GlobalBlackListEvent.ADD:
                                         globalBlackList.addAll(event.getDomains());
+                                        viewModel.modifyGlobalBlackList(homeViewManager.addToGlobalBlackList(event.getDomains()),container);
                                         break;
                                     case GlobalBlackListEvent.CLEAR:
                                         globalBlackList.clear();
+                                        viewModel.modifyGlobalBlackList(homeViewManager.deleteAllFromGlobalBlackList(),container);
                                         break;
                                     case GlobalBlackListEvent.REMOVE:
                                         globalBlackList.removeAll(event.getDomains());
+                                        viewModel.modifyGlobalBlackList(homeViewManager.removeFromGlobalBlackList(event.getDomains()),container);
                                         break;
                                 }
                             }
@@ -506,6 +525,8 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                     }
                     total++;
                     if(host!=null&&resourceHost!=null&&!host.equals(resourceHost)){
+
+
                         if(recordForThirdParty!=null){
                             if(thirdPartyCounter.containsKey(resourceHost)){
                                 int count = thirdPartyCounter.get(resourceHost);
@@ -532,8 +553,16 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
         public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
             String resourceHost = InternetDomainName.from(Uri.parse(url).getHost()).topPrivateDomain().toString();
             if(!resourceHost.equals(curHost)){
-                if(blockAllThirdParty||(blockBlackList&&tabPolicy.containsKey(resourceHost))){
+                if(blockAllThirdParty){
                     return new WebResourceResponse("text/css", "UTF-8", null);
+                }else if(blockBlackList){
+                    if(tabPolicy.containsKey(resourceHost)&&tabPolicy.get(resourceHost)) {
+                        return new WebResourceResponse("text/css", "UTF-8", null);
+                    }
+                }else{
+                    if(!tabPolicy.containsKey(resourceHost)){
+                        tabPolicy.put(resourceHost,false);
+                    }
                 }
             }
             return super.shouldInterceptRequest(view, url);
@@ -691,6 +720,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
+        compositeSubscription.unsubscribe();
     }
 
     @Override

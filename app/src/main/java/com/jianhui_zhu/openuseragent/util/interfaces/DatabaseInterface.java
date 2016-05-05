@@ -24,4 +24,7 @@ public interface DatabaseInterface {
     Observable<List<History>> getHistoryByDate(int year, int month, int day);
     Observable<String> deleteSelectedHistory(List<History> histories);
     Observable<Set<String>> getBlackList();
+    Observable<String> addToBlackList(Set<String> domains);
+    Observable<String> removeFromGlobalBlackList(Set<String>domains);
+    Observable<String> deleteAllFromBlackList();
 }

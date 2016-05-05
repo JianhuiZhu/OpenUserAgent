@@ -1,5 +1,6 @@
 package com.jianhui_zhu.openuseragent.view.adapter;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,14 +31,14 @@ import butterknife.OnClick;
  * Created by jianhuizhu on 2016-05-03.
  */
 public class ThirdPartyContentAdapter extends RecyclerView.Adapter<ThirdPartyContentAdapter.ViewHolder> {
+    private boolean hasAction;
     private ThirdPartyContentViewModel viewModel = new ThirdPartyContentViewModel();
     private List<Map.Entry<String,Boolean>> policyList = new ArrayList<>();
     private HashSet<String> globalBlackList = new HashSet<>();
-
     public HashSet<String> getTobeAdded() {
         return tobeAdded;
     }
-
+    private Context context;
     private HashSet<String> tobeAdded = new HashSet<>();
     private TextView tv;
     private ImageView icon;
@@ -56,6 +57,7 @@ public class ThirdPartyContentAdapter extends RecyclerView.Adapter<ThirdPartyCon
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        this.context = parent.getContext();
         return new ViewHolder(LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_third_party,parent,false));
     }
@@ -68,15 +70,22 @@ public class ThirdPartyContentAdapter extends RecyclerView.Adapter<ThirdPartyCon
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                hasAction =true;
                 if(isChecked){
                     tobeAdded.add(item.getKey());
                 }else{
                     tobeAdded.remove(item.getKey());
                 }
+                if(tobeAdded.size()>0){
+                    viewModel.changeIconStatus(context,true,tv,icon);
+                }else{
+                    viewModel.changeIconStatus(context,false,tv,icon);
+                }
             }
         });
         if(globalBlackList.contains(item.getKey())){
             holder.checkBox.setChecked(true);
+
         }else{
             holder.checkBox.setChecked(false);
         }
@@ -103,6 +112,7 @@ public class ThirdPartyContentAdapter extends RecyclerView.Adapter<ThirdPartyCon
 
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            hasAction = true;
             if(isChecked){
                 status.setText(R.string.block);
                 RxBus.getInstance().send(new ThirdPartyTabSpecificEvent(domain.getText().toString(),true));
