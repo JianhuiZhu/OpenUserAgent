@@ -1,13 +1,19 @@
 package com.jianhui_zhu.openuseragent.viewmodel;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.webkit.URLUtil;
+import android.widget.Button;
+
+import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.History;
 import com.jianhui_zhu.openuseragent.view.HomeView;
 import com.jianhui_zhu.openuseragent.view.adapter.NavigationHomeAdapter;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -68,6 +74,32 @@ public class HomeViewModel {
                 Snackbar.make(container,s,Snackbar.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void changeButtonText(Context context,int progress, HashMap<String,Boolean> tabPolicy, Button entry){
+        int count = 0;
+        switch (progress){
+            case HomeView.CustomWebViewClient.ALLOW_ALL:
+                entry.setText("0 resource blocked");
+                entry.setTextColor(context.getResources().getColor(R.color.mdtp_light_gray));
+                entry.setClickable(false);
+                break;
+            case HomeView.CustomWebViewClient.BLOCK_BLACK_LIST:
+                for (Map.Entry<String, Boolean> en : tabPolicy.entrySet()) {
+                    if (en.getValue()) {
+                        count++;
+                    }
+                }
+                entry.setText(String.valueOf(count) + " resource blocked");
+                entry.setTextColor(context.getResources().getColor(R.color.mdtp_white));
+                entry.setClickable(true);
+                break;
+            case HomeView.CustomWebViewClient.BLOCK_ALL_THIRD_PARTY:
+                entry.setText(tabPolicy.size()+" resources blocked");
+                entry.setTextColor(context.getResources().getColor(R.color.mdtp_light_gray));
+                entry.setClickable(false);
+                break;
+        }
     }
 
 }

@@ -9,6 +9,7 @@ import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
 import com.jianhui_zhu.openuseragent.model.beans.History;
 import com.jianhui_zhu.openuseragent.util.LocalDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.util.TrafficStatisticUtil;
+import com.jianhui_zhu.openuseragent.view.HomeView;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -64,12 +65,23 @@ public class HomeViewManager {
             }
         }).subscribeOn(Schedulers.io()).subscribe();
     }
-    public void flushRecord(BufferedWriter recordForThirdParty,HashMap<String,Integer> thirdPartyCounter,boolean blockAllThirdParty,int total,int count,long startTime){
+    public void flushRecord(BufferedWriter recordForThirdParty,HashMap<String,Integer> thirdPartyCounter,int curpolicy,int total,int count,long startTime){
         try {
             for(Map.Entry<String,Integer> entry: thirdPartyCounter.entrySet()){
                 recordForThirdParty.append(entry.getKey()+" "+entry.getValue()+"\n");
             }
-            recordForThirdParty.append("Policy: Block all third party: "+blockAllThirdParty+"\n");
+            recordForThirdParty.append("Policy used: ");
+            switch (curpolicy){
+                case HomeView.CustomWebViewClient.ALLOW_ALL:
+                    recordForThirdParty.append("ALLOW ALL CONTENT\n");
+                    break;
+                case HomeView.CustomWebViewClient.BLOCK_BLACK_LIST:
+                    recordForThirdParty.append("BLOCK BLACK LIST\n");
+                    break;
+                case HomeView.CustomWebViewClient.BLOCK_ALL_THIRD_PARTY:
+                    recordForThirdParty.append("BLOCK ALL THIRD PARTY\n");
+                    break;
+            }
             recordForThirdParty.append("Time comsume to load the page: "+(System.currentTimeMillis()-startTime)+" milliseconds\n");
             recordForThirdParty.append("total resource requested: "+total+"  third party count: "+count+"\n");
             recordForThirdParty.append("Total bandwidth consumed: "+ TrafficStatisticUtil.getInstance().getCurTotalBytesConsume()+" Bytes\n");
@@ -80,7 +92,8 @@ public class HomeViewManager {
             e.printStackTrace();
         }
     }
-    public Observable<String> addToGlobalBlackList(Set<String> domains){
+    public Observable<String> addToGlobalBlackList(Set<String> domains,Set<String>oldDomains){
+        domains.removeAll(oldDomains);
         return LocalDatabaseSingleton.getInstance().addToBlackList(domains);
     }
     public Observable<String> removeFromGlobalBlackList(Set<String> domains){

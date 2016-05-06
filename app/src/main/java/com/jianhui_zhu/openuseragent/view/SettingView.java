@@ -25,22 +25,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by Jianhui Zhu on 2016-02-05.
  */
 public class SettingView extends Fragment {
-    @Bind(R.id.setting_profile_area)
-    LinearLayout profileArea;
-    @Bind(R.id.setting_avatar)
-    CircleImageView avatar;
     @Bind(R.id.setting_home_page)
     EditText homePage;
     @Bind(R.id.search_engine_spinner)
     Spinner searchEngine;
-    @Bind(R.id.name)
-            EditText name;
-    @Bind(R.id.username)
-            EditText username;
-    @Bind(R.id.email)
-            EditText email;
-    @Bind(R.id.password)
-            EditText password;
     SettingSingleton settings;
     @OnClick(R.id.general_tool_bar_go_back)
     public void click(){

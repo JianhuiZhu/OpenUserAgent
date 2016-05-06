@@ -26,9 +26,7 @@ public class CustomWebView extends WebView {
     }
 
     CustomWebViewClient client;
-    public void setAllThirdPartyPolicy(boolean allThirdPartyPolicy) {
-        this.allThirdPartyPolicy = allThirdPartyPolicy;
-    }
+
 
     private boolean allThirdPartyPolicy;
     private void initSettings(){
@@ -43,9 +41,6 @@ public class CustomWebView extends WebView {
         setWebChromeClient(new CustomWebChrome());
     }
 
-    public boolean isAllThirdPartyPolicy() {
-        return allThirdPartyPolicy;
-    }
 
     public void setHomeViewInterface(HomeViewInterface homeViewInterface) {
         this.homeViewInterface = homeViewInterface;
@@ -64,7 +59,6 @@ public class CustomWebView extends WebView {
 
     @Override
     public void setWebViewClient(WebViewClient client) {
-        allThirdPartyPolicy = ((HomeView.CustomWebViewClient)client).getAllThirdPartyPolicy();
         this.client = (CustomWebViewClient) client;
         super.setWebViewClient(client);
     }
@@ -113,7 +107,7 @@ public class CustomWebView extends WebView {
 
     @Override
     public void destroy() {
-        ((CustomWebViewClient)client).unsubscribe();
+        client.unsubscribe();
         super.destroy();
     }
 }

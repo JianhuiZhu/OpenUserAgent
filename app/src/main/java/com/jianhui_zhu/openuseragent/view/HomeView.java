@@ -32,13 +32,12 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.Switch;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import com.google.common.net.InternetDomainName;
 import com.jianhui_zhu.openuseragent.R;
@@ -50,7 +49,6 @@ import com.jianhui_zhu.openuseragent.util.RxBus;
 import com.jianhui_zhu.openuseragent.util.SettingSingleton;
 import com.jianhui_zhu.openuseragent.util.activity.MainActivity;
 import com.jianhui_zhu.openuseragent.util.event.GlobalBlackListEvent;
-import com.jianhui_zhu.openuseragent.util.event.ThirdPartyAllEvent;
 import com.jianhui_zhu.openuseragent.util.event.ThirdPartyTabSpecificEvent;
 import com.jianhui_zhu.openuseragent.util.event.WebViewRefreshEvent;
 import com.jianhui_zhu.openuseragent.view.adapter.NavigationHomeAdapter;
@@ -62,17 +60,13 @@ import com.jianhui_zhu.openuseragent.view.dialogs.TabStackDialog;
 import com.jianhui_zhu.openuseragent.view.dialogs.ThirdPartyContentDialog;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 import com.jianhui_zhu.openuseragent.viewmodel.HomeViewModel;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -88,7 +82,6 @@ import rx.subscriptions.CompositeSubscription;
  */
 public class HomeView extends Fragment implements HomeViewInterface,SwipeRefreshLayout.OnRefreshListener {
     private HashSet<String> globalBlackList = new HashSet<>();
-    boolean switchInitialized =false;
     HomeView homeView;
     HistoryManager historyManager = new HistoryManager();
     BookmarkManager bookmarkManager = new BookmarkManager();
@@ -119,35 +112,14 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
     WebViewAdapter webViewAdapter;
     CompositeSubscription compositeSubscription = new CompositeSubscription();
     @OnClick({R.id.home_menu_icon,R.id.refresh_area,R.id.tab_area,R.id.add_bookmark_area,R.id.backward_area,R.id.forward_area})
-    public void click(View view) {
+    public void click(final View view) {
 
         switch (view.getId()) {
             case R.id.home_menu_icon:
                 if(webHolder!=null) {
-
-                    Switch thirdPartySwitch = (Switch) view.getRootView().findViewById(R.id.third_party_switch);
-                    if(!switchInitialized){
-                        switchInitialized = true;
-                        thirdPartySwitch.setChecked(false);
-                    }
-
-                    thirdPartySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                        @Override
-                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                            ThirdPartyAllEvent event = new ThirdPartyAllEvent();
-                            event.setBlockAllThirdParty(isChecked);
-                            RxBus.getInstance().send(event);
-                            settingDrawer.closeDrawers();
-                        }
-                    });
-                    Button entry = (Button)view.getRootView().findViewById(R.id.third_party_dialog_entry);
-                    int count = 0;
-                    for(Map.Entry<String,Boolean> en : webHolder.getClient().getTabPolicy().entrySet() ){
-                        if(en.getValue()){
-                            count++;
-                        }
-                    }
-                    entry.setText(String.valueOf(count)+" resource blocked");
+                    final TextView title = (TextView)view.getRootView().findViewById(R.id.third_party_title);
+                    SeekBar thirdPartySeekBar = (SeekBar) view.getRootView().findViewById(R.id.third_party_switch);
+                    final Button entry = (Button)view.getRootView().findViewById(R.id.third_party_dialog_entry);
                     entry.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -158,6 +130,41 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                             settingDrawer.closeDrawers();
                         }
                     });
+                    if(webHolder.getClient().getCurrentPolicy()!=CustomWebViewClient.BLOCK_BLACK_LIST){
+                        entry.setClickable(false);
+                        entry.setTextColor(getResources().getColor(R.color.mdtp_light_gray));
+                    }
+                    thirdPartySeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                        @Override
+                        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                            switch (progress){
+                                case 0:
+                                    title.setText(R.string.allow_all);
+                                    break;
+                                case 1:
+                                    title.setText(R.string.block_blacklist);
+                                    break;
+                                case 2:
+                                    title.setText(R.string.block_all_third_party);
+                                    break;
+                            }
+                        }
+
+                        @Override
+                        public void onStartTrackingTouch(SeekBar seekBar) {
+
+                        }
+
+                        @Override
+                        public void onStopTrackingTouch(SeekBar seekBar) {
+                            int progress = seekBar.getProgress();
+                            webHolder.getClient().changePolicy(progress);
+                            viewModel.changeButtonText(getActivity(),progress,webHolder.getClient().getTabPolicy(),entry);
+                        }
+                    });
+                    int currentPolicy = webHolder.getClient().getCurrentPolicy();
+                    viewModel.changeButtonText(getActivity(),currentPolicy,webHolder.getClient().getTabPolicy(),entry);
+
                 }
                 settingDrawer.openDrawer(Gravity.RIGHT);
                 break;
@@ -233,16 +240,16 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
             public boolean onQueryTextSubmit(String query) {
                 if (URLUtil.isValidUrl(query)) {
                     loadTargetUrl(query);
-
                 } else {
-                    loadTargetUrl(SettingSingleton.getInstance(getActivity()).getSearchEngine() + query);
-
+                    String url =SettingSingleton.getInstance(getActivity()).getSearchEngine() + query;
+                    loadTargetUrl(url);
                 }
                 homeViewManager.saveQueryText(query);
                 suggestionAdapter.changeCursor(null);
                 changeToolBarVisibility(View.GONE);
                 InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(urlBar.getWindowToken(), 0);
+                urlBar.clearFocus();
                 return true;
             }
 
@@ -298,6 +305,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                 }
             }
         });
+        compositeSubscription.add(subscription);
     }
 
 
@@ -309,6 +317,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
         }
         if (url != null && !url.equals("")&&URLUtil.isValidUrl(url)) {
             this.webHolder.loadUrl(url);
+            urlBar.setQuery(url,false);
         } else {
             this.webHolder.loadUrl(SettingSingleton.getInstance(getActivity()).getHomePage());
         }
@@ -401,6 +410,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
     public void clearWebHolder() {
 
         webviewContainer.removeAllViews();
+        webHolder.destroy();
         webHolder = null;
     }
 
@@ -411,41 +421,42 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
 
 
     public class CustomWebViewClient extends WebViewClient {
-        public String getCurHost() {
-            return curHost;
+        public int getCurrentPolicy() {
+            return currentPolicy;
         }
 
+        private int currentPolicy = 0;
+        public static final int ALLOW_ALL = 0;
+        public static final int BLOCK_BLACK_LIST = 1;
+        public static final int BLOCK_ALL_THIRD_PARTY = 2;
+        private CompositeSubscription compositeSubscription;
+        private long startTime;
+        private boolean isRedirect =false;
         String curHost;
         int total;
         int count;
+        public void changePolicy(int policy){
+            if(policy<=2&&policy>=0){
+                if(currentPolicy!=policy) {
+                    currentPolicy = policy;
+                    webHolder.reload();
+                }
+            }
+        }
+        public String getCurHost() {
+            return curHost;
+        }
         HashMap<String,Integer> thirdPartyCounter = new HashMap<>();
         BufferedWriter recordForThirdParty;
-
         public HashMap<String, Boolean> getTabPolicy() {
             return tabPolicy;
-        }
-
-        public void setTabPolicy(HashMap<String, Boolean> tabPolicy) {
-            this.tabPolicy = tabPolicy;
         }
 
         private HashMap<String,Boolean> tabPolicy = new HashMap<>();
         public void unsubscribe(){
             compositeSubscription.unsubscribe();
         }
-        private CompositeSubscription compositeSubscription;
-        private long startTime;
-        private boolean blockAllThirdParty;
-        private boolean blockBlackList;
-        private boolean isRedirect =false;
-        private String host;
-        public boolean getAllThirdPartyPolicy(){
-            return blockAllThirdParty;
-        }
 
-        public void setBlockAllThirdParty(boolean blockAllThirdParty) {
-            this.blockAllThirdParty = blockAllThirdParty;
-        }
 
         public CustomWebViewClient(){
             super();
@@ -456,7 +467,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                         tabPolicy.put(domain , true);
                     }
                 }
-            }).subscribeOn(Schedulers.io()).subscribe();
+            }).subscribeOn(Schedulers.computation()).subscribe();
             if(compositeSubscription==null) {
                 compositeSubscription = new CompositeSubscription();
             }
@@ -464,16 +475,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                     .subscribe(new Action1<Object>() {
                         @Override
                         public void call(Object o) {
-                            if(o instanceof ThirdPartyAllEvent){
-                                if(((ThirdPartyAllEvent)o).isBlockAllThirdParty()){
-                                    blockAllThirdParty = true;
-                                }else{
-                                    blockAllThirdParty =false;
-                                }
-                                if(webHolder!=null){
-                                    webHolder.reload();
-                                }
-                            }else if(o instanceof ThirdPartyTabSpecificEvent){
+                            if(o instanceof ThirdPartyTabSpecificEvent){
                                 ThirdPartyTabSpecificEvent event =(ThirdPartyTabSpecificEvent)o;
                                 tabPolicy.put(event.getDomain(),event.isStatus());
                                 Log.d("Tab policy ",tabPolicy.toString());
@@ -481,8 +483,8 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                                 GlobalBlackListEvent event = (GlobalBlackListEvent)o;
                                 switch (event.getAction()){
                                     case GlobalBlackListEvent.ADD:
+                                        viewModel.modifyGlobalBlackList(homeViewManager.addToGlobalBlackList(event.getDomains(),globalBlackList),container);
                                         globalBlackList.addAll(event.getDomains());
-                                        viewModel.modifyGlobalBlackList(homeViewManager.addToGlobalBlackList(event.getDomains()),container);
                                         break;
                                     case GlobalBlackListEvent.CLEAR:
                                         globalBlackList.clear();
@@ -552,18 +554,23 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
         @Override
         public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
             String resourceHost = InternetDomainName.from(Uri.parse(url).getHost()).topPrivateDomain().toString();
-            if(!resourceHost.equals(curHost)){
-                if(blockAllThirdParty){
-                    return new WebResourceResponse("text/css", "UTF-8", null);
-                }else if(blockBlackList){
-                    if(tabPolicy.containsKey(resourceHost)&&tabPolicy.get(resourceHost)) {
+            switch (currentPolicy){
+                case ALLOW_ALL:
+                    tabPolicy.put(resourceHost,false);
+                    break;
+                case BLOCK_BLACK_LIST:
+                    if(tabPolicy.containsKey(resourceHost)&&tabPolicy.get(resourceHost)){
                         return new WebResourceResponse("text/css", "UTF-8", null);
-                    }
-                }else{
-                    if(!tabPolicy.containsKey(resourceHost)){
+                    }else{
                         tabPolicy.put(resourceHost,false);
                     }
-                }
+                    break;
+                case BLOCK_ALL_THIRD_PARTY:
+                    if(!resourceHost.equals(curHost)){
+                        tabPolicy.put(resourceHost,false);
+                        return new WebResourceResponse("text/css", "UTF-8", null);
+                    }
+                    break;
             }
             return super.shouldInterceptRequest(view, url);
         }
@@ -589,15 +596,15 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
             }
 
             swipeRefreshLayout.setRefreshing(true);
-            URI uri= null;
-            try {
-                uri = new URI(view.getUrl());
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            }
-            if (uri != null) {
-                this.host =uri.getHost();
-            }
+//            URI uri= null;
+//            try {
+//                uri = new URI(view.getUrl());
+//            } catch (URISyntaxException e) {
+//                e.printStackTrace();
+//            }
+//            if (uri != null) {
+//                this.curHost =uri.getHost();
+//            }
             isRedirect = false;
         }
 
@@ -608,7 +615,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                     @Override
                     public void call(Subscriber<? super Object> subscriber) {
                         if(recordForThirdParty!=null){
-                            homeViewManager.flushRecord(recordForThirdParty,thirdPartyCounter,blockAllThirdParty,total,count,startTime);
+                            homeViewManager.flushRecord(recordForThirdParty,thirdPartyCounter,currentPolicy,total,count,startTime);
                             total = 0;
                             count = 0;
                             recordForThirdParty=null;

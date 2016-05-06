@@ -20,5 +20,9 @@
     <string name="block">BLOCKED</string>
 
     <string name="third_party_dialog_title">Third Party</string>
-    <string name="third_party_dialog_block_hint">Add @blacklist</string>
+    <string name="third_party_dialog_block_hint"> \@blacklist</string>
+
+    <string name="allow_all">ALLOW ALL CONTENTS</string>
+    <string name="block_blacklist">BLOCK BLACKLIST</string>
+    <string name="block_all_third_party">BLOCK ALL THIRD PARTY</string>
 </resources>

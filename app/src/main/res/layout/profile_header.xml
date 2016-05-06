@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/mdtp_accent_color">
+    android:background="@color/mdtp_accent_color"
+    >
     <TextView
         android:layout_marginTop="@dimen/material_top_bottom_margin"
         android:layout_marginBottom="@dimen/material_top_bottom_margin"
@@ -22,28 +23,16 @@
         android:layout_marginBottom="@dimen/material_top_bottom_margin"
         android:layout_marginLeft="@dimen/material_side_margin"
         android:layout_marginRight="@dimen/material_side_margin"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <TextView
-            android:textSize="12sp"
-            android:textColor="@color/mdtp_white"
-            android:text="@string/off"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"/>
-    <Switch
+    <SeekBar
         android:id="@+id/third_party_switch"
-        android:textColor="@color/mdtp_white"
-        android:shadowColor="@color/mdtp_white"
-        android:layout_width="wrap_content"
+        android:max="2"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:thumb="@drawable/ic_panorama_horizontal_black_24dp"
+        android:thumbOffset="@dimen/material_top_bottom_margin"
         android:layout_marginRight="5dp"/>
-        <TextView
-            android:textSize="12sp"
-            android:textColor="@color/mdtp_white"
-            android:text="@string/on"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
     </LinearLayout>
     <RelativeLayout
         android:layout_marginLeft="@dimen/material_side_margin"
