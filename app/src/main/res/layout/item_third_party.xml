@@ -24,7 +24,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <TextView
-
         android:textSize="@dimen/text_caption"
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@+id/third_party_block_switch"

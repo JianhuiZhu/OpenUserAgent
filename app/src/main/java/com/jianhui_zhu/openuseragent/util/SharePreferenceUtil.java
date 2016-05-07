@@ -15,12 +15,21 @@ public final class SharePreferenceUtil {
                 .putString(key,value)
                 .commit();
     }
-
-    public static String getByKey(Context context,String key){
+    public static void saveInteger(Context context,String key, int value){
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putInt(key,value)
+                .commit();
+    }
+    public static String getStringByKey(Context context, String key){
         return PreferenceManager
                 .getDefaultSharedPreferences(context)
                 .getString(key,"NOT_FOUND");
 
+    }
+    public static int getIntegerByKey(Context context,String key){
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getInt(key,-1);
     }
     public static void removeByKey(Context context,String key){
         PreferenceManager

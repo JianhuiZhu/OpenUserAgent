@@ -4,6 +4,8 @@ import android.app.Application;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.ndk.CrashlyticsNdk;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.lang.Override;import io.fabric.sdk.android.Fabric;
 
@@ -20,5 +22,6 @@ public class BrowserApplication extends Application {
 		LocalDatabaseSingleton.instantiate(this);
 		SettingSingleton.getInstance(getApplicationContext());
 		TrafficStatisticUtil.instantiate();
+		Fresco.initialize(this);
 	}
 }

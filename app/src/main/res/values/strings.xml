@@ -25,4 +25,16 @@
     <string name="allow_all">ALLOW ALL CONTENTS</string>
     <string name="block_blacklist">BLOCK BLACKLIST</string>
     <string name="block_all_third_party">BLOCK ALL THIRD PARTY</string>
+
+
+    //setting view
+    <string name="setting">SETTING</string>
+    <string name="basic">BASIC SETTING</string>
+    <string name="global">GLOBAL TAB SETTING</string>
+    <string name="cookies">COOKIES</string>
+    <string name="location">LOCATION</string>
+    <string name="js">JAVASCRIPT</string>
+    <string name="popup">POPUP WINDOW</string>
+    <string name="full_screen">FULL SCREEN</string>
+    <string name="third_party_head">THIRD PARTY CONTENT</string>
 </resources>
