@@ -37,4 +37,5 @@
     <string name="popup">POPUP WINDOW</string>
     <string name="full_screen">FULL SCREEN</string>
     <string name="third_party_head">THIRD PARTY CONTENT</string>
+    <string name="file_data">FILE DATA</string>
 </resources>

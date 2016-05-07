@@ -9,7 +9,9 @@ import com.jianhui_zhu.openuseragent.view.HomeView;
  */
 public class SettingSingleton {
     boolean allowAutomaticDownload;
-
+    public static void instantiate(Context context){
+        new SettingSingleton(context);
+    }
     public int getThirdPartyPolicy() {
         return thirdPartyPolicy;
     }
@@ -96,10 +98,7 @@ public class SettingSingleton {
 
     private String homePage;
     private String searchEngine;
-    public synchronized static SettingSingleton getInstance(Context context){
-        if(instance==null){
-            return new SettingSingleton(context);
-        }
+    public synchronized static SettingSingleton getInstance(){
         return instance;
     }
 
@@ -122,13 +121,13 @@ public class SettingSingleton {
             SharePreferenceUtil.saveString(context,SEARCH_ENGINE,Constant.GOOGLE_PREFIX);
         }
         if(SharePreferenceUtil.getIntegerByKey(context,THIRD_PARTY_POLICY)==-1){
-            SharePreferenceUtil.saveInteger(context,THIRD_PARTY_POLICY, HomeView.CustomWebViewClient.ALLOW_ALL);
+            SharePreferenceUtil.saveInteger(context,THIRD_PARTY_POLICY, Constant.ALLOW_ALL);
         }
         if(SharePreferenceUtil.getStringByKey(context,COOKIE_POLICY).equals(NOT_FOUND)){
             SharePreferenceUtil.saveString(context,COOKIE_POLICY,Constant.COOKIE_ALLOW_ALL);
         }
         if(SharePreferenceUtil.getStringByKey(context,FULL_SCREEN_POLICY).equals(NOT_FOUND)){
-            SharePreferenceUtil.saveString(context,FULL_SCREEN_POLICY,Constant.FULL_SCREEN_ALLOW_ALL);
+            SharePreferenceUtil.saveString(context,FULL_SCREEN_POLICY,Constant.FULL_SCREEN_BLOCK_ALL);
         }
         if(SharePreferenceUtil.getStringByKey(context,POPUP_POLICY).equals(NOT_FOUND)){
             SharePreferenceUtil.saveString(context,POPUP_POLICY,Constant.POPUP_BLOCK_ALL);

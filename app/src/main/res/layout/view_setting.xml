@@ -339,7 +339,7 @@
             android:layout_height="wrap_content">
             <ImageView
                 android:id="@+id/site_data_ic"
-                android:src="@drawable/ic_cookies"
+                android:src="@drawable/ic_data"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
                 android:layout_width="24dp"
@@ -348,7 +348,7 @@
                 android:id="@+id/site_data_header"
                 android:layout_toRightOf="@id/site_data_ic"
                 android:layout_marginLeft="@dimen/material_side_margin"
-                android:text="@string/location"
+                android:text="@string/file_data"
                 android:textColor="@android:color/black"
                 android:textSize="@dimen/text_body"
                 android:layout_width="wrap_content"

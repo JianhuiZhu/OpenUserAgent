@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.jianhui_zhu.openuseragent.model.beans.Bookmark;
 import com.jianhui_zhu.openuseragent.model.beans.History;
+import com.jianhui_zhu.openuseragent.util.Constant;
 import com.jianhui_zhu.openuseragent.util.LocalDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.util.TrafficStatisticUtil;
 import com.jianhui_zhu.openuseragent.view.HomeView;
@@ -72,13 +73,13 @@ public class HomeViewManager {
             }
             recordForThirdParty.append("Policy used: ");
             switch (curpolicy){
-                case HomeView.CustomWebViewClient.ALLOW_ALL:
+                case Constant.ALLOW_ALL:
                     recordForThirdParty.append("ALLOW ALL CONTENT\n");
                     break;
-                case HomeView.CustomWebViewClient.BLOCK_BLACK_LIST:
+                case Constant.BLOCK_BLACK_LIST:
                     recordForThirdParty.append("BLOCK BLACK LIST\n");
                     break;
-                case HomeView.CustomWebViewClient.BLOCK_ALL_THIRD_PARTY:
+                case Constant.BLOCK_ALL_THIRD_PARTY:
                     recordForThirdParty.append("BLOCK ALL THIRD PARTY\n");
                     break;
             }

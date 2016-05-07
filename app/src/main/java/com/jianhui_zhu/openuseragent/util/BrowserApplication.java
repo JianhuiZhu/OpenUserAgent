@@ -20,7 +20,7 @@ public class BrowserApplication extends Application {
 		Fabric.with(this, new Crashlytics(), new CrashlyticsNdk());
 		WebUtil.instantiate(this);
 		LocalDatabaseSingleton.instantiate(this);
-		SettingSingleton.getInstance(getApplicationContext());
+		SettingSingleton.instantiate(getApplicationContext());
 		TrafficStatisticUtil.instantiate();
 		Fresco.initialize(this);
 	}

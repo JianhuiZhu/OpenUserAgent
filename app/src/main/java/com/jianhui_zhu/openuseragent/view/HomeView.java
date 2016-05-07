@@ -32,18 +32,21 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 import com.google.common.net.InternetDomainName;
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.BookmarkManager;
 import com.jianhui_zhu.openuseragent.model.HistoryManager;
 import com.jianhui_zhu.openuseragent.model.HomeViewManager;
+import com.jianhui_zhu.openuseragent.util.Constant;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.RxBus;
 import com.jianhui_zhu.openuseragent.util.SettingSingleton;
@@ -116,9 +119,45 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
 
         switch (view.getId()) {
             case R.id.home_menu_icon:
+                final TextView title = (TextView)view.getRootView().findViewById(R.id.third_party_title);
+                SeekBar thirdPartySeekBar = (SeekBar) view.getRootView().findViewById(R.id.third_party_switch);
+                final TextView jsTitle = (TextView)view.getRootView().findViewById(R.id.js_tab_setting_title);
+                Switch jsSwitch = (Switch)view.getRootView().findViewById(R.id.js_switch);
                 if(webHolder!=null) {
-                    final TextView title = (TextView)view.getRootView().findViewById(R.id.third_party_title);
-                    SeekBar thirdPartySeekBar = (SeekBar) view.getRootView().findViewById(R.id.third_party_switch);
+                    title.setVisibility(View.VISIBLE);
+                    switch (SettingSingleton.getInstance().getThirdPartyPolicy()){
+                        case Constant.ALLOW_ALL:
+                            title.setText(R.string.allow_all);
+                            break;
+                        case Constant.BLOCK_BLACK_LIST:
+                            title.setText(R.string.block_blacklist);
+                            break;
+                        case Constant.BLOCK_ALL_THIRD_PARTY:
+                            title.setText(R.string.block_all_third_party);
+                            break;
+                    }
+                    thirdPartySeekBar.setVisibility(View.VISIBLE);
+                    jsTitle.setVisibility(View.VISIBLE);
+                    jsSwitch.setVisibility(View.VISIBLE);
+                    String jsSetting = SettingSingleton.getInstance().getJsPolicy();
+                    if(jsSetting.equals(Constant.JS_ALLOW)){
+                        jsSwitch.setChecked(true);
+                        jsTitle.setText(Constant.JS_ALLOW);
+                    }else{
+                        jsSwitch.setChecked(false);
+                        jsTitle.setText(Constant.JS_BLOCK);
+                    }
+                    jsSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                        @Override
+                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                            if(isChecked){
+                                jsTitle.setText(Constant.JS_ALLOW);
+                            }else{
+                                jsTitle.setText(Constant.JS_BLOCK);
+                            }
+                            webHolder.changeJsSetting(isChecked);
+                        }
+                    });
                     final Button entry = (Button)view.getRootView().findViewById(R.id.third_party_dialog_entry);
                     entry.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -130,7 +169,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                             settingDrawer.closeDrawers();
                         }
                     });
-                    if(webHolder.getClient().getCurrentPolicy()!=CustomWebViewClient.BLOCK_BLACK_LIST){
+                    if(webHolder.getClient().getCurrentPolicy()!=Constant.BLOCK_BLACK_LIST){
                         entry.setClickable(false);
                         entry.setTextColor(getResources().getColor(R.color.mdtp_light_gray));
                     }
@@ -138,13 +177,13 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                         @Override
                         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                             switch (progress){
-                                case 0:
+                                case Constant.ALLOW_ALL:
                                     title.setText(R.string.allow_all);
                                     break;
-                                case 1:
+                                case Constant.BLOCK_BLACK_LIST:
                                     title.setText(R.string.block_blacklist);
                                     break;
-                                case 2:
+                                case Constant.BLOCK_ALL_THIRD_PARTY:
                                     title.setText(R.string.block_all_third_party);
                                     break;
                             }
@@ -165,6 +204,11 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                     int currentPolicy = webHolder.getClient().getCurrentPolicy();
                     viewModel.changeButtonText(getActivity(),currentPolicy,webHolder.getClient().getTabPolicy(),entry);
 
+                }else{
+                    title.setText("NO TAB OPEN");
+                    thirdPartySeekBar.setVisibility(View.GONE);
+                    jsTitle.setVisibility(View.GONE);
+                    jsSwitch.setVisibility(View.GONE);
                 }
                 settingDrawer.openDrawer(Gravity.RIGHT);
                 break;
@@ -184,7 +228,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                 }
                 break;
             case R.id.home_area:
-                String homePageUrl = SettingSingleton.getInstance(getActivity()).getHomePage();
+                String homePageUrl = SettingSingleton.getInstance().getHomePage();
                 if(homePageUrl!=null)
                     loadTargetUrl(homePageUrl);
                 break;
@@ -221,7 +265,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                         FragmenUtil.switchToFragment(getActivity(),new DownloadView());
                         break;
                     case R.id.add_tab_option:
-                        loadTargetUrl(SettingSingleton.getInstance(getActivity()).getHomePage());
+                        loadTargetUrl(SettingSingleton.getInstance().getHomePage());
                         break;
                 }
                 settingDrawer.closeDrawers();
@@ -241,7 +285,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                 if (URLUtil.isValidUrl(query)) {
                     loadTargetUrl(query);
                 } else {
-                    String url =SettingSingleton.getInstance(getActivity()).getSearchEngine() + query;
+                    String url =SettingSingleton.getInstance().getSearchEngine() + query;
                     loadTargetUrl(url);
                 }
                 homeViewManager.saveQueryText(query);
@@ -319,7 +363,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
             this.webHolder.loadUrl(url);
             urlBar.setQuery(url,false);
         } else {
-            this.webHolder.loadUrl(SettingSingleton.getInstance(getActivity()).getHomePage());
+            this.webHolder.loadUrl(SettingSingleton.getInstance().getHomePage());
         }
 
 
@@ -338,7 +382,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
 
     @Override
     public void searchTargetWord(String word) {
-        loadTargetUrl(SettingSingleton.getInstance(getActivity()).getSearchEngine() + word);
+        loadTargetUrl(SettingSingleton.getInstance().getSearchEngine() + word);
     }
 
     @Override
@@ -424,11 +468,9 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
         public int getCurrentPolicy() {
             return currentPolicy;
         }
-
+        private boolean firstLoad = true;
         private int currentPolicy = 0;
-        public static final int ALLOW_ALL = 0;
-        public static final int BLOCK_BLACK_LIST = 1;
-        public static final int BLOCK_ALL_THIRD_PARTY = 2;
+
         private CompositeSubscription compositeSubscription;
         private long startTime;
         private boolean isRedirect =false;
@@ -456,10 +498,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
         public void unsubscribe(){
             compositeSubscription.unsubscribe();
         }
-
-
-        public CustomWebViewClient(){
-            super();
+        private void init(){
             Observable.create(new Observable.OnSubscribe<Object>() {
                 @Override
                 public void call(Subscriber<? super Object> subscriber) {
@@ -499,6 +538,11 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                         }
                     });
             compositeSubscription.add(subscription);
+        }
+
+        public CustomWebViewClient(){
+            super();
+            init();
         }
         @Override
         public void onLoadResource(WebView view, final String url) {
@@ -554,20 +598,23 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
         @Override
         public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
             String resourceHost = InternetDomainName.from(Uri.parse(url).getHost()).topPrivateDomain().toString();
-            switch (currentPolicy){
-                case ALLOW_ALL:
+            if(!tabPolicy.containsKey(resourceHost)){
+                if(globalBlackList.contains(resourceHost)){
+                    tabPolicy.put(resourceHost,true);
+                }else{
                     tabPolicy.put(resourceHost,false);
+                }
+            }
+            switch (currentPolicy){
+                case Constant.ALLOW_ALL:
                     break;
-                case BLOCK_BLACK_LIST:
+                case Constant.BLOCK_BLACK_LIST:
                     if(tabPolicy.containsKey(resourceHost)&&tabPolicy.get(resourceHost)){
                         return new WebResourceResponse("text/css", "UTF-8", null);
-                    }else{
-                        tabPolicy.put(resourceHost,false);
                     }
                     break;
-                case BLOCK_ALL_THIRD_PARTY:
+                case Constant.BLOCK_ALL_THIRD_PARTY:
                     if(!resourceHost.equals(curHost)){
-                        tabPolicy.put(resourceHost,false);
                         return new WebResourceResponse("text/css", "UTF-8", null);
                     }
                     break;
@@ -611,6 +658,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
         @Override
         public void onPageFinished(WebView view, String url) {
             if(isRedirect==false) {
+                firstLoad = false;
                 Observable.create(new Observable.OnSubscribe<Object>() {
                     @Override
                     public void call(Subscriber<? super Object> subscriber) {
@@ -691,9 +739,9 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
     }
 
     private CustomWebView initWebView(){
-        CustomWebView web = new CustomWebView(getActivity());
         WebViewClient client = new CustomWebViewClient();
-        web.setWebViewClient(client);
+        CustomWebView web = new CustomWebView(getActivity(),client);
+
         web.setDownloadListener(new DownloadListener() {
             @Override
             public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {

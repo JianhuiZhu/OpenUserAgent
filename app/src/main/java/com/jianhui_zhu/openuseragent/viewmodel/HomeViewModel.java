@@ -10,6 +10,7 @@ import android.widget.Button;
 
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.beans.History;
+import com.jianhui_zhu.openuseragent.util.Constant;
 import com.jianhui_zhu.openuseragent.view.HomeView;
 import com.jianhui_zhu.openuseragent.view.adapter.NavigationHomeAdapter;
 
@@ -79,12 +80,12 @@ public class HomeViewModel {
     public void changeButtonText(Context context,int progress, HashMap<String,Boolean> tabPolicy, Button entry){
         int count = 0;
         switch (progress){
-            case HomeView.CustomWebViewClient.ALLOW_ALL:
+            case Constant.ALLOW_ALL:
                 entry.setText("0 resource blocked");
                 entry.setTextColor(context.getResources().getColor(R.color.mdtp_light_gray));
                 entry.setClickable(false);
                 break;
-            case HomeView.CustomWebViewClient.BLOCK_BLACK_LIST:
+            case Constant.BLOCK_BLACK_LIST:
                 for (Map.Entry<String, Boolean> en : tabPolicy.entrySet()) {
                     if (en.getValue()) {
                         count++;
@@ -94,7 +95,7 @@ public class HomeViewModel {
                 entry.setTextColor(context.getResources().getColor(R.color.mdtp_white));
                 entry.setClickable(true);
                 break;
-            case HomeView.CustomWebViewClient.BLOCK_ALL_THIRD_PARTY:
+            case Constant.BLOCK_ALL_THIRD_PARTY:
                 entry.setText(tabPolicy.size()+" resources blocked");
                 entry.setTextColor(context.getResources().getColor(R.color.mdtp_light_gray));
                 entry.setClickable(false);
