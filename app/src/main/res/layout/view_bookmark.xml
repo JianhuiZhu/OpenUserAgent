@@ -9,7 +9,7 @@
         android:id="@+id/top_toolbar_area"
         android:layout_width="match_parent"
         android:background="@color/mdtp_accent_color"
-        android:layout_height="48dp">
+        android:layout_height="@dimen/material_height_double_line_list_item_dense">
         <ImageView
             android:layout_centerVertical="true"
             android:id="@+id/general_tool_bar_go_back"
@@ -23,7 +23,7 @@
             android:id="@+id/general_tool_bar_title"
             android:layout_toRightOf="@+id/general_tool_bar_go_back"
             android:text="Bookmark"
-            android:textSize="14sp"
+            android:textSize="@dimen/text_headline_regular"
             android:textColor="@android:color/white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -91,7 +91,7 @@ public class NavigationHomeAdapter extends RecyclerView.Adapter<NavigationHomeAd
 
         @Override
         public void onClick(View v) {
-            home.loadTargetUrl(histories.get(position).getUrl());
+            home.loadTargetUrl(histories.get(position).getUrl(),false);
         }
     }
 }

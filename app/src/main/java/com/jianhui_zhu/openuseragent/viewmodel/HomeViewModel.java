@@ -31,7 +31,7 @@ public class HomeViewModel {
 
     public void validateAndLoad(HomeView homeView,String word){
         if(URLUtil.isValidUrl(word)){
-            homeView.loadTargetUrl(word);
+            homeView.loadTargetUrl(word,false);
         }else{
             homeView.searchTargetWord(word);
         }

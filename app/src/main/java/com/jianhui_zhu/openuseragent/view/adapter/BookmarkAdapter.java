@@ -96,7 +96,7 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
                 if(home==null)
                     FragmenUtil.switchToFragment(context,HomeView.newInstanceWithUrl(bookmarks.get(position).getUrl()));
                 else{
-                    home.loadTargetUrl(bookmarks.get(position).getUrl());
+                    home.loadTargetUrl(bookmarks.get(position).getUrl(),false);
                     FragmenUtil.backToPreviousFragment(context,bookmarkView);
                 }
             }

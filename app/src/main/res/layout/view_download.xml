@@ -8,13 +8,14 @@
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:background="@color/mdtp_accent_color"
-        android:layout_height="48dp">
+        android:layout_height="@dimen/toolbar_dense">
             <ImageView
                 android:clickable="true"
                 android:id="@+id/download_go_back"
                 android:layout_marginTop="8dp"
                 android:layout_marginLeft="16dp"
                 android:layout_width="24dp"
+                android:layout_centerVertical="true"
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_back"
                 android:layout_height="24dp" />
@@ -22,7 +23,7 @@
             android:id="@+id/general_tool_bar_title"
             android:layout_toRightOf="@+id/download_go_back"
             android:text="Download"
-            android:textSize="14sp"
+            android:textSize="@dimen/text_headline_regular"
             android:textColor="@android:color/white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

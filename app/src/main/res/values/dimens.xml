@@ -14,4 +14,5 @@
     <dimen name="text_body">14sp</dimen>
     <dimen name="text_caption">12sp</dimen>
 
+    <dimen name="toolbar_dense">56dp</dimen>
 </resources>

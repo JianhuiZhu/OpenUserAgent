@@ -10,13 +10,13 @@
         android:layout_width="match_parent"
         android:background="@color/mdtp_accent_color"
         android:layout_alignParentTop="true"
-        android:layout_height="48dp">
+        android:layout_height="@dimen/toolbar_dense">
         <ImageView
             android:layout_centerVertical="true"
             android:id="@+id/general_tool_bar_go_back"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="16dp"
+            android:layout_marginTop="@dimen/material_top_bottom_margin"
+            android:layout_marginBottom="@dimen/material_top_bottom_margin"
+            android:layout_marginLeft="@dimen/material_side_margin"
             android:layout_width="24dp"
             android:src="@drawable/ic_back"
             android:layout_height="24dp" />
@@ -24,12 +24,12 @@
             android:id="@+id/general_tool_bar_title"
             android:layout_toRightOf="@+id/general_tool_bar_go_back"
             android:text="@string/setting"
-            android:textSize="14sp"
+            android:textSize="@dimen/text_headline_regular"
             android:textColor="@android:color/white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold"
-            android:layout_marginLeft="16dp"
+            android:layout_marginLeft="@dimen/material_side_margin"
             android:layout_centerVertical="true"/>
     </RelativeLayout>
 <ScrollView

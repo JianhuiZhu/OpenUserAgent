@@ -139,7 +139,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
             if(home==null)
                 FragmenUtil.switchToFragment(context, HomeView.newInstanceWithUrl(histories.get(getAdapterPosition()).getUrl()));
             else{
-                home.loadTargetUrl(histories.get(getAdapterPosition()).getUrl());
+                home.loadTargetUrl(histories.get(getAdapterPosition()).getUrl(),false);
                 FragmenUtil.backToPreviousFragment(context,historyView);
             }
         }

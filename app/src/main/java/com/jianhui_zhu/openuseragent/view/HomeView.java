@@ -230,7 +230,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
             case R.id.home_area:
                 String homePageUrl = SettingSingleton.getInstance().getHomePage();
                 if(homePageUrl!=null)
-                    loadTargetUrl(homePageUrl);
+                    loadTargetUrl(homePageUrl,false);
                 break;
             case R.id.backward_area:
                 if(webHolder!=null&&webHolder.canGoBack()){
@@ -265,7 +265,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                         FragmenUtil.switchToFragment(getActivity(),new DownloadView());
                         break;
                     case R.id.add_tab_option:
-                        loadTargetUrl(SettingSingleton.getInstance().getHomePage());
+                        loadTargetUrl(SettingSingleton.getInstance().getHomePage(),true);
                         break;
                 }
                 settingDrawer.closeDrawers();
@@ -283,10 +283,10 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
             @Override
             public boolean onQueryTextSubmit(String query) {
                 if (URLUtil.isValidUrl(query)) {
-                    loadTargetUrl(query);
+                    loadTargetUrl(query,false);
                 } else {
                     String url =SettingSingleton.getInstance().getSearchEngine() + query;
-                    loadTargetUrl(url);
+                    loadTargetUrl(url,false);
                 }
                 homeViewManager.saveQueryText(query);
                 suggestionAdapter.changeCursor(null);
@@ -354,9 +354,9 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
 
 
     @Override
-    public void loadTargetUrl(String url) {
+    public void loadTargetUrl(String url,boolean newTabFlag) {
         swipeRefreshLayout.setRefreshing(true);
-        if(webHolder==null) {
+        if(webHolder==null||newTabFlag) {
             webHolder = initWebView();
         }
         if (url != null && !url.equals("")&&URLUtil.isValidUrl(url)) {
@@ -368,7 +368,6 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
 
 
     }
-
     @Override
     public void showTag(String info) {
         Snackbar.make(container,info,Snackbar.LENGTH_SHORT).show();
@@ -382,7 +381,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
 
     @Override
     public void searchTargetWord(String word) {
-        loadTargetUrl(SettingSingleton.getInstance().getSearchEngine() + word);
+        loadTargetUrl(SettingSingleton.getInstance().getSearchEngine() + word,false);
     }
 
     @Override

@@ -4,9 +4,9 @@
     android:id="@+id/item_history_container"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_marginTop="8dp"
-    android:layout_marginBottom="8dp"
-    android:layout_height="48dp">
+    android:layout_marginTop="@dimen/material_top_bottom_margin"
+    android:layout_marginBottom="@dimen/material_top_bottom_margin"
+    android:layout_height="@dimen/material_height_double_line_list_item_dense">
     <ImageView
         android:id="@+id/history_avatar"
         android:layout_marginLeft="16dp"
@@ -22,7 +22,7 @@
         android:textColor="@color/mdtp_date_picker_text_normal"
         android:layout_toRightOf="@+id/history_avatar"
         android:id="@+id/history_title"
-        android:textSize="12sp"
+        android:textSize="@dimen/text_body"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <TextView
@@ -36,7 +36,7 @@
         android:maxLines="1"
         android:textStyle="italic"
         android:layout_marginTop="5dp"
-        android:textSize="10sp"
+        android:textSize="@dimen/text_caption"
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="16dp"
         android:textColor="@color/mdtp_transparent_black"
