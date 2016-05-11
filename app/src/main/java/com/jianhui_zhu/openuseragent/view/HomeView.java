@@ -28,6 +28,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.DownloadListener;
 import android.webkit.URLUtil;
 import android.webkit.WebIconDatabase;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -50,6 +51,7 @@ import com.jianhui_zhu.openuseragent.util.Constant;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.RxBus;
 import com.jianhui_zhu.openuseragent.util.SettingSingleton;
+import com.jianhui_zhu.openuseragent.util.WebUtil;
 import com.jianhui_zhu.openuseragent.util.activity.MainActivity;
 import com.jianhui_zhu.openuseragent.util.event.GlobalBlackListEvent;
 import com.jianhui_zhu.openuseragent.util.event.ThirdPartyTabSpecificEvent;
@@ -128,12 +130,15 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                     switch (SettingSingleton.getInstance().getThirdPartyPolicy()){
                         case Constant.ALLOW_ALL:
                             title.setText(R.string.allow_all);
+                            thirdPartySeekBar.setProgress(Constant.ALLOW_ALL);
                             break;
                         case Constant.BLOCK_BLACK_LIST:
                             title.setText(R.string.block_blacklist);
+                            thirdPartySeekBar.setProgress(Constant.BLOCK_BLACK_LIST);
                             break;
                         case Constant.BLOCK_ALL_THIRD_PARTY:
                             title.setText(R.string.block_all_third_party);
+                            thirdPartySeekBar.setProgress(Constant.BLOCK_ALL_THIRD_PARTY);
                             break;
                     }
                     thirdPartySeekBar.setVisibility(View.VISIBLE);
@@ -480,7 +485,9 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
             if(policy<=2&&policy>=0){
                 if(currentPolicy!=policy) {
                     currentPolicy = policy;
-                    webHolder.reload();
+                    if(webHolder!=null) {
+                        webHolder.reload();
+                    }
                 }
             }
         }
@@ -594,37 +601,43 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
             return true;
         }
 
-        @Override
-        public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-            String resourceHost = InternetDomainName.from(Uri.parse(url).getHost()).topPrivateDomain().toString();
-            if(!tabPolicy.containsKey(resourceHost)){
-                if(globalBlackList.contains(resourceHost)){
-                    tabPolicy.put(resourceHost,true);
-                }else{
-                    tabPolicy.put(resourceHost,false);
-                }
-            }
-            switch (currentPolicy){
-                case Constant.ALLOW_ALL:
-                    break;
-                case Constant.BLOCK_BLACK_LIST:
-                    if(tabPolicy.containsKey(resourceHost)&&tabPolicy.get(resourceHost)){
-                        return new WebResourceResponse("text/css", "UTF-8", null);
-                    }
-                    break;
-                case Constant.BLOCK_ALL_THIRD_PARTY:
-                    if(!resourceHost.equals(curHost)){
-                        return new WebResourceResponse("text/css", "UTF-8", null);
-                    }
-                    break;
-            }
-            return super.shouldInterceptRequest(view, url);
-        }
 
         @Override
+        public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+            String resourceHost;
+                try {
+                    resourceHost = WebUtil.getDomain(url);
+                }catch (Exception e){
+                    return super.shouldInterceptRequest(view, url);
+                }
+
+                if (!tabPolicy.containsKey(resourceHost)) {
+                    if (globalBlackList.contains(resourceHost)) {
+                        tabPolicy.put(resourceHost, true);
+                    } else {
+                        tabPolicy.put(resourceHost, false);
+                    }
+                }
+                switch (currentPolicy) {
+                    case Constant.ALLOW_ALL:
+                        break;
+                    case Constant.BLOCK_BLACK_LIST:
+                        if (tabPolicy.containsKey(resourceHost) && tabPolicy.get(resourceHost)) {
+                            return new WebResourceResponse("text/css", "UTF-8", null);
+                        }
+                        break;
+                    case Constant.BLOCK_ALL_THIRD_PARTY:
+                        if (!resourceHost.equals(curHost)) {
+                            return new WebResourceResponse("text/css", "UTF-8", null);
+                        }
+                        break;
+                }
+
+            return super.shouldInterceptRequest(view, url);
+        }
+        @Override
         public void onPageStarted(final WebView view, String url, Bitmap favicon) {
-            final String viewUrl=view.getUrl();
-            curHost = InternetDomainName.from(Uri.parse(viewUrl).getHost()).topPrivateDomain().toString();
+            curHost = WebUtil.getDomain(view.getUrl());
             try {
                 File path = Environment.getExternalStoragePublicDirectory(
                         Environment.DIRECTORY_DOWNLOADS);
@@ -783,6 +796,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
         if(webHolder!=null){
             webHolder.destroy();
         }
+        webHolder = null;
         super.onDestroy();
     }
 }

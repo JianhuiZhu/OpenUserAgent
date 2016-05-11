@@ -51,19 +51,24 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
         return Observable.create(new Observable.OnSubscribe<Bookmark>() {
             @Override
             public void call(Subscriber<? super Bookmark> subscriber) {
-                Cursor cursor = LocalDatabaseHelper.getInstance(context)
-                        .getReadableDatabase()
-                        .rawQuery("SELECT * FROM Bookmarks WHERE id=?", new String[]{bookmark.getbID()});
-                if (cursor.getCount() > 0) {
-                    ContentValues newValues = new ContentValues();
-                    newValues.put("name", bookmark.getName());
-                    newValues.put("url", bookmark.getUrl());
-                    LocalDatabaseHelper.getInstance(context).getWritableDatabase()
-                            .update("Bookmarks", newValues, "id=" + bookmark.getbID(), null);
-                    subscriber.onNext(bookmark);
-                    subscriber.onCompleted();
+                SQLiteDatabase db =LocalDatabaseHelper.getInstance(context)
+                        .getReadableDatabase();
+                try {
+                     Cursor cursor= db.rawQuery("SELECT * FROM Bookmarks WHERE id=?", new String[]{bookmark.getbID()});
+                    if (cursor.getCount() > 0) {
+                        ContentValues newValues = new ContentValues();
+                        newValues.put("name", bookmark.getName());
+                        newValues.put("url", bookmark.getUrl());
+                        LocalDatabaseHelper.getInstance(context).getWritableDatabase()
+                                .update("Bookmarks", newValues, "id=" + bookmark.getbID(), null);
+                        cursor.close();
+                        subscriber.onNext(bookmark);
+                        subscriber.onCompleted();
+                    }
+                }finally {
+                    db.close();
                 }
-                cursor.close();
+
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
@@ -160,8 +165,9 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
             @Override
             public void call(Subscriber<? super Set<String>> subscriber) {
                 Set<String> result = new HashSet<>();
-                Cursor cursor = LocalDatabaseHelper.getInstance(context).getReadableDatabase()
-                        .query("BlackList",null,null,null,null,null,null);
+                    Cursor cursor = LocalDatabaseHelper.getInstance(context).getReadableDatabase()
+                            .query("BlackList", null, null, null, null, null, null);
+
                 try {
                     if (cursor.moveToFirst()) {
                         do {
@@ -182,13 +188,18 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
         return Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
-                ContentValues newValues = new ContentValues();
-                for(String domain : domains){
-                    newValues.put("domain",domain);
+                SQLiteDatabase db =LocalDatabaseHelper.getInstance(context).getWritableDatabase();
+                try {
+                    ContentValues newValues = new ContentValues();
+                    for (String domain : domains) {
+                        newValues.put("domain", domain);
+                    }
+                    db.insert("BlackList", null, newValues);
+                    subscriber.onNext("Added " + domains.size() + " domain(s) into blacklist.");
+                    subscriber.onCompleted();
+                }finally {
+                    db.close();
                 }
-                LocalDatabaseHelper.getInstance(context).getWritableDatabase().insert("BlackList",null,newValues);
-                subscriber.onNext("Added "+ domains.size()+" domain(s) into blacklist.");
-                subscriber.onCompleted();
             }
         }).subscribeOn(Schedulers.io());
     }
@@ -197,9 +208,14 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
         return Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
-                LocalDatabaseHelper.getInstance(context).getWritableDatabase().delete("BlackList",null,null);
-                subscriber.onNext("Blacklist has been cleared");
-                subscriber.onCompleted();
+                SQLiteDatabase db =LocalDatabaseHelper.getInstance(context).getWritableDatabase();
+                try {
+                    db.delete("BlackList", null, null);
+                    subscriber.onNext("Blacklist has been cleared");
+                    subscriber.onCompleted();
+                }finally {
+                    db.close();
+                }
             }
         }).subscribeOn(Schedulers.io());
     }
@@ -208,10 +224,16 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
         return Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
-                String whereClause = String.format("domain" + " in (%s)", TextUtils.join(",", Collections.nCopies(domains.size(), "?")));
-                LocalDatabaseHelper.getInstance(context).getWritableDatabase().delete("BlackList", whereClause, domains.toArray(new String[0]));
-                subscriber.onNext("Removed "+domains.size()+" domain(s) from blacklist.");
-                subscriber.onCompleted();
+                SQLiteDatabase db = LocalDatabaseHelper.getInstance(context).getWritableDatabase();
+                try {
+
+                    String whereClause = String.format("domain" + " in (%s)", TextUtils.join(",", Collections.nCopies(domains.size(), "?")));
+                    db.delete("BlackList", whereClause, domains.toArray(new String[0]));
+                    subscriber.onNext("Removed " + domains.size() + " domain(s) from blacklist.");
+                    subscriber.onCompleted();
+                }finally {
+                    db.close();
+                }
             }
         }).subscribeOn(Schedulers.io());
     }
@@ -221,9 +243,11 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
         return Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
-                int result = LocalDatabaseHelper.getInstance(context).getWritableDatabase().delete("Bookmarks", "id=" + bookmark.getbID(), null);
+                SQLiteDatabase db =LocalDatabaseHelper.getInstance(context).getWritableDatabase();
+                int result = db.delete("Bookmarks", "id=" + bookmark.getbID(), null);
                 subscriber.onNext(String.valueOf(result));
                 subscriber.onCompleted();
+                db.close();
             }
         }).subscribeOn(Schedulers.io());
 
@@ -233,29 +257,34 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
         return Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
-                Cursor cursor =LocalDatabaseHelper.getInstance(context)
+
+                Cursor cursor = LocalDatabaseHelper.getInstance(context)
                         .getReadableDatabase()
-                        .query("Histories",null,"url = ?",new String[]{history.getUrl()},null,null,null);
-                if(cursor.getCount()==0) {
-                LocalDatabaseHelper.getInstance(context)
-                        .getWritableDatabase()
-                        .execSQL("INSERT INTO Histories (name,url,timestamp) " +
-                                "VALUES("
-                                + "\"" + history.getName() + "\",\""
-                                + history.getUrl() + "\","
-                                + history.getTimestamp() + ")");
-                subscriber.onNext("DONE");
-                subscriber.onCompleted();
-                }else{
-                    if(cursor.moveToFirst()) {
-                        int id = cursor.getInt(0);
-                        int count = cursor.getInt(3);
-                        ContentValues newValue = new ContentValues();
-                        newValue.put("frequent", (count+1));
+                        .query("Histories", null, "url = ?", new String[]{history.getUrl()}, null, null, null);
+                try {
+                    if (cursor.getCount() == 0) {
                         LocalDatabaseHelper.getInstance(context)
                                 .getWritableDatabase()
-                                .update("Histories", newValue,"_id = ?",new String[]{String.valueOf(id)});
+                                .execSQL("INSERT INTO Histories (name,url,timestamp) " +
+                                        "VALUES("
+                                        + "\"" + history.getName() + "\",\""
+                                        + history.getUrl() + "\","
+                                        + history.getTimestamp() + ")");
+                        subscriber.onNext("DONE");
+                        subscriber.onCompleted();
+                    } else {
+                        if (cursor.moveToFirst()) {
+                            int id = cursor.getInt(0);
+                            int count = cursor.getInt(3);
+                            ContentValues newValue = new ContentValues();
+                            newValue.put("frequent", (count + 1));
+                            LocalDatabaseHelper.getInstance(context)
+                                    .getWritableDatabase()
+                                    .update("Histories", newValue, "_id = ?", new String[]{String.valueOf(id)});
+                        }
                     }
+                }finally {
+                    cursor.close();
                 }
             }
         }).subscribeOn(Schedulers.io());
@@ -263,13 +292,18 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
     }
 
     public void saveQueryRecord(final String query) {
-        ContentValues newValue = new ContentValues();
-        newValue.put("query", query);
-        long result = LocalDatabaseHelper
+        SQLiteDatabase db = LocalDatabaseHelper
                 .getInstance(context)
-                .getWritableDatabase()
-                .insert("QueryRecords", null, newValue);
-        Log.d(this.getClass().getSimpleName(), "result is  " + result);
+                .getWritableDatabase();
+        try {
+            ContentValues newValue = new ContentValues();
+            newValue.put("query", query);
+
+            db.insert("QueryRecords", null, newValue);
+        }finally {
+            db.close();
+        }
+
     }
 
     public Observable<Cursor> getSimilarHistory(final String query) {
@@ -295,6 +329,7 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
                 Log.e(this.getClass().getSimpleName(), "query result is " + count);
                 subscriber.onNext(c);
                 subscriber.onCompleted();
+                c.close();
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 
@@ -312,14 +347,16 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
         return Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
-                LocalDatabaseHelper.getInstance(context)
-                        .getWritableDatabase()
-                        .execSQL("INSERT INTO Bookmarks (url,name) " +
+                SQLiteDatabase db =LocalDatabaseHelper.getInstance(context)
+                        .getWritableDatabase();
+
+                        db.execSQL("INSERT INTO Bookmarks (url,name) " +
                                 "VALUES(\""
                                 + bookmark.getUrl() + "\",\""
                                 + bookmark.getName() + "\")");
                 subscriber.onNext(bookmark.getName() + " saved as bookmark");
                 subscriber.onCompleted();
+                db.close();
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 
@@ -346,7 +383,6 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
                         subscriber.onCompleted();
                     }
                 }finally {
-
                     cursor.close();
                     db.close();
 
@@ -420,10 +456,9 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
 
     }
 
-
     private static class LocalDatabaseHelper extends SQLiteOpenHelper {
         private static final String dbName = "DBRecords";
-        private static final int numberOfDatabase = 1;
+        private static final int DBVersion = 2;
         private static LocalDatabaseHelper instance = null;
 
         private LocalDatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -432,10 +467,11 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
 
         public static LocalDatabaseHelper getInstance(Context context) {
             if (instance == null) {
-                instance = new LocalDatabaseHelper(context, dbName, null, numberOfDatabase);
+                instance = new LocalDatabaseHelper(context, dbName, null, DBVersion);
             }
             return instance;
         }
+
 
         @Override
         public void onCreate(SQLiteDatabase db) {
@@ -463,7 +499,32 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+                if(oldVersion<newVersion){
+                    db.execSQL("DROP TABLE IF EXISTS Bookmarks");
+                    db.execSQL("DROP TABLE IF EXISTS Histories");
+                    db.execSQL("DROP TABLE IF EXISTS QueryRecords");
+                    db.execSQL("DROP TABLE IF EXISTS BlackList");
+                    String createBookmarksTable = "CREATE TABLE IF NOT EXISTS Bookmarks(" +
+                            "id INTEGER NOT NULL PRIMARY KEY," +
+                            "name VARCHAR(50) NOT NULL," +
+                            "url VARCHAR(300) NOT NULL)";
+                    String createRecordsTable = "CREATE TABLE IF NOT EXISTS Histories(" +
+                            "_id INTEGER NOT NULL PRIMARY KEY," +
+                            "name VARCHAR(50) NOT NULL," +
+                            "url VARCHAR(300) NOT NULL," +
+                            "frequent INTEGER NOT NULL DEFAULT 1,"+
+                            "timestamp INTEGER NOT NULL)";
+                    String createQueryTable = "CREATE TABLE IF NOT EXISTS QueryRecords(" +
+                            "_id INTEGER NOT NULL PRIMARY KEY," +
+                            "query VARCHAR(400) NOT NULL," +
+                            "count INT NOT NULL DEFAULT 1)";
+                    String createBlackListTable = "CREATE TABLE IF NOT EXISTS BlackList("+
+                            "domain VARCHAR(255) NOT NULL PRIMARY KEY)";
+                    db.execSQL(createQueryTable);
+                    db.execSQL(createBookmarksTable);
+                    db.execSQL(createRecordsTable);
+                    db.execSQL(createBlackListTable);
+                }
         }
     }
 }

@@ -73,7 +73,7 @@ public class SettingView extends Fragment {
                 if(getString(R.string.allow_all).equals(cur)){
                     thirdPartyStatus.setText(R.string.block_blacklist);
                     SettingSingleton.getInstance().setThirdPartyPolicy(Constant.BLOCK_BLACK_LIST);
-                }else if(getString(R.string.black_list).equals(cur)){
+                }else if(getString(R.string.block_blacklist).equals(cur)){
                     thirdPartyStatus.setText(R.string.block_all_third_party);
                     SettingSingleton.getInstance().setThirdPartyPolicy(Constant.BLOCK_ALL_THIRD_PARTY);
                 }else if(getString(R.string.block_all_third_party).equals(cur)){

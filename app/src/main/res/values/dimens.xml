@@ -13,6 +13,7 @@
     <dimen name="text_subheading_regular">16sp</dimen>
     <dimen name="text_body">14sp</dimen>
     <dimen name="text_caption">12sp</dimen>
-
+    <dimen name="item_tab_height">368dp</dimen>
+    <dimen name="item_tab_width">192dp</dimen>
     <dimen name="toolbar_dense">56dp</dimen>
 </resources>

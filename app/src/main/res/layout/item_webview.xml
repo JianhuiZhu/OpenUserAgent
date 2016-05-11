@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical" android:layout_width="@dimen/item_tab_width"
     android:background="@android:color/transparent"
-    android:layout_marginRight="16dp"
-    android:layout_marginLeft="16dp"
-    android:layout_marginTop="8dp"
-    android:layout_marginBottom="8dp"
-    android:layout_height="match_parent">
+    android:layout_marginRight="@dimen/material_side_margin"
+    android:layout_marginLeft="@dimen/material_side_margin"
+    android:layout_marginTop="@dimen/material_top_bottom_margin"
+    android:layout_marginBottom="@dimen/material_top_bottom_margin"
+    android:layout_height="@dimen/item_tab_height">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

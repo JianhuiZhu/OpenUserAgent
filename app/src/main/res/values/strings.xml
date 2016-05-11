@@ -38,4 +38,9 @@
     <string name="full_screen">FULL SCREEN</string>
     <string name="third_party_head">THIRD PARTY CONTENT</string>
     <string name="file_data">FILE DATA</string>
+
+    <string name="alert">This is first party</string>
+
+
+    <string name="resource_missing">The target resource is missing</string>
 </resources>

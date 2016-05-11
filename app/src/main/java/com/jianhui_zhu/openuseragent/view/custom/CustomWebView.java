@@ -5,19 +5,23 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.util.Constant;
+import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.RxBus;
 import com.jianhui_zhu.openuseragent.util.SettingSingleton;
 import com.jianhui_zhu.openuseragent.util.event.GlobalSettingChangeEvent;
 import com.jianhui_zhu.openuseragent.view.HomeView.CustomWebViewClient;
 import com.jianhui_zhu.openuseragent.util.WebUtil;
 import com.jianhui_zhu.openuseragent.view.HomeView;
+import com.jianhui_zhu.openuseragent.view.dialogs.AlertDialog;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 
 import java.net.CookieHandler;
@@ -110,6 +114,21 @@ public class CustomWebView extends WebView {
         this.setDrawingCacheEnabled(true);
         changeSetting();
         setWebChromeClient(new CustomWebChrome());
+        setOnLongClickListener(new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                HitTestResult result = getHitTestResult();
+                AlertDialog dialog;
+                if(result.getExtra()==null){
+                    dialog = AlertDialog.newInstanceWithWarning(v.getContext().getString(R.string.resource_missing));
+
+                }else {
+                    dialog = AlertDialog.newInstance(result.getExtra(), client.getTabPolicy().get(WebUtil.getDomain(result.getExtra())), client.getCurHost(), client);
+                }
+                FragmenUtil.switchToFragment(v.getContext(), dialog);
+                return true;
+            }
+        });
     }
 
 
@@ -180,6 +199,10 @@ public class CustomWebView extends WebView {
 
     @Override
     public void destroy() {
+        ViewGroup v =(ViewGroup)this.getParent();
+        if(v!=null){
+            v.removeView(this);
+        }
         client.unsubscribe();
         compositeSubscription.unsubscribe();
         super.destroy();

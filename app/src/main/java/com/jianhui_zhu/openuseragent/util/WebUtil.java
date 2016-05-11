@@ -7,6 +7,8 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
 
+import com.google.common.net.InternetDomainName;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -108,5 +110,25 @@ public class WebUtil {
 
             URI uri = new URI(url);
             return uri.getHost();
+    }
+    public static boolean isThirdParty(String host, String url){
+        String target = "";
+        String resource ="";
+        try {
+            target = getDomain(host);
+            resource = getDomain(url);
+        }catch (Exception e){
+            return false;
+        }
+        return !target.equals(resource);
+    }
+    public static String getDomain(String host){
+        String result= host;
+        try {
+            result = InternetDomainName.from(Uri.parse(host).getHost()).topPrivateDomain().toString();
+        }catch (Exception e){
+            return host;
+        }
+        return result;
     }
 }

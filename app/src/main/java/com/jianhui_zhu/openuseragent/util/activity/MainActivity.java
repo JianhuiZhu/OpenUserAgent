@@ -6,6 +6,7 @@ import android.support.design.widget.CoordinatorLayout;
 
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
+import com.jianhui_zhu.openuseragent.util.LocalDatabaseSingleton;
 import com.jianhui_zhu.openuseragent.view.HomeView;
 
 import butterknife.Bind;
@@ -42,5 +43,10 @@ public class MainActivity extends Activity {
 	@Override
 	public void onBackPressed() {
 		super.onBackPressed();
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
 	}
 }
