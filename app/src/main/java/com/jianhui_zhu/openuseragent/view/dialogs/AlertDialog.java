@@ -1,6 +1,7 @@
 package com.jianhui_zhu.openuseragent.view.dialogs;
 
 import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -11,7 +12,9 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.jianhui_zhu.openuseragent.R;
+import com.jianhui_zhu.openuseragent.util.RxBus;
 import com.jianhui_zhu.openuseragent.util.WebUtil;
+import com.jianhui_zhu.openuseragent.util.event.WebViewRefreshEvent;
 import com.jianhui_zhu.openuseragent.view.HomeView;
 
 import butterknife.Bind;
@@ -97,5 +100,11 @@ public class AlertDialog extends DialogFragment {
         bundle.putString(WARNING_TAG,warning);
         dialog.flag = false;
         return dialog;
+    }
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        super.onDismiss(dialog);
+        RxBus.getInstance().send(new WebViewRefreshEvent());
     }
 }

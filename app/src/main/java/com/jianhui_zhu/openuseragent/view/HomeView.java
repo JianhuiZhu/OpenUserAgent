@@ -368,7 +368,8 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
             this.webHolder.loadUrl(url);
             urlBar.setQuery(url,false);
         } else {
-            this.webHolder.loadUrl(SettingSingleton.getInstance().getHomePage());
+            //this.webHolder.loadUrl(SettingSingleton.getInstance().getHomePage());
+            this.webHolder.loadUrl(SettingSingleton.getInstance().getSearchEngine()+url);
         }
 
 
@@ -610,19 +611,20 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                 }catch (Exception e){
                     return super.shouldInterceptRequest(view, url);
                 }
-
-                if (!tabPolicy.containsKey(resourceHost)) {
-                    if (globalBlackList.contains(resourceHost)) {
-                        tabPolicy.put(resourceHost, true);
-                    } else {
-                        tabPolicy.put(resourceHost, false);
+                if(!resourceHost.equals(curHost)) {
+                    if (!tabPolicy.containsKey(resourceHost)) {
+                        if (globalBlackList.contains(resourceHost)) {
+                            tabPolicy.put(resourceHost, true);
+                        } else {
+                            tabPolicy.put(resourceHost, false);
+                        }
                     }
                 }
                 switch (currentPolicy) {
                     case Constant.ALLOW_ALL:
                         break;
                     case Constant.BLOCK_BLACK_LIST:
-                        if (tabPolicy.containsKey(resourceHost) && tabPolicy.get(resourceHost)) {
+                        if (tabPolicy.containsKey(resourceHost) && tabPolicy.get(resourceHost)&&!resourceHost.equals(curHost)) {
                             return new WebResourceResponse("text/css", "UTF-8", null);
                         }
                         break;
