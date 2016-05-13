@@ -3,6 +3,8 @@ package com.jianhui_zhu.openuseragent.view.custom;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Message;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +30,8 @@ import java.net.CookieHandler;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import rx.Observable;
+import rx.Subscriber;
 import rx.Subscription;
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
@@ -36,6 +40,7 @@ import rx.subscriptions.CompositeSubscription;
  * Created by jianhuizhu on 2016-03-09.
  */
 public class CustomWebView extends WebView {
+    CustomWebView instance;
     public CustomWebViewClient getClient() {
         return client;
     }
@@ -120,13 +125,26 @@ public class CustomWebView extends WebView {
                 HitTestResult result = getHitTestResult();
                 AlertDialog dialog;
                 if(result.getExtra()==null){
-                    dialog = AlertDialog.newInstanceWithWarning(v.getContext().getString(R.string.resource_missing));
-
+                    if(result.getType()==HitTestResult.UNKNOWN_TYPE) {
+                        Message msg = new Message();
+                        msg.setTarget(new MyHandler());
+                        instance.requestFocusNodeHref(msg);
+                    }else{
+                        return true;
+                    }
                 }else {
                     dialog = AlertDialog.newInstance(result.getExtra(), client.getTabPolicy().get(WebUtil.getDomain(result.getExtra())), client.getCurHost(), client);
+                    FragmenUtil.switchToFragment(v.getContext(), dialog);
                 }
-                FragmenUtil.switchToFragment(v.getContext(), dialog);
+
                 return true;
+            }
+        });
+        setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                HitTestResult result = getHitTestResult();
+                homeViewInterface.changeTextInSearchBar(result.getExtra());
             }
         });
     }
@@ -142,6 +160,7 @@ public class CustomWebView extends WebView {
         super(context);
         this.setWebViewClient(client);
         initSettings();
+        this.instance = this;
 
     }
 
@@ -206,5 +225,19 @@ public class CustomWebView extends WebView {
         client.unsubscribe();
         compositeSubscription.unsubscribe();
         super.destroy();
+    }
+    class MyHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            AlertDialog dialog;
+            String src = msg.getData().getString("src");
+            if(src==null||src.equals("")){
+                dialog = AlertDialog.newInstanceWithWarning("CANNOT GET THE RESOURCE LINK");
+            }else {
+                dialog = AlertDialog.newInstance(src, client.getTabPolicy().get(WebUtil.getDomain(src)), client.getCurHost(), client);
+            }
+            FragmenUtil.switchToFragment(getContext(), dialog);
+        }
     }
 }

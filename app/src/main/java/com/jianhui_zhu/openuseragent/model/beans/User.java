@@ -36,7 +36,7 @@ public class User implements Parcelable {
         username = in.readString();
         avatarUrl = in.readString();
         homepage=in.readString();
-        Bundle bundle = in.readBundle();
+        Bundle bundle = in.readBundle(getClass().getClassLoader());
         bookmarks = MapUtil.fromBundle(bundle.getBundle("bookmarks"), Bookmark.class);
         histories = MapUtil.fromBundle(bundle.getBundle("histories"), History.class);
     }

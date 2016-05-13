@@ -1,9 +1,10 @@
 package com.jianhui_zhu.openuseragent.view;
 
-import android.app.Fragment;
+
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.github.ikidou.fragmentBackHandler.BackHandlerHelper;
+import com.github.ikidou.fragmentBackHandler.FragmentBackHandler;
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.BookmarkManager;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
@@ -27,7 +30,7 @@ import butterknife.OnClick;
 /**
  * Created by Jianhui Zhu on 2016-02-06.
  */
-public class BookmarkView extends Fragment{
+public class BookmarkView extends Fragment implements FragmentBackHandler{
     HomeViewInterface viewInterface;
     CoordinatorLayout container;
     @Bind(R.id.list)
@@ -78,5 +81,10 @@ public class BookmarkView extends Fragment{
         BookmarkView bookmarkView = new BookmarkView();
         bookmarkView.viewInterface = viewInterface;
         return bookmarkView;
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        return BackHandlerHelper.handleBackPress(this);
     }
 }

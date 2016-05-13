@@ -1,12 +1,14 @@
 package com.jianhui_zhu.openuseragent.view.dialogs;
 
-import android.app.DialogFragment;
+
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -49,6 +51,7 @@ public class AlertDialog extends DialogFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         if(flag) {
             final String url = getArguments().getString(URL_TAG);
             String host = getArguments().getString(HOST_TAG);
@@ -98,6 +101,7 @@ public class AlertDialog extends DialogFragment {
         AlertDialog dialog = new AlertDialog();
         Bundle bundle = new Bundle();
         bundle.putString(WARNING_TAG,warning);
+        dialog.setArguments(bundle);
         dialog.flag = false;
         return dialog;
     }

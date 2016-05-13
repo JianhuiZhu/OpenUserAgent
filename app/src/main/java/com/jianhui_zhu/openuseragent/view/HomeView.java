@@ -1,6 +1,5 @@
 package com.jianhui_zhu.openuseragent.view;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -13,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -42,6 +42,9 @@ import android.widget.SearchView;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import com.github.ikidou.fragmentBackHandler.BackHandlerHelper;
+import com.github.ikidou.fragmentBackHandler.FragmentBackHandler;
 import com.google.common.net.InternetDomainName;
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.BookmarkManager;
@@ -85,7 +88,7 @@ import rx.subscriptions.CompositeSubscription;
 /**
  * Created by Jianhui Zhu on 2016-01-27.
  */
-public class HomeView extends Fragment implements HomeViewInterface,SwipeRefreshLayout.OnRefreshListener {
+public class HomeView extends Fragment implements HomeViewInterface,SwipeRefreshLayout.OnRefreshListener,FragmentBackHandler{
     private HashSet<String> globalBlackList = new HashSet<>();
     HomeView homeView;
     HistoryManager historyManager = new HistoryManager();
@@ -464,8 +467,23 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
     }
 
     @Override
+    public void changeTextInSearchBar(String url) {
+        urlBar.setQuery(url,false);
+    }
+
+    @Override
     public void onRefresh() {
         webHolder.reload();
+    }
+
+    @Override
+    public boolean onBackPressed() {
+       if(webHolder!=null&&webHolder.canGoBack()){
+           webHolder.goBack();
+           return true;
+       }else{
+           return BackHandlerHelper.handleBackPress(this);
+       }
     }
 
 
@@ -796,6 +814,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
     public void onDestroy() {
         webViewAdapter.destoryAll();
         if(webHolder!=null){
+            ((ViewGroup)webHolder.getParent()).removeView(webHolder);
             webHolder.destroy();
         }
         webHolder = null;

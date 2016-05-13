@@ -1,10 +1,10 @@
 package com.jianhui_zhu.openuseragent.view;
 
-import android.app.Fragment;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.github.ikidou.fragmentBackHandler.BackHandlerHelper;
+import com.github.ikidou.fragmentBackHandler.FragmentBackHandler;
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.model.HistoryManager;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
@@ -32,7 +34,7 @@ import butterknife.OnClick;
 /**
  * Created by jianhuizhu on 2016-02-16.
  */
-public class HistoryView extends Fragment implements DatePickerDialog.OnDateSetListener{
+public class HistoryView extends Fragment implements DatePickerDialog.OnDateSetListener,FragmentBackHandler{
     HomeViewInterface viewInterface;
     CoordinatorLayout container;
     HistoryView historyView;
@@ -54,7 +56,7 @@ public class HistoryView extends Fragment implements DatePickerDialog.OnDateSetL
                     now.get(Calendar.YEAR),
                     now.get(Calendar.MONTH),
                     now.get(Calendar.DAY_OF_MONTH));
-            dpd.show(getFragmentManager(), "Datepickerdialog");
+            dpd.show(getActivity().getFragmentManager(), "Datepickerdialog");
                 break;
             case R.id.history_go_back:
                 FragmenUtil.backToPreviousFragment(getActivity(),this);
@@ -109,5 +111,10 @@ public class HistoryView extends Fragment implements DatePickerDialog.OnDateSetL
         HistoryView view = new HistoryView();
         view.viewInterface = viewInterface;
         return view;
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        return BackHandlerHelper.handleBackPress(this);
     }
 }

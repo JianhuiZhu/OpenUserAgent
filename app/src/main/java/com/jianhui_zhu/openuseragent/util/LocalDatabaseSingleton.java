@@ -326,7 +326,7 @@ public class LocalDatabaseSingleton implements DatabaseInterface {
                         .getReadableDatabase()
                         .query("QueryRecords", null, "query LIKE ?", new String[]{"%" + query + "%"}, null, null, "count DESC", "3");
                 int count = c.getCount();
-                Log.e(this.getClass().getSimpleName(), "query result is " + count);
+                Log.d(this.getClass().getSimpleName(), "query result is " + count);
                 subscriber.onNext(c);
                 subscriber.onCompleted();
                 c.close();

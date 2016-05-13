@@ -18,4 +18,5 @@ public interface HomeViewInterface {
     void changeNumTabsIcon(int num);
     void changeWebView(CustomWebView webView);
     void clearWebHolder();
+    void changeTextInSearchBar(String url);
 }

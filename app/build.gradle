@@ -63,6 +63,7 @@ dependencies {
     compile 'com.balysv:material-ripple:1.0.2'
     compile 'com.github.castorflex.smoothprogressbar:library-circular:1.0.0'
     compile 'com.google.guava:guava:18.0'
+    compile 'com.github.ikidou:FragmentBackHandler:2.1'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }

@@ -1,8 +1,9 @@
 package com.jianhui_zhu.openuseragent.view;
 
-import android.app.Fragment;
+
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,8 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.github.ikidou.fragmentBackHandler.BackHandlerHelper;
+import com.github.ikidou.fragmentBackHandler.FragmentBackHandler;
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.util.Constant;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
@@ -28,7 +31,7 @@ import butterknife.OnClick;
 /**
  * Created by Jianhui Zhu on 2016-02-05.
  */
-public class SettingView extends Fragment {
+public class SettingView extends Fragment implements FragmentBackHandler{
     @Bind(R.id.third_party_setting_status)
     TextView thirdPartyStatus;
     @Bind(R.id.cookie_status)
@@ -165,4 +168,8 @@ public class SettingView extends Fragment {
         //RxBus.getInstance().send(new GlobalSettingChangeEvent());
     }
 
+    @Override
+    public boolean onBackPressed() {
+        return BackHandlerHelper.handleBackPress(this);
+    }
 }
