@@ -28,7 +28,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.DownloadListener;
 import android.webkit.URLUtil;
 import android.webkit.WebIconDatabase;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -53,7 +52,7 @@ import com.jianhui_zhu.openuseragent.model.HomeViewManager;
 import com.jianhui_zhu.openuseragent.util.Constant;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.RxBus;
-import com.jianhui_zhu.openuseragent.util.SettingSingleton;
+import com.jianhui_zhu.openuseragent.util.Setting;
 import com.jianhui_zhu.openuseragent.util.WebUtil;
 import com.jianhui_zhu.openuseragent.util.activity.MainActivity;
 import com.jianhui_zhu.openuseragent.util.event.GlobalBlackListEvent;
@@ -74,7 +73,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -116,10 +115,14 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
     ImageView forwardIcon;
     @Bind(R.id.tab)
     ImageView tabIcon;
+    @Bind(R.id.refresh)
+            ImageView refreshIcon;
+    @Bind(R.id.add_bookmark)
+            ImageView addBookmarkIcon;
     SearchSuggestionAdapter suggestionAdapter;
     WebViewAdapter webViewAdapter;
     CompositeSubscription compositeSubscription = new CompositeSubscription();
-    @OnClick({R.id.home_menu_icon,R.id.refresh_area,R.id.tab_area,R.id.add_bookmark_area,R.id.backward_area,R.id.forward_area})
+    @OnClick({R.id.home_menu_icon,R.id.refresh_area,R.id.tab,R.id.add_bookmark,R.id.backward,R.id.forward})
     public void click(final View view) {
 
         switch (view.getId()) {
@@ -130,7 +133,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                 Switch jsSwitch = (Switch)view.getRootView().findViewById(R.id.js_switch);
                 if(webHolder!=null) {
                     title.setVisibility(View.VISIBLE);
-                    switch (SettingSingleton.getInstance().getThirdPartyPolicy()){
+                    switch (Setting.getInstance().getThirdPartyPolicy()){
                         case Constant.ALLOW_ALL:
                             title.setText(R.string.allow_all);
                             thirdPartySeekBar.setProgress(Constant.ALLOW_ALL);
@@ -147,7 +150,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                     thirdPartySeekBar.setVisibility(View.VISIBLE);
                     jsTitle.setVisibility(View.VISIBLE);
                     jsSwitch.setVisibility(View.VISIBLE);
-                    String jsSetting = SettingSingleton.getInstance().getJsPolicy();
+                    String jsSetting = Setting.getInstance().getJsPolicy();
                     if(jsSetting.equals(Constant.JS_ALLOW)){
                         jsSwitch.setChecked(true);
                         jsTitle.setText(Constant.JS_ALLOW);
@@ -220,32 +223,32 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                 }
                 settingDrawer.openDrawer(Gravity.RIGHT);
                 break;
-            case R.id.refresh_area:
+            case R.id.refresh:
                 onRefresh();
                 break;
-            case R.id.tab_area:
+            case R.id.tab:
                 if(webViewAdapter.getItemCount()==0){
                     Snackbar.make(container,"No tab exists",Snackbar.LENGTH_SHORT).show();
                 }else {
                     FragmenUtil.switchToFragment(getActivity(), TabStackDialog.newInstance(homeView));
                 }
                 break;
-            case R.id.add_bookmark_area:
+            case R.id.add_bookmark:
                 if(webHolder!=null) {
                     viewModel.saveBookmark(bookmarkManager.saveBookmark(webHolder.getUrl(), webHolder.getTitle()),container);
                 }
                 break;
             case R.id.home_area:
-                String homePageUrl = SettingSingleton.getInstance().getHomePage();
+                String homePageUrl = Setting.getInstance().getHomePage();
                 if(homePageUrl!=null)
                     loadTargetUrl(homePageUrl,false);
                 break;
-            case R.id.backward_area:
+            case R.id.backward:
                 if(webHolder!=null&&webHolder.canGoBack()){
                     webHolder.goBack();
                 }
                 break;
-            case R.id.forward_area:
+            case R.id.forward:
                 if(webHolder!=null&&webHolder.canGoForward()){
                     webHolder.goForward();
                 }
@@ -273,7 +276,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                         FragmenUtil.switchToFragment(getActivity(),new DownloadView());
                         break;
                     case R.id.add_tab_option:
-                        loadTargetUrl(SettingSingleton.getInstance().getHomePage(),true);
+                        loadTargetUrl(Setting.getInstance().getHomePage(),true);
                         break;
                 }
                 settingDrawer.closeDrawers();
@@ -293,7 +296,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
                 if (URLUtil.isValidUrl(query)) {
                     loadTargetUrl(query,false);
                 } else {
-                    String url =SettingSingleton.getInstance().getSearchEngine() + query;
+                    String url = Setting.getInstance().getSearchEngine() + query;
                     loadTargetUrl(url,false);
                 }
                 homeViewManager.saveQueryText(query);
@@ -371,8 +374,8 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
             this.webHolder.loadUrl(url);
             urlBar.setQuery(url,false);
         } else {
-            //this.webHolder.loadUrl(SettingSingleton.getInstance().getHomePage());
-            this.webHolder.loadUrl(SettingSingleton.getInstance().getSearchEngine()+url);
+            //this.webHolder.loadUrl(Setting.getInstance().getHomePage());
+            this.webHolder.loadUrl(Setting.getInstance().getSearchEngine()+url);
         }
 
 
@@ -390,7 +393,7 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
 
     @Override
     public void searchTargetWord(String word) {
-        loadTargetUrl(SettingSingleton.getInstance().getSearchEngine() + word,false);
+        loadTargetUrl(Setting.getInstance().getSearchEngine() + word,false);
     }
 
     @Override
@@ -749,6 +752,14 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
     }
 
     private LinearLayout initPanelView(){
+        /**
+         * when display panel view, webholder will be none, forward,backward tab etc make no sense
+         */
+        forwardIcon.setColorFilter(R.color.cardview_shadow_end_color, PorterDuff.Mode.MULTIPLY);
+        backwardIcon.setColorFilter(R.color.cardview_shadow_end_color, PorterDuff.Mode.MULTIPLY);
+        tabIcon.setColorFilter(R.color.cardview_shadow_end_color, PorterDuff.Mode.MULTIPLY);
+        refreshIcon.setColorFilter(R.color.cardview_shadow_end_color, PorterDuff.Mode.MULTIPLY);
+        addBookmarkIcon.setColorFilter(R.color.cardview_shadow_end_color, PorterDuff.Mode.MULTIPLY);
         LinearLayout layout = new LinearLayout(getActivity());
         LinearLayout.LayoutParams params =
                 new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT
@@ -756,10 +767,6 @@ public class HomeView extends Fragment implements HomeViewInterface,SwipeRefresh
         layout.setOrientation(LinearLayout.VERTICAL);
         params.setMargins(0,8,0,0);
         layout.setLayoutParams(params);
-        TextView title = new TextView(getActivity());
-        title.setText("Visit Often visited website");
-        title.setGravity(Gravity.CENTER);
-        layout.addView(title);
         final RecyclerView bookmarkRecycler = new RecyclerView(getActivity());
         bookmarkRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         bookmarkRecycler.setItemAnimator(new DefaultItemAnimator());

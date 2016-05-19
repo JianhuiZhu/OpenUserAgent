@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
-import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
@@ -14,24 +13,18 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.jianhui_zhu.openuseragent.R;
-import com.jianhui_zhu.openuseragent.util.Constant;
+import com.jianhui_zhu.openuseragent.util.Setting;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
 import com.jianhui_zhu.openuseragent.util.RxBus;
-import com.jianhui_zhu.openuseragent.util.SettingSingleton;
 import com.jianhui_zhu.openuseragent.util.event.GlobalSettingChangeEvent;
 import com.jianhui_zhu.openuseragent.view.HomeView.CustomWebViewClient;
 import com.jianhui_zhu.openuseragent.util.WebUtil;
-import com.jianhui_zhu.openuseragent.view.HomeView;
 import com.jianhui_zhu.openuseragent.view.dialogs.AlertDialog;
 import com.jianhui_zhu.openuseragent.view.interfaces.HomeViewInterface;
 
-import java.net.CookieHandler;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import rx.Observable;
-import rx.Subscriber;
 import rx.Subscription;
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
@@ -51,49 +44,49 @@ public class CustomWebView extends WebView {
         WebSettings settings = this.getSettings();
         settings.setJavaScriptEnabled(setting);
     }
-    private void changeSetting(){
+    private void initSetting(){
         WebSettings settings=this.getSettings();
-        switch (SettingSingleton.getInstance().getCookiePolicy()){
-            case Constant.COOKIE_ALLOW_ALL:
+        switch (Setting.getInstance().getCookiePolicy()){
+            case Setting.COOKIE_ALLOW_ALL:
                 cookieManager.setAcceptCookie(true);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     cookieManager.setAcceptThirdPartyCookies(this,true);
                 }
                 break;
-            case Constant.COOKIE_ALLOW_FIRST_PARTY:
+            case Setting.COOKIE_ALLOW_FIRST_PARTY:
                 cookieManager.setAcceptCookie(true);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     cookieManager.setAcceptThirdPartyCookies(this,false);
                 }
                 break;
-            case Constant.COOKIE_NONE:
+            case Setting.COOKIE_NONE:
                 cookieManager.setAcceptCookie(false);
                 break;
         }
-        switch (SettingSingleton.getInstance().getThirdPartyPolicy()){
-            case Constant.ALLOW_ALL:
-                client.changePolicy(Constant.ALLOW_ALL);
+        switch (Setting.getInstance().getThirdPartyPolicy()){
+            case Setting.ALLOW_ALL:
+                client.changePolicy(Setting.ALLOW_ALL);
                 break;
-            case Constant.BLOCK_BLACK_LIST:
-                client.changePolicy(Constant.BLOCK_BLACK_LIST);
+            case Setting.BLOCK_BLACK_LIST:
+                client.changePolicy(Setting.BLOCK_BLACK_LIST);
                 break;
-            case Constant.BLOCK_ALL_THIRD_PARTY:
-                client.changePolicy(Constant.BLOCK_ALL_THIRD_PARTY);
+            case Setting.BLOCK_ALL_THIRD_PARTY:
+                client.changePolicy(Setting.BLOCK_ALL_THIRD_PARTY);
                 break;
         }
-        switch (SettingSingleton.getInstance().getJsPolicy()){
-            case Constant.JS_ALLOW:
+        switch (Setting.getInstance().getJsPolicy()){
+            case Setting.JS_ALLOW:
                 settings.setJavaScriptEnabled(true);
                 break;
-            case Constant.JS_BLOCK:
+            case Setting.JS_BLOCK:
                 settings.setJavaScriptEnabled(false);
                 break;
         }
-        switch (SettingSingleton.getInstance().getPopupPolicy()){
-            case Constant.POPUP_ALLOW_ALL:
+        switch (Setting.getInstance().getPopupPolicy()){
+            case Setting.POPUP_ALLOW_ALL:
                 settings.setJavaScriptCanOpenWindowsAutomatically(true);
                 break;
-            case Constant.POPUP_BLOCK_ALL:
+            case Setting.POPUP_BLOCK_ALL:
                 settings.setJavaScriptCanOpenWindowsAutomatically(false);
                 break;
         }
@@ -111,13 +104,13 @@ public class CustomWebView extends WebView {
                 @Override
                 public void call(Object o) {
                     if(o instanceof GlobalSettingChangeEvent){
-                        changeSetting();
+                        initSetting();
                     }
                 }
             });
         }
         this.setDrawingCacheEnabled(true);
-        changeSetting();
+        initSetting();
         setWebChromeClient(new CustomWebChrome());
         setOnLongClickListener(new OnLongClickListener() {
             @Override

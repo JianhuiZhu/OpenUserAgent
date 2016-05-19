@@ -2,15 +2,38 @@ package com.jianhui_zhu.openuseragent.util;
 
 import android.content.Context;
 
-import com.jianhui_zhu.openuseragent.view.HomeView;
-
 /**
  * Created by jianhuizhu on 2016-03-06.
  */
-public class SettingSingleton {
+public class Setting {
+    public static final String GOOGLE_PREFIX ="https://www.google.com/search?q=";
+    public static final String BAIDU_PREFIX ="http://www.baidu.com/s?wd=";
+    public static final String BING_PREFIX="http://www.bing.com/search?q=";
+
+    public static final String COOKIE_ALLOW_ALL = "ALLOW_ALL_COOKIES";
+    public static final String COOKIE_ALLOW_FIRST_PARTY = "ALLOW_FIRST_PARTY_COOKIES";
+    public static final String COOKIE_NONE = "BLOCK_ALL_COOKIES";
+
+    public static final String FULL_SCREEN_ALLOW_ALL = "FULL_SCREEN_ALLOW_ALL";
+    public static final String FULL_SCREEN_BLOCK_ALL = "TO_BE_IMPLEMENTED";
+    public static final String FULL_SCREEN_ASK = "FULL_SCREEN_ASK";
+
+    public static final String POPUP_ALLOW_ALL = "POPUP_ALLOW_ALL";
+    public static final String POPUP_BLOCK_ALL = "POPUP_BLOCK_ALL";
+
+    public static final String LOCATION_BLOCK ="BLOCK_OTHER_TO_BE_IMPLEMENTED";
+    public static final String LOCATION_ALLOW = "ALLOW";
+    public static final String LOCATION_ASK = "ASK_USER";
+
+    public static final String JS_ALLOW = "ALLOW_JAVASCRIPT";
+    public static final String JS_BLOCK = "BLOCK_JAVASCRIPT";
+
+    public static final int ALLOW_ALL = 0;
+    public static final int BLOCK_BLACK_LIST = 1;
+    public static final int BLOCK_ALL_THIRD_PARTY = 2;
     boolean allowAutomaticDownload;
     public static void instantiate(Context context){
-        new SettingSingleton(context);
+        new Setting(context);
     }
     public int getThirdPartyPolicy() {
         return thirdPartyPolicy;
@@ -75,7 +98,7 @@ public class SettingSingleton {
     public static final String POPUP_POLICY = "POPUP_POLICY";
     public static final String LOCATION_POLICY = "LOCATION_POLICY";
     public static final String JS_POLICY = "JS_POLICY";
-    private static SettingSingleton instance;
+    private static Setting instance;
     private Context context;
 
     public String getHomePage() {
@@ -98,7 +121,7 @@ public class SettingSingleton {
 
     private String homePage;
     private String searchEngine;
-    public synchronized static SettingSingleton getInstance(){
+    public synchronized static Setting getInstance(){
         return instance;
     }
 
@@ -111,32 +134,32 @@ public class SettingSingleton {
         SharePreferenceUtil.saveString(context,JS_POLICY,jsPolicy);
     }
 
-    private SettingSingleton(Context context) {
+    private Setting(Context context) {
         this.context=context;
         instance =this;
         if(SharePreferenceUtil.getStringByKey(context,HOME_PAGE).equals(NOT_FOUND)){
             SharePreferenceUtil.saveString(context,HOME_PAGE,"https://www.google.com");
         }
         if(SharePreferenceUtil.getStringByKey(context,SEARCH_ENGINE).equals(NOT_FOUND)){
-            SharePreferenceUtil.saveString(context,SEARCH_ENGINE,Constant.GOOGLE_PREFIX);
+            SharePreferenceUtil.saveString(context,SEARCH_ENGINE,GOOGLE_PREFIX);
         }
         if(SharePreferenceUtil.getIntegerByKey(context,THIRD_PARTY_POLICY)==-1){
-            SharePreferenceUtil.saveInteger(context,THIRD_PARTY_POLICY, Constant.ALLOW_ALL);
+            SharePreferenceUtil.saveInteger(context,THIRD_PARTY_POLICY, ALLOW_ALL);
         }
         if(SharePreferenceUtil.getStringByKey(context,COOKIE_POLICY).equals(NOT_FOUND)){
-            SharePreferenceUtil.saveString(context,COOKIE_POLICY,Constant.COOKIE_ALLOW_ALL);
+            SharePreferenceUtil.saveString(context,COOKIE_POLICY,COOKIE_ALLOW_ALL);
         }
         if(SharePreferenceUtil.getStringByKey(context,FULL_SCREEN_POLICY).equals(NOT_FOUND)){
-            SharePreferenceUtil.saveString(context,FULL_SCREEN_POLICY,Constant.FULL_SCREEN_BLOCK_ALL);
+            SharePreferenceUtil.saveString(context,FULL_SCREEN_POLICY,FULL_SCREEN_BLOCK_ALL);
         }
         if(SharePreferenceUtil.getStringByKey(context,POPUP_POLICY).equals(NOT_FOUND)){
-            SharePreferenceUtil.saveString(context,POPUP_POLICY,Constant.POPUP_BLOCK_ALL);
+            SharePreferenceUtil.saveString(context,POPUP_POLICY,POPUP_BLOCK_ALL);
         }
         if(SharePreferenceUtil.getStringByKey(context,LOCATION_POLICY).equals(NOT_FOUND)){
-            SharePreferenceUtil.saveString(context,LOCATION_POLICY,Constant.LOCATION_BLOCK);
+            SharePreferenceUtil.saveString(context,LOCATION_POLICY,LOCATION_BLOCK);
         }
         if(SharePreferenceUtil.getStringByKey(context,JS_POLICY).equals(NOT_FOUND)){
-            SharePreferenceUtil.saveString(context,JS_POLICY,Constant.JS_ALLOW);
+            SharePreferenceUtil.saveString(context,JS_POLICY,JS_ALLOW);
         }
         homePage=SharePreferenceUtil.getStringByKey(context,HOME_PAGE);
         searchEngine=SharePreferenceUtil.getStringByKey(context,SEARCH_ENGINE);

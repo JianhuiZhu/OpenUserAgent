@@ -4,13 +4,11 @@ package com.jianhui_zhu.openuseragent.view;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -19,9 +17,7 @@ import com.github.ikidou.fragmentBackHandler.FragmentBackHandler;
 import com.jianhui_zhu.openuseragent.R;
 import com.jianhui_zhu.openuseragent.util.Constant;
 import com.jianhui_zhu.openuseragent.util.FragmenUtil;
-import com.jianhui_zhu.openuseragent.util.RxBus;
-import com.jianhui_zhu.openuseragent.util.SettingSingleton;
-import com.jianhui_zhu.openuseragent.util.event.GlobalSettingChangeEvent;
+import com.jianhui_zhu.openuseragent.util.Setting;
 import com.jianhui_zhu.openuseragent.view.adapter.SearchEngineAdapter;
 
 import butterknife.Bind;
@@ -48,7 +44,7 @@ public class SettingView extends Fragment implements FragmentBackHandler{
     EditText homePage;
     @Bind(R.id.search_engine_spinner)
     Spinner searchEngine;
-    SettingSingleton settings;
+    Setting settings;
     @OnClick({R.id.general_tool_bar_go_back,R.id.cookie_setting_area,R.id.third_party_setting_area,R.id.js_setting_area})
     public void click(View view){
         switch (view.getId()) {
@@ -59,15 +55,15 @@ public class SettingView extends Fragment implements FragmentBackHandler{
                 switch (cookieStatus.getText().toString()){
                     case Constant.COOKIE_ALLOW_ALL:
                         cookieStatus.setText(Constant.COOKIE_ALLOW_FIRST_PARTY);
-                        SettingSingleton.getInstance().setCookiePolicy(Constant.COOKIE_ALLOW_FIRST_PARTY);
+                        Setting.getInstance().setCookiePolicy(Constant.COOKIE_ALLOW_FIRST_PARTY);
                         break;
                     case Constant.COOKIE_ALLOW_FIRST_PARTY:
                         cookieStatus.setText(Constant.COOKIE_NONE);
-                        SettingSingleton.getInstance().setCookiePolicy(Constant.COOKIE_NONE);
+                        Setting.getInstance().setCookiePolicy(Constant.COOKIE_NONE);
                         break;
                     case Constant.COOKIE_NONE:
                         cookieStatus.setText(Constant.ALLOW_ALL);
-                        SettingSingleton.getInstance().setCookiePolicy(Constant.COOKIE_ALLOW_ALL);
+                        Setting.getInstance().setCookiePolicy(Constant.COOKIE_ALLOW_ALL);
                         break;
                 }
                 break;
@@ -75,22 +71,22 @@ public class SettingView extends Fragment implements FragmentBackHandler{
                 String cur = thirdPartyStatus.getText().toString();
                 if(getString(R.string.allow_all).equals(cur)){
                     thirdPartyStatus.setText(R.string.block_blacklist);
-                    SettingSingleton.getInstance().setThirdPartyPolicy(Constant.BLOCK_BLACK_LIST);
+                    Setting.getInstance().setThirdPartyPolicy(Constant.BLOCK_BLACK_LIST);
                 }else if(getString(R.string.block_blacklist).equals(cur)){
                     thirdPartyStatus.setText(R.string.block_all_third_party);
-                    SettingSingleton.getInstance().setThirdPartyPolicy(Constant.BLOCK_ALL_THIRD_PARTY);
+                    Setting.getInstance().setThirdPartyPolicy(Constant.BLOCK_ALL_THIRD_PARTY);
                 }else if(getString(R.string.block_all_third_party).equals(cur)){
                     thirdPartyStatus.setText(R.string.allow_all);
-                    SettingSingleton.getInstance().setThirdPartyPolicy(Constant.ALLOW_ALL);
+                    Setting.getInstance().setThirdPartyPolicy(Constant.ALLOW_ALL);
                 }
                 break;
             case R.id.js_setting_area:
                 if(jsStatus.getText().toString().equals(Constant.JS_ALLOW)){
                     jsStatus.setText(Constant.JS_BLOCK);
-                    SettingSingleton.getInstance().setJsPolicy(Constant.JS_BLOCK);
+                    Setting.getInstance().setJsPolicy(Constant.JS_BLOCK);
                 }else{
                     jsStatus.setText(Constant.JS_ALLOW);
-                    SettingSingleton.getInstance().setJsPolicy(Constant.JS_ALLOW);
+                    Setting.getInstance().setJsPolicy(Constant.JS_ALLOW);
                 }
 
         }
@@ -98,7 +94,7 @@ public class SettingView extends Fragment implements FragmentBackHandler{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        settings=SettingSingleton.getInstance();
+        settings= Setting.getInstance();
     }
 
     @Nullable
@@ -113,12 +109,12 @@ public class SettingView extends Fragment implements FragmentBackHandler{
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         homePage.setText(settings.getHomePage());
-        String curSearchEngine=SettingSingleton.getInstance().getSearchEngine();
+        String curSearchEngine= Setting.getInstance().getSearchEngine();
         final SearchEngineAdapter adapter=new SearchEngineAdapter(getActivity(),curSearchEngine);
         //ArrayAdapter<CharSequence> arrayAdapter=ArrayAdapter.createFromResource(getActivity(),R.array.search_engines,R.layout.item_spinner);
         //adapter.setDropDownViewResource(R.layout.item_spinner);
         //int position=arrayAdapter.getPosition(curSearchEngine);
-        switch (SettingSingleton.getInstance().getThirdPartyPolicy()){
+        switch (Setting.getInstance().getThirdPartyPolicy()){
             case 0:
                 thirdPartyStatus.setText(R.string.allow_all);
                 break;
@@ -130,11 +126,11 @@ public class SettingView extends Fragment implements FragmentBackHandler{
                 break;
         }
 
-        cookieStatus.setText(SettingSingleton.getInstance().getCookiePolicy());
-        fullScreenStatus.setText(SettingSingleton.getInstance().getFullScreenPolicy());
-        popupStatus.setText(SettingSingleton.getInstance().getPopupPolicy());
-        locationStatus.setText(SettingSingleton.getInstance().getLocationPolicy());
-        jsStatus.setText(SettingSingleton.getInstance().getJsPolicy());
+        cookieStatus.setText(Setting.getInstance().getCookiePolicy());
+        fullScreenStatus.setText(Setting.getInstance().getFullScreenPolicy());
+        popupStatus.setText(Setting.getInstance().getPopupPolicy());
+        locationStatus.setText(Setting.getInstance().getLocationPolicy());
+        jsStatus.setText(Setting.getInstance().getJsPolicy());
         searchEngine.setAdapter(adapter);
         int position=adapter.getPosition(curSearchEngine);
         searchEngine.setSelection(position);
@@ -142,9 +138,9 @@ public class SettingView extends Fragment implements FragmentBackHandler{
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String engine=adapter.getItem(position).toString();
-                String defaultEngine=SettingSingleton.getInstance().getSearchEngine();
+                String defaultEngine= Setting.getInstance().getSearchEngine();
                 if(!engine.equals(defaultEngine)){
-                    SettingSingleton.getInstance().setSearchEngine(engine);
+                    Setting.getInstance().setSearchEngine(engine);
                 }
             }
 

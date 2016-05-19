@@ -37,8 +37,20 @@ public class NewBookmarkDialog extends DialogFragment {
     @OnClick({R.id.done_bookmark,R.id.cancel_bookmark})
     public void onClick(View view){
         if(view.getId()==R.id.done_bookmark){
-            if(name.getText().equals("")||url.getText().equals("")){
-                Snackbar.make(container,"Please fill both name and url",Snackbar.LENGTH_SHORT).show();
+            boolean setFocus = false;
+            if(name.getText().length()==0){
+                name.setError(getString(R.string.new_bookmark_name_error_msg));
+                name.requestFocus();
+                setFocus = true;
+            }
+            if(url.getText().length()==0){
+                url.setError(getString(R.string.new_bookmark_url_error_msg));
+                if(!setFocus){
+                    url.requestFocus();
+                    setFocus = true;
+                }
+            }
+            if(setFocus){
                 return;
             }
             Bookmark bookmark = new Bookmark();

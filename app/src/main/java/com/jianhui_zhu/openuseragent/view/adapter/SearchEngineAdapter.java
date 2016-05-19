@@ -8,7 +8,6 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.jianhui_zhu.openuseragent.R;
-import com.jianhui_zhu.openuseragent.util.SettingSingleton;
 
 import java.util.ArrayList;
 import java.util.List;

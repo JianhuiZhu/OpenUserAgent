@@ -15,7 +15,7 @@
 
     <TextView
         android:layout_marginTop="@dimen/material_top_bottom_margin"
-        android:layout_marginLeft="5dp"
+        android:layout_marginLeft="@dimen/material_top_bottom_margin"
         android:textColor="@color/mdtp_date_picker_text_normal"
         android:text="to be filled"
         android:id="@+id/bookmark_name"
@@ -37,6 +37,7 @@
         android:textSize="@dimen/text_caption"
         android:layout_marginBottom="@dimen/material_top_bottom_margin"
         android:layout_marginLeft="@dimen/material_side_margin"
+        android:layout_marginRight="@dimen/material_side_margin"
         android:textColor="@color/mdtp_dark_gray"
         android:layout_height="wrap_content" />
     <View

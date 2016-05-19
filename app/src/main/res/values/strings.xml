@@ -2,6 +2,11 @@
     <string name="app_name">OpenUserAgent</string>
 
     <string name="login">Login via Google</string>
+
+    <string name="bookmark_name_hint">Bookmark name</string>
+    <string name="bookmark_url_hint">Bookmark url</string>
+    <string name="new_bookmark_name_error_msg">Bookmark name cannot be null.</string>
+    <string name="new_bookmark_url_error_msg">Bookmark url cannot be null</string>
     <string-array name="search_engines">
         <item>Google</item>
         <item>Baidu</item>
